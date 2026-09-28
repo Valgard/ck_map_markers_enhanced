@@ -1,0 +1,327 @@
+# The one hand-kept table behind the mod's map-marker icons.
+#
+# tools/generate_icons.py turns it into the five MapMarkerIconDataBlock assets
+# and the C# legacy mapping. Icon order is the order in the marker dialog, and
+# the addresses ascend in that order because each loader sorts its blocks by
+# address. An address is an icon's identity in every saved marker: never change
+# one once it has shipped.
+#
+# A variant's `type` is a MapMarkers+ PlusMarkerType name; its large sprite is
+# markers_<type>. `small` names the minimap slice; without it the minimap uses
+# the large sprite.
+
+[[icon]]
+name = "General"
+address = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
+
+[[icon.variant]]
+type = "QuestionMark"
+small = "markers_QuestionMark_small"
+
+[[icon.variant]]
+type = "ExclamationMark"
+small = "markers_ExclamationMark_small"
+
+[[icon.variant]]
+type = "MusicNote"
+small = "markers_MusicNote_small"
+
+[[icon.variant]]
+type = "Cross"
+small = "markers_Cross_small"
+
+[[icon.variant]]
+type = "ArrowLeft"
+small = "markers_ArrowLeft_small"
+
+[[icon.variant]]
+type = "ArrowRight"
+small = "markers_ArrowRight_small"
+
+[[icon.variant]]
+type = "ArrowUp"
+small = "markers_ArrowUp_small"
+
+[[icon.variant]]
+type = "ArrowDown"
+small = "markers_ArrowDown_small"
+
+[[icon.variant]]
+type = "Chest"
+small = "markers_Chest_small"
+
+[[icon.variant]]
+type = "Sign"
+small = "markers_Sign_small"
+
+[[icon.variant]]
+type = "StructureWood"
+small = "markers_StructureWood_small"
+
+[[icon.variant]]
+type = "StructureStone"
+small = "markers_StructureStone_small"
+
+[[icon.variant]]
+type = "Leaf"
+small = "markers_Leaf_small"
+
+[[icon.variant]]
+type = "Fish"
+small = "markers_Fish_small"
+
+[[icon.variant]]
+type = "Cog"
+small = "markers_Cog_small"
+
+[[icon.variant]]
+type = "Heart"
+small = "markers_Heart_small"
+
+[[icon.variant]]
+type = "Skull"
+small = "markers_skull_small"
+
+[[icon.variant]]
+type = "SkullRed"
+small = "markers_SkullRed_small"
+
+[[icon.variant]]
+type = "Flames"
+small = "markers_Flames_small"
+
+[[icon.variant]]
+type = "Shield"
+small = "markers_Shield_small"
+
+[[icon.variant]]
+type = "Dagger"
+small = "markers_Dagger_small"
+
+[[icon.variant]]
+type = "Axe"
+small = "markers_Axe_small"
+
+[[icon]]
+name = "OresAndGems"
+address = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
+
+[[icon.variant]]
+type = "AncientCrystal"
+small = "markers_ancient_crystal_small"
+
+[[icon.variant]]
+type = "Copper"
+small = "markers_Copper_small"
+
+[[icon.variant]]
+type = "Tin"
+small = "markers_Tin_small"
+
+[[icon.variant]]
+type = "Iron"
+small = "markers_Iron_small"
+
+[[icon.variant]]
+type = "Gold"
+small = "markers_Gold_small"
+
+[[icon.variant]]
+type = "Scarlet"
+small = "markers_Scarlet_small"
+
+[[icon.variant]]
+type = "Octarine"
+small = "markers_Octarine_small"
+
+[[icon.variant]]
+type = "Galaxite"
+small = "markers_Galaxite_small"
+
+[[icon.variant]]
+type = "Solarite"
+small = "markers_Solarite_small"
+
+[[icon.variant]]
+type = "Pandorium"
+small = "markers_Pandorium_small"
+
+[[icon.variant]]
+type = "Relucite"
+small = "markers_Relucite_small"
+
+[[icon]]
+name = "Flags"
+address = "2e4b6d8c-a19b-476a-b770-8e293827689e"
+
+[[icon.variant]]
+type = "FlagRed"
+small = "markers_FlagRed_small"
+
+[[icon.variant]]
+type = "FlagOrange"
+small = "markers_FlagOrange_small"
+
+[[icon.variant]]
+type = "FlagPeach"
+small = "markers_FlagPeach_small"
+
+[[icon.variant]]
+type = "FlagYellow"
+small = "markers_FlagYellow_small"
+
+[[icon.variant]]
+type = "FlagGreen"
+small = "markers_FlagGreen_small"
+
+[[icon.variant]]
+type = "FlagTeal"
+small = "markers_FlagTeal_small"
+
+[[icon.variant]]
+type = "FlagCyan"
+small = "markers_FlagCyan_small"
+
+[[icon.variant]]
+type = "FlagBlue"
+small = "markers_FlagBlue_small"
+
+[[icon.variant]]
+type = "FlagPurple"
+small = "markers_FlagPurple_small"
+
+[[icon.variant]]
+type = "FlagPink"
+small = "markers_FlagPink_small"
+
+[[icon.variant]]
+type = "FlagBrown"
+small = "markers_FlagBrown_small"
+
+[[icon.variant]]
+type = "FlagBlack"
+small = "markers_FlagBlack_small"
+
+[[icon.variant]]
+type = "FlagGray"
+small = "markers_FlagGray_small"
+
+[[icon.variant]]
+type = "FlagWhite"
+small = "markers_FlagWhite_small"
+
+[[icon]]
+name = "Numbers"
+address = "6152c695-14f2-4344-bee4-a2967b880bd3"
+
+[[icon.variant]]
+type = "Number1"
+
+[[icon.variant]]
+type = "Number2"
+
+[[icon.variant]]
+type = "Number3"
+
+[[icon.variant]]
+type = "Number4"
+
+[[icon.variant]]
+type = "Number5"
+
+[[icon.variant]]
+type = "Number6"
+
+[[icon.variant]]
+type = "Number7"
+
+[[icon.variant]]
+type = "Number8"
+
+[[icon.variant]]
+type = "Number9"
+
+[[icon.variant]]
+type = "Number0"
+
+[[icon]]
+name = "Letters"
+address = "77aea3e9-b732-4217-92f4-1bc153361245"
+
+[[icon.variant]]
+type = "LetterA"
+
+[[icon.variant]]
+type = "LetterB"
+
+[[icon.variant]]
+type = "LetterC"
+
+[[icon.variant]]
+type = "LetterD"
+
+[[icon.variant]]
+type = "LetterE"
+
+[[icon.variant]]
+type = "LetterF"
+
+[[icon.variant]]
+type = "LetterG"
+
+[[icon.variant]]
+type = "LetterH"
+
+[[icon.variant]]
+type = "LetterI"
+
+[[icon.variant]]
+type = "LetterJ"
+
+[[icon.variant]]
+type = "LetterK"
+
+[[icon.variant]]
+type = "LetterL"
+
+[[icon.variant]]
+type = "LetterM"
+
+[[icon.variant]]
+type = "LetterN"
+
+[[icon.variant]]
+type = "LetterO"
+
+[[icon.variant]]
+type = "LetterP"
+
+[[icon.variant]]
+type = "LetterQ"
+
+[[icon.variant]]
+type = "LetterR"
+
+[[icon.variant]]
+type = "LetterS"
+
+[[icon.variant]]
+type = "LetterT"
+
+[[icon.variant]]
+type = "LetterU"
+
+[[icon.variant]]
+type = "LetterV"
+
+[[icon.variant]]
+type = "LetterW"
+
+[[icon.variant]]
+type = "LetterX"
+
+[[icon.variant]]
+type = "LetterY"
+
+[[icon.variant]]
+type = "LetterZ"
