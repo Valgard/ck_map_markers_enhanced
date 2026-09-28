@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1194909520, guid: 5a7e404e57a3ed387bf565f46c30b9c1, type: 3}
+  m_Name: General
+  m_EditorClassIdentifier: 
+  m_overload:
+    m_address:
+      m_low: 0
+      m_high: 0
+  m_address:
+    m_low: 5422191513200747415
+    m_high: 6925179451278697144
+  m_dynamicCollections:
+    m_list: []
+  variants:
+  - largeMapSprite: {fileID: 973633699, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -212590887, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 973633699, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -2039649613, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -266973354, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -2039649613, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -820130008, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -58308429, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -820130008, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1242748886, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 2132114114, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1242748886, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1965150259, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 425050904, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 1965150259, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -42445275, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 2045263870, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -42445275, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1249859002, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -1996581259, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1249859002, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 212645416, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 575091257, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 212645416, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -612933561, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -1461592062, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -612933561, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -763866296, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 1197294961, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -763866296, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1153904521, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -21745242, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1153904521, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1808782953, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -1008593549, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1808782953, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 140349268, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -331751143, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 140349268, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1772754390, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -402063026, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 1772754390, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 573984933, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -1996588359, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 573984933, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1313977174, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -887294438, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 1313977174, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1200122449, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 2013586434, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 1200122449, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1834031914, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -676697965, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 1834031914, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1127029842, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -1242000522, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1127029842, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -1438204807, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 189280364, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -1438204807, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: -151160332, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: -2122368767, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: -151160332, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 391421788, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    miniMapSprite: {fileID: 181121707, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+    colorIcon: {fileID: 391421788, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  references:
+    version: 2
+    RefIds: []

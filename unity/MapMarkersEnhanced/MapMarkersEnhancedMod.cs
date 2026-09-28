@@ -1,3 +1,4 @@
+using System.Text;
 using PugMod;
 using UnityEngine;
 
@@ -10,25 +11,70 @@ namespace MapMarkersEnhanced
     /// </summary>
     public sealed class MapMarkersEnhancedMod : IMod
     {
-        public void EarlyInit()
-        {
-        }
+        private static bool s_iconsLogged;
+
+        public void EarlyInit() { }
 
         public void Init()
         {
             Debug.Log("[MapMarkersEnhanced] Mod initialized.");
         }
 
-        public void ModObjectLoaded(Object obj)
-        {
-        }
+        public void ModObjectLoaded(Object obj) { }
 
-        public void Shutdown()
-        {
-        }
+        public void Shutdown() { }
 
         public void Update()
         {
+            if (!s_iconsLogged && ScriptableData.isLoaded)
+            {
+                s_iconsLogged = true;
+                LogIcons();
+            }
+        }
+
+        /// <summary>
+        /// Logs which of the mod's icon addresses the game registered, once per
+        /// session. The addresses are compared as <c>ToString()</c> output against
+        /// <see cref="IconTable.ModIconAddresses"/>; when none match, every
+        /// registered address is printed so a format mismatch is visible.
+        /// </summary>
+        private static void LogIcons()
+        {
+            if (!ScriptableData.TryGetDataBlocks<MapMarkerIconDataBlock>(out var blocks) || blocks == null)
+            {
+                Debug.LogWarning("[MapMarkersEnhanced] icons: no MapMarkerIconDataBlock list registered");
+                return;
+            }
+
+            var found = new StringBuilder();
+            var indices = new StringBuilder();
+            int count = 0;
+            foreach (string wanted in IconTable.ModIconAddresses)
+            {
+                for (int i = 0; i < blocks.Count; i++)
+                {
+                    if (blocks[i] != null && blocks[i].address.ToString() == wanted)
+                    {
+                        count++;
+                        found.Append(' ').Append(wanted);
+                        indices.Append(' ').Append(i);
+                        break;
+                    }
+                }
+            }
+
+            Debug.Log($"[MapMarkersEnhanced] icons: {count}{found} (indices:{indices} of {blocks.Count})");
+
+            if (count == 0)
+            {
+                var all = new StringBuilder();
+                for (int i = 0; i < blocks.Count; i++)
+                {
+                    all.Append(' ').Append(blocks[i] == null ? "<null>" : blocks[i].address.ToString());
+                }
+                Debug.Log($"[MapMarkersEnhanced] icons: none matched; registered addresses:{all}");
+            }
         }
     }
 }
