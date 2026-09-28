@@ -1,0 +1,8 @@
+[b]Map Markers Enhanced[/b]
+
+MapMarkers+'s marker art as native 1.3 map-marker icons, with old markers restored
+
+[h2]Features[/h2]
+[list]
+[*] Describe what the mod does.
+[/list]
