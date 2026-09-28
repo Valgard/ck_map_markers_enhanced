@@ -201,6 +201,24 @@ def test_render_asset_references(icons, ids):
             for v in icon.variants
         ]
         assert mini == expected_mini
+        color = [line.strip() for line in text.splitlines() if "colorIcon:" in line]
+        expected_color = [
+            f"colorIcon: {{fileID: {ids[v.large]}, guid: {PNG_GUID}, type: 3}}"
+            for v in icon.variants
+        ]
+        assert color == expected_color
+
+
+def test_legacy_excluded_is_exactly_the_vanilla_backed_types():
+    """Upstream PlusMarkerUtility.TryGetVanillaInfo let vanilla create these, plus None."""
+    assert {
+        "None",
+        "Ping",
+        "AncientCrystal",
+        "QuestionMark",
+        "Skull",
+        "FlagGreen",
+    } == gi.LEGACY_EXCLUDED
 
 
 def test_render_asset_rejects_missing_sprite(icons, ids):
