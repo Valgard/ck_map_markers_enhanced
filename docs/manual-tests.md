@@ -41,3 +41,21 @@ migration in, never on a live save. Load the copy with the mod enabled.
   question mark (AC5).
 - A fresh world, and the copy after its first restored pass, log no further
   `restored` line (Review Focus 2).
+
+### Result, 2026-09-29 (CK 1.3.0.2, world copy in slot 4)
+
+- `restored 62 legacy markers`, once. The map showed ores and music notes where
+  the question marks were; no unresolved icon in the log.
+- Save scan before/after: 62 markers at `6016`–`6028` before, none at or above
+  `6000` after — a changed `Amount` on an existing entity **is** persisted.
+- Second launch of the same copy: no further `restored` line.
+- **Not testable in 1.3.0.2:** the renamed, restyled and set-back cases. The
+  game cannot edit a placed marker — `MapUI.ApplyEditToExistingMarker` exists
+  but has no caller — so these states cannot be produced. The guards stay;
+  `docs/roadmap.md` ("Edit a placed marker") notes that they become testable
+  once editing exists.
+- Marker counts by byte-pattern scan, player markers at `Amount` 1 / legacy:
+  original world 9 / 62, copy before 9 / 62, after the restoring launch 72 / 0,
+  after the next launch **71 / 0** = 9 + 62. The extra record in the first save
+  was transient — a stale entity-pool record the next save dropped — so compare
+  two consecutive saves before trusting such a count.
