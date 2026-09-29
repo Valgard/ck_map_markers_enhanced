@@ -31,6 +31,8 @@ namespace MapMarkersEnhanced
                 s_iconsLogged = true;
                 LogIcons();
             }
+
+            ScrollToSelectionPatch.Tick();
         }
 
         /// <summary>

@@ -16,3 +16,6 @@ Open the map-marker dialog (create a marker on the large map).
 - `Player.log` holds one `[MapMarkersEnhanced] icon order: moved <n>, ours at
   <indices> of <count>` line per session, and `<indices>` are the last five
   indices of `<count>` (with 13 icons in total: `8,9,10,11,12 of 13`).
+- Edit a preset/marker that uses a mod icon deep in the row (e.g. Letters with
+  variant Z): on open, both the selected icon and the selected variant are
+  visible without scrolling.
