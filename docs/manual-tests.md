@@ -76,3 +76,17 @@ client has enabled — and switched back on for the client afterwards.
 Passed. Server log: 31 mods loaded, none of them MapMarkers. Client log: no
 unresolved icon, no join error, and no `restored` line — restoration is
 server-side, and this server does not have the mod.
+
+## Task 5 on a dedicated server with the mod
+
+A fresh copy of the MapMarkers+ world in its own slot, served by the local
+dedicated server with the mod installed (normal `relink`).
+
+### Result, 2026-09-29 (CK 1.3.0.2)
+
+Passed. The server log shows `restored 62 legacy markers` only after a player
+joined — an empty server does not simulate — and the map showed the restored
+icons. After a clean server stop, the saved world held no marker at or above
+`6000` and 71 = 9 + 62 player markers at `Amount` 1. The dedicated server's
+later `IMod.Init()` does not affect the restore system: it is a managed system
+that needs no Burst workaround.
