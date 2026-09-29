@@ -37,3 +37,25 @@ nothing calls it.
   guards reachable for the first time — a question mark renamed or restyled
   before the mod first sees the world. Those guards are designed for it but so
   far only argued from code; test them in game when this lands.
+
+## More than five presets
+
+The marker bar holds five presets. With five extra icons and up to 26 variants
+each, five quick slots run out fast.
+
+- **What the game does:** five is a literal in six places — the preset bar's
+  construction (`Pug.Other:344430`), `MapUI.EnsurePresetsInitialized`
+  (`345773`), and four range checks in `MapUI` (`345426`, `345440`, `345449`,
+  `345457`). The prefs list itself grows on demand
+  (`PrefsManager.SetMapMarkerPreset`), so storage needs no change. Presets live in
+  the client prefs, not in the world, so this part needs no server.
+- **Approach:** a transpiler would need `OpCodes` from `System.Reflection.Emit`,
+  which the sandbox denies; whether Harmony helpers outside the deny list avoid
+  naming it is untested. The fallback is prefixes that reimplement those six
+  methods with the mod's own limit — each one a copy of vanilla code that can
+  drift at the next update.
+- **Trap:** the bar hides a slot whose preset has no icon, and
+  `EnsurePresetsInitialized` only fills slots 0–4, so slots 5 and up must be
+  pre-filled or they can never be opened.
+- **Unknown:** how many slots the bar can show before it overflows; decide the
+  limit from a look at the prefab or in game.
