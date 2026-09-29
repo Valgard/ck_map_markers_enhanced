@@ -59,3 +59,20 @@ migration in, never on a live save. Load the copy with the mod enabled.
   after the next launch **71 / 0** = 9 + 62. The extra record in the first save
   was transient — a stale entity-pool record the next save dropped — so compare
   two consecutive saves before trusting such a count.
+
+## Task 6 — server without the mod
+
+Local dedicated server (`utils/server.sh`), started with the mod on the client's
+`disabledMods` for the duration of `start` only — `relink` mirrors every mod the
+client has enabled — and switched back on for the client afterwards.
+
+- Join from a client that has the mod: no mod dialog, no version error.
+- Place a marker with one of the mod's icons, stop the server (quit handlers
+  run, world written), start it again the same way, rejoin: the marker still
+  shows its icon (AC6).
+
+### Result, 2026-09-29 (CK 1.3.0.2, world 4)
+
+Passed. Server log: 31 mods loaded, none of them MapMarkers. Client log: no
+unresolved icon, no join error, and no `restored` line — restoration is
+server-side, and this server does not have the mod.
