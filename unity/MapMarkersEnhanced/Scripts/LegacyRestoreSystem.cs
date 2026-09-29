@@ -14,8 +14,8 @@ namespace MapMarkersEnhanced
     /// restoration happen once per marker. A marker restyled since (no longer
     /// the question mark) and an amount the table does not know are left alone;
     /// the first pass in a world that finds legacy-amount markers which are not
-    /// the question mark logs how many, so a changed migration default does not
-    /// leave restoration off without a trace.
+    /// the question mark warns how many, with one of them as an example, so a
+    /// changed migration default does not leave restoration off without a trace.
     /// Runs in the server world only; the serializer and ghost replication carry
     /// the change to the save and to every client.
     /// </summary>
@@ -34,7 +34,7 @@ namespace MapMarkersEnhanced
 
         private readonly Dictionary<int, (DataBlockAddress address, int variant)> _legacy = new Dictionary<int, (DataBlockAddress address, int variant)>();
         private readonly List<Entity> _matches = new List<Entity>();
-        private readonly List<Entity> _skipped = new List<Entity>();
+        private readonly List<(DataBlockAddress address, int variant)> _skipped = new List<(DataBlockAddress address, int variant)>();
 
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
@@ -102,7 +102,7 @@ namespace MapMarkersEnhanced
             // serializer and ghost replication revisit all markers every pass.
             Dictionary<int, (DataBlockAddress address, int variant)> legacy = _legacy;
             List<Entity> matches = _matches;
-            List<Entity> skipped = _skipped;
+            List<(DataBlockAddress address, int variant)> skipped = _skipped;
             DataBlockAddress questionMark = _questionMark;
             matches.Clear();
             skipped.Clear();
@@ -119,7 +119,8 @@ namespace MapMarkersEnhanced
                             }
                             else
                             {
-                                skipped.Add(entity);
+                                // Copied out of the `in` parameter; the scan stays read-only.
+                                skipped.Add((custom.iconAddress, custom.variantIndex));
                             }
                         }
                     }
@@ -129,10 +130,19 @@ namespace MapMarkersEnhanced
 
             if (skipped.Count > 0 && !_skippedLogged)
             {
-                // Expected only after a game change to the migration's defaults, or a
-                // player edit that kept the legacy amount; either way nothing is restored.
+                // On CK 1.3.0.2 a placed marker cannot be edited (MapUI.ApplyEditToExistingMarker
+                // has no caller), so nothing a player does leaves a legacy amount on another
+                // icon. A skipped marker therefore most likely means a game update changed
+                // what the version-13 migration writes, which stops restoration entirely; the
+                // example is the new icon and variant to compare against the constants above.
+                // A player edit becomes possible only in a future version that allows editing.
                 _skippedLogged = true;
-                Debug.Log($"[MapMarkersEnhanced] skipped {skipped.Count} legacy markers that are not the migration's question mark");
+                (DataBlockAddress address, int variant) sample = skipped[0];
+                Debug.LogWarning(
+                    $"[MapMarkersEnhanced] skipped {skipped.Count} legacy markers that are not the migration's question mark "
+                        + $"(expected {QuestionMarkAddress} variant {QuestionMarkVariant}, e.g. {sample.address} variant {sample.variant}); "
+                        + "they are not restored"
+                );
             }
             skipped.Clear();
 
