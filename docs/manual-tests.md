@@ -4,6 +4,79 @@ This mod has no C# test harness, so behaviour that only the running game can
 show is checked here, in game, after a build. Each section lists what to check,
 then what the last run found.
 
+## Reading the log
+
+Every line the mod writes starts with `[MapMarkersEnhanced]`, so
+`grep MapMarkersEnhanced Player.log` shows all of them. A healthy session prints
+only these, each at most once:
+
+- `Mod initialized.` — at load.
+- `icons: 5 <addresses> (indices: <i> … of <count>)` — once the game data is
+  loaded; the five addresses are `ModIconAddresses` in `IconTable.g.cs`.
+- `icon order: moved <n>, ours at <indices> of <count>` — the first time the
+  marker dialog opens; `<indices>` are the last five of `<count>`.
+- `restored <n> legacy markers` — only on a world with MapMarkers+ markers the
+  1.3 migration turned into question marks, and only on the first load there. It
+  comes from the server world, so with a dedicated server it is in the server's
+  log, not the client's.
+
+Anything else is a warning or an error. Each is logged once per session (the
+restoration ones once per world), never per frame:
+
+- `icons: no MapMarkerIconDataBlock list registered` — the game has no icon list
+  at all, so the icon type or its loading changed in a game update. Check the
+  decompile for `MapMarkerIconDataBlock` and `ScriptableData.TryGetDataBlocks`.
+- `icons: <n> <addresses> (indices: … of <count>); only <n> of 5 registered` —
+  some of the mod's icons did not load, and markers using a missing one show
+  the game's fallback sprite. Check that the five `.asset` files are in the
+  build and that `uv run tools/generate_icons.py --check` passes.
+- `icons: none matched; registered addresses: <all addresses>` — follows the
+  line above when not one icon matched. Compare the printed addresses with
+  `ModIconAddresses`: a different format means `DataBlockAddress.ToString()`
+  changed, the same format means the icons were not loaded.
+- `icon order failed with an exception; icons stay where the game put them` —
+  followed by the exception. The dialog still opens, the mod's icons most likely
+  in front of vanilla's; the stack trace names the cause.
+- `icon order: no MapMarkerIconDataBlock list registered` — as the `icons:`
+  line of the same text, seen from the dialog.
+- `icon order: the icon list is not a List<>, so it cannot be reordered; icons
+  stay in front` — `ScriptableData.TryGetDataBlocks` now hands out another
+  collection type. Check its return value in the decompile.
+- `icon order: the reorder did not stick (the list is not live); icons stay in
+  front` — the list is a copy rather than the game's own, so the dialog reads
+  another one. Check what `PopulateIconRow` iterates.
+- `icon order: only <n> of the mod's 5 icons are registered` — as the `only <n>
+  of 5 registered` line above.
+- `icon order: the mod's icons are at the end but not in table order` — the
+  addresses no longer sort in table order. Check the address rule in
+  `CLAUDE.md` and run `uv run tools/generate_icons.py --check`.
+- `cannot scroll the marker dialog to a mod icon: <problem>` — a preset with a
+  mod icon opened with its icon or variant out of view. `<problem>` is one of
+  `the icon row has no selected tile for it` (the icon is missing from the row,
+  or the game's selection works differently), `the selected tile has no
+  UIComponentMonoBehaviour`, `the scrollable's content has no
+  UIComponentMonoBehaviour` or `no ScrollableUIComponent above the selected
+  tile` (the dialog's UI hierarchy changed). Check the icon lines above first,
+  then `MapMarkerCustomizationPanel` in the decompile.
+- `could not scroll the marker dialog to the selection: <exception>` — the
+  scroll threw. The dialog still works, unscrolled; the exception names the
+  cause.
+- `skipped <n> legacy markers that are not the migration's question mark
+  (expected <address> variant 9, e.g. <address> variant <v>); they are not
+  restored` — markers still carry a MapMarkers+ amount but not the icon the
+  migration is known to write. On 1.3.0.2 a player cannot produce this, since a
+  placed marker cannot be edited, so it most likely means a game update changed
+  what the version-13 migration writes, and restoration no longer runs. Compare
+  the example with `QuestionMarkAddress` and `QuestionMarkVariant` in
+  `LegacyRestoreSystem.cs` and with `ConvertOldMapMarkersSystem` in the
+  decompile.
+
+Two errors, both from restoration, each followed by the exception:
+`legacy marker table could not be parsed; restoration is off` (an address in
+`IconTable.g.cs` does not parse — regenerate and check) and `legacy marker
+restoration failed; will keep trying silently` (the pass threw; the stack trace
+names the cause).
+
 ## Icons in the dialog and on the map
 
 Open the map-marker dialog (create a marker on the large map).
