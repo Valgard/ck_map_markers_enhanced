@@ -1,48 +1,79 @@
 # Manual tests
 
 This mod has no C# test harness, so behaviour that only the running game can
-show is checked here, in game, after a build.
+show is checked here, in game, after a build. Each section lists what to check,
+then what the last run found.
 
-## Task 4 — icon order
+## Icons in the dialog and on the map
 
 Open the map-marker dialog (create a marker on the large map).
+
+- `Player.log` holds `Successfully compiled MapMarkersEnhanced` and one
+  `[MapMarkersEnhanced] icons: 5 <address> …` line whose five addresses equal
+  `ModIconAddresses` in `IconTable.g.cs`; no error line names the mod or one of
+  its icons.
+- The dialog shows five extra icons — General, Ores and Gems, Flags, Numbers,
+  Letters — each with all of its variants (Ores and Gems: 11, Copper included;
+  Letters: A–Z).
+- Place one marker per icon: each shows its icon on the large map and on the
+  minimap.
+- Restart the game: every placed marker still shows its icon.
+
+**Result, 2026-09-29 (CK 1.3.0.2):**
+
+Passed, with one known limitation. All five addresses were registered as in the
+table; the dialog showed every icon and variant; five placed markers (cross,
+flag, 6, F, an ore) showed their icons on the large map and kept them after a
+restart. **On the minimap, Numbers and Letters are too large**: they use their
+full-size sprite, which fills the cell and overlaps neighbouring markers. The
+slots below them in the sheet are blank placeholder buttons, not usable small
+sprites — kept for 1.0.0, redraw planned in `docs/roadmap.md`.
+
+## Icon order and scrolling
 
 - The icon row reads: the vanilla icons (8), then General, Ores and Gems, Flags,
   Numbers, Letters.
 - Close and reopen the dialog five times: the order stays the same and no tiles
   are added.
-- `Player.log` holds no `[MapMarkersEnhanced] icon order could not be changed;
-  icons stay in front` warning.
 - `Player.log` holds one `[MapMarkersEnhanced] icon order: moved <n>, ours at
   <indices> of <count>` line per session, and `<indices>` are the last five
-  indices of `<count>` (with 13 icons in total: `8,9,10,11,12 of 13`).
-- Edit a preset/marker that uses a mod icon deep in the row (e.g. Letters with
-  variant Z): on open, both the selected icon and the selected variant are
-  visible without scrolling.
+  indices of `<count>` (with 13 icons in total: `8,9,10,11,12 of 13`); no icon
+  order warning.
+- Edit a preset that uses a mod icon deep in the row (e.g. Letters, variant Z):
+  on open, both the selected icon and the selected variant are visible without
+  scrolling. A preset with a vanilla icon still opens at the start of the row.
 
-## Task 5 — legacy restoration
+**Result, 2026-09-29 (CK 1.3.0.2):**
 
-Only ever on a copy of a world that MapMarkers+ markers went through the 1.3
-migration in, never on a live save. Load the copy with the mod enabled.
+Passed. Log: `moved 13, ours at 8,9,10,11,12 of 13`, no warning; repeated
+opening kept the order. Scrolling was added after the first run showed the row
+opening at its start, with the mod's icons now out of view — an ore preset, a
+Letters/Z preset and a vanilla preset then all opened correctly.
+
+## Legacy restoration
+
+Only ever on a copy of a world whose MapMarkers+ markers went through the 1.3
+migration, never on a live save. How the copy was made: with the game closed,
+back up `worlds/`, `worldinfos/` and `maps/`; copy `worlds/<n>.world.gzip` to a
+free slot number and `worldinfos/<n>.worldinfo` beside it, changing only its
+`"name"`. The copy keeps the original's `guid`; that caused no problem here.
+Load the copy with the mod enabled.
 
 - Every question mark the migration made of a MapMarkers+ marker shows its
   original icon again, and `Player.log` holds one `[MapMarkersEnhanced] restored
   <n> legacy markers` line.
-- A question mark that was renamed before loading becomes its icon and keeps
-  its name.
-- A marker that was restyled before loading (another icon or variant than the
-  question mark) stays exactly as it was.
 - Restart the game and load the copy again: every restored marker still shows
-  its icon. A scan of the saved copy (method: `docs/ck/savegame-formats.md` in
-  the parent repository) shows the restored markers at `Amount` 1 and none left
-  at `6000 +` a mapped type. This is the check that settles whether a changed
-  `Amount` on an existing entity is persisted.
-- Set one restored marker back to the question mark, then restart: it stays a
-  question mark (AC5).
-- A fresh world, and the copy after its first restored pass, log no further
-  `restored` line (Review Focus 2).
+  its icon, and no further `restored` line appears. A scan of the saved copy
+  (method: `docs/ck/savegame-formats.md` in the parent repository) shows the
+  restored markers at `Amount` 1 and none left at `6000 +` a mapped type — the
+  check that settles whether a changed `Amount` on an existing entity is
+  persisted.
+- When the game can edit placed markers: a question mark renamed before the
+  mod's first load becomes its icon and keeps its name; one restyled to another
+  icon stays as it was; a restored marker set back to the question mark stays a
+  question mark after a restart.
 
-### Result, 2026-09-29 (CK 1.3.0.2, world copy in slot 4)
+**Result, 2026-09-29 (CK 1.3.0.2, single-player copy):**
 
 - `restored 62 legacy markers`, once. The map showed ores and music notes where
   the question marks were; no unresolved icon in the log.
@@ -60,7 +91,21 @@ migration in, never on a live save. Load the copy with the mod enabled.
   was transient — a stale entity-pool record the next save dropped — so compare
   two consecutive saves before trusting such a count.
 
-## Task 6 — server without the mod
+## Legacy restoration on a dedicated server
+
+A fresh copy of the MapMarkers+ world in its own slot, served by the local
+dedicated server with the mod installed (normal `relink`).
+
+**Result, 2026-09-29 (CK 1.3.0.2):**
+
+Passed. The server log shows `restored 62 legacy markers` only after a player
+joined — an empty server does not simulate — and the map showed the restored
+icons. After a clean server stop, the saved world held no marker at or above
+`6000` and 71 = 9 + 62 player markers at `Amount` 1. The dedicated server's
+later `IMod.Init()` does not affect the restore system: it is a managed system
+that needs no Burst workaround.
+
+## Server without the mod
 
 Local dedicated server (`utils/server.sh`), started with the mod on the client's
 `disabledMods` for the duration of `start` only — `relink` mirrors every mod the
@@ -69,24 +114,23 @@ client has enabled — and switched back on for the client afterwards.
 - Join from a client that has the mod: no mod dialog, no version error.
 - Place a marker with one of the mod's icons, stop the server (quit handlers
   run, world written), start it again the same way, rejoin: the marker still
-  shows its icon (AC6).
+  shows its icon.
 
-### Result, 2026-09-29 (CK 1.3.0.2, world 4)
+**Result, 2026-09-29 (CK 1.3.0.2):**
 
-Passed. Server log: 31 mods loaded, none of them MapMarkers. Client log: no
-unresolved icon, no join error, and no `restored` line — restoration is
-server-side, and this server does not have the mod.
+Passed. The server log lists 31 loaded mods, none of them MapMarkers — that is
+what shows the server ran without the mod. Both joins raised no mod dialog; the
+client log shows no unresolved icon and no join error.
 
-## Task 5 on a dedicated server with the mod
+## Without the mod on the client
 
-A fresh copy of the MapMarkers+ world in its own slot, served by the local
-dedicated server with the mod installed (normal `relink`).
+Load a world that holds markers placed with the mod's icons while the mod is
+switched off on the client — the state a player is in after uninstalling, or a
+player without the mod on a shared world.
 
-### Result, 2026-09-29 (CK 1.3.0.2)
+**Result, 2026-09-29 (CK 1.3.0.2):**
 
-Passed. The server log shows `restored 62 legacy markers` only after a player
-joined — an empty server does not simulate — and the map showed the restored
-icons. After a clean server stop, the saved world held no marker at or above
-`6000` and 71 = 9 + 62 player markers at `Amount` 1. The dedicated server's
-later `IMod.Init()` does not affect the restore system: it is a managed system
-that needs no Burst workaround.
+Such a marker shows the marker prefab's default sprite — a blue diamond — not
+nothing, and `Player.log` repeats `Failed to resolve MapMarkerIconDataBlock at
+address <address> for map marker entity …` on every redraw (over 1000 lines in a
+few minutes for two markers). Re-enabling the mod brings the icons back.
