@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef61ecb41356dbc4db1133ad6be0ebf9, type: 3}
   m_Name: MapMarkersEnhanced_Steam
   m_EditorClassIdentifier: 
-  fileId: 0
-  modOwner: 
+  fileId: 3810221199
+  modOwner: 76561197970776512
   modName: MapMarkersEnhanced
-  selectedPath: 
-  tags: []
+  selectedPath: /var/folders/3h/ckl4plz52xjbfgl5jqt4b8280000gn/T/Pugstorm/CKModSDK/a3a4ac40-99d9-40f6-917a-604af3caea74
+  tags:
+  - Quality of Life
+  - Client
+  - Script
