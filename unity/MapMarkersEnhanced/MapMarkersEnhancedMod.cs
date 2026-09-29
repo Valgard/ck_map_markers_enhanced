@@ -37,7 +37,8 @@ namespace MapMarkersEnhanced
 
         /// <summary>
         /// Logs which of the mod's icon addresses the game registered, once per
-        /// session. The addresses are compared as <c>ToString()</c> output against
+        /// session, as a warning when fewer than all of them are there. The addresses
+        /// are compared as <c>ToString()</c> output against
         /// <see cref="IconTable.ModIconAddresses"/>; when none match, every
         /// registered address is printed so a format mismatch is visible.
         /// </summary>
@@ -66,7 +67,16 @@ namespace MapMarkersEnhanced
                 }
             }
 
-            Debug.Log($"[MapMarkersEnhanced] icons: {count}{found} (indices:{indices} of {blocks.Count})");
+            string line = $"[MapMarkersEnhanced] icons: {count}{found} (indices:{indices} of {blocks.Count})";
+            if (count < IconTable.ModIconAddresses.Length)
+            {
+                // A missing icon turns every marker using it into the game's fallback sprite.
+                Debug.LogWarning($"{line}; only {count} of {IconTable.ModIconAddresses.Length} registered");
+            }
+            else
+            {
+                Debug.Log(line);
+            }
 
             if (count == 0)
             {
@@ -75,7 +85,7 @@ namespace MapMarkersEnhanced
                 {
                     all.Append(' ').Append(blocks[i] == null ? "<null>" : blocks[i].address.ToString());
                 }
-                Debug.Log($"[MapMarkersEnhanced] icons: none matched; registered addresses:{all}");
+                Debug.LogWarning($"[MapMarkersEnhanced] icons: none matched; registered addresses:{all}");
             }
         }
     }

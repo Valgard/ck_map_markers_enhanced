@@ -12,7 +12,10 @@ namespace MapMarkersEnhanced
     /// gives it the mapped icon and variant from <see cref="IconTable.Legacy"/>
     /// and sets <c>Amount</c> to 1, vanilla's value, which is what makes the
     /// restoration happen once per marker. A marker restyled since (no longer
-    /// the question mark) and an amount the table does not know are left alone.
+    /// the question mark) and an amount the table does not know are left alone;
+    /// the first pass in a world that finds legacy-amount markers which are not
+    /// the question mark logs how many, so a changed migration default does not
+    /// leave restoration off without a trace.
     /// Runs in the server world only; the serializer and ghost replication carry
     /// the change to the save and to every client.
     /// </summary>
@@ -31,10 +34,12 @@ namespace MapMarkersEnhanced
 
         private readonly Dictionary<int, (DataBlockAddress address, int variant)> _legacy = new Dictionary<int, (DataBlockAddress address, int variant)>();
         private readonly List<Entity> _matches = new List<Entity>();
+        private readonly List<Entity> _skipped = new List<Entity>();
 
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
         private bool _failureLogged;
+        private bool _skippedLogged;
 
         protected override void OnCreate()
         {
@@ -97,26 +102,39 @@ namespace MapMarkersEnhanced
             // serializer and ghost replication revisit all markers every pass.
             Dictionary<int, (DataBlockAddress address, int variant)> legacy = _legacy;
             List<Entity> matches = _matches;
+            List<Entity> skipped = _skipped;
             DataBlockAddress questionMark = _questionMark;
             matches.Clear();
+            skipped.Clear();
 
             Entities
                 .ForEach(
                     (Entity entity, in ObjectDataCD data, in MapMarkerCustomDataCD custom) =>
                     {
-                        if (
-                            data.objectID == ObjectID.MapMarker
-                            && legacy.ContainsKey(data.amount)
-                            && custom.iconAddress == questionMark
-                            && custom.variantIndex == QuestionMarkVariant
-                        )
+                        if (data.objectID == ObjectID.MapMarker && legacy.ContainsKey(data.amount))
                         {
-                            matches.Add(entity);
+                            if (custom.iconAddress == questionMark && custom.variantIndex == QuestionMarkVariant)
+                            {
+                                matches.Add(entity);
+                            }
+                            else
+                            {
+                                skipped.Add(entity);
+                            }
                         }
                     }
                 )
                 .WithoutBurst()
                 .Run();
+
+            if (skipped.Count > 0 && !_skippedLogged)
+            {
+                // Expected only after a game change to the migration's defaults, or a
+                // player edit that kept the legacy amount; either way nothing is restored.
+                _skippedLogged = true;
+                Debug.Log($"[MapMarkersEnhanced] skipped {skipped.Count} legacy markers that are not the migration's question mark");
+            }
+            skipped.Clear();
 
             if (matches.Count == 0)
             {
