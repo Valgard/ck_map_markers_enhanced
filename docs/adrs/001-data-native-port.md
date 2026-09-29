@@ -59,11 +59,11 @@ Four decisions follow from it:
   and legacy type; a script generates the assets and the C# legacy mapping from
   it, and a missing sprite aborts generation. MapMarkers+ resolved sprites by
   name at runtime and fell back to a placeholder silently.
-- **Icons behind vanilla's.** In practice the game lists mod blocks before its
-  own, for reasons the decompile does not explain. `TryGetDataBlocks` hands out
-  its live list, so a Harmony prefix on the dialog's only reader of it moves
-  the mod's blocks to the end, stably, and warns if a later version hands out a
-  copy instead.
+- **Icons behind vanilla's.** The game listed mod blocks before its own —
+  observed in one run; the decompile does not explain it. `TryGetDataBlocks`
+  hands out its live list, so a Harmony prefix on the dialog's only reader of
+  it moves the mod's blocks to the end, stably, and warns if a later version
+  hands out a copy instead.
 - **Restoration on the server.** An ECS system in the server world restores any
   marker that is a `MapMarker`, carries a known legacy `Amount`, and still shows
   the migration's question mark. It then sets `Amount` to `1`, vanilla's value,
@@ -74,8 +74,10 @@ Four decisions follow from it:
 
 - **`requiredOn` drops from `3` to `1`.** The mod has no commands of its own
   any more, and vanilla's marker RPC stores an address without checking it, so a
-  server works without the mod. Players without it see the marker prefab's
-  default sprite and an error per redraw.
+  dedicated server works without the mod; a hosting player needs it to see the
+  icons. Players without it see a stand-in — a blue diamond on a fresh display
+  element, possibly another marker's icon on a reused one — and an error per
+  redraw.
 - **Uninstalling leaves markers the game cannot draw**, and restoration has
   already discarded the legacy type, so a restored marker cannot become a
   question mark again. Reinstalling brings the icons back, because the addresses
@@ -96,10 +98,10 @@ copy, with the changed `Amount` confirmed in the saved file and no second
 restoration on the next launch ("Legacy restoration"), and restoration on a
 dedicated server ("Legacy restoration on a dedicated server"); a marker
 surviving a restart of a dedicated server without the mod ("Server without the
-mod"); and the default sprite with an error per redraw on a client without the
-mod ("Without the mod on the client"). Not testable on 1.3.0.2: restoration of
-a renamed or restyled question mark, because the game cannot edit a placed
-marker.
+mod"); and a blue diamond right after launch with an error per redraw on a
+client without the mod ("Without the mod on the client"). Not testable on
+1.3.0.2: restoration of a renamed or restyled question mark, because the game
+cannot edit a placed marker.
 
 ## Pros and Cons of the Options
 
@@ -120,7 +122,7 @@ marker.
 ### 3. Data-native
 
 - Good, because the mod is data plus two small patches and one system.
-- Good, because a server needs nothing.
+- Good, because a dedicated server needs nothing.
 - Bad, because the minimap needs a small sprite per variant, which Numbers and
   Letters do not have yet.
 - Bad, because the icon order depends on the game handing out a live list.

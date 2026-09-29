@@ -53,16 +53,17 @@ marker used to be.
 Every player who wants to see the mod's icons needs the mod.
 
 - **On a server that has the mod**, every joining player must have it too.
-- **On a server without the mod**, you can join and place markers with the
-  mod's icons; they are saved with the world and still show after a server
-  restart. Players without the mod see a plain blue diamond where such a marker
-  is. Old MapMarkers+ markers are not restored there, because restoration runs
-  only where the world runs.
+- **On a server without the mod**, you can join and place markers with the mod's
+  icons; they are saved with the world and still show after a server restart.
+  Players without the mod see a stand-in where such a marker is: usually a blue
+  diamond, but at times the icon of another marker. Old MapMarkers+ markers are
+  not restored there, because restoration runs only where the world runs.
 
 ## Uninstalling
 
 A marker that uses one of the mod's icons — one you placed, or one the mod
-restored — shows as a plain blue diamond without the mod, and the game logs an
+restored — loses its icon without the mod. It shows a stand-in instead, usually
+a blue diamond but at times the icon of another marker, and the game logs an
 error for it every time it draws it. Reinstalling brings the icons back: each
 icon has a fixed identity that saved markers refer to. What does not come back
 is the MapMarkers+ type a restored marker once carried, as described above.

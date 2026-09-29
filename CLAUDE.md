@@ -48,9 +48,11 @@ beside the new one at the same address — fails both modes (exit 1); delete it
 by hand.
 
 **Addresses are identities.** A saved marker stores its icon's address, so an
-address that has shipped never changes, and an icon is never removed — either
-turns every marker using it into the blue fallback diamond. Within the mod, the
-dialog order is the address order (the game sorts each loader's blocks by
+address that has shipped never changes, and an icon is never removed: either
+leaves every marker using it without its icon. Such a marker shows whatever
+sprite its display element last had — a blue diamond on a fresh one, another
+marker's icon on a reused one — and logs an error every frame. Within the mod,
+the dialog order is the address order (the game sorts each loader's blocks by
 address), so a new icon appended after Letters needs an address greater than the
 last one, and every address starts with a hex digit `0`–`7`, which the generator
 enforces — `Guid.CompareTo` compares the first field unsigned today, and the
@@ -81,7 +83,7 @@ marker buttons") has what to change once the art exists.
 | Legacy amount | `6000 + (int)PlusMarkerType` | MapMarkers+ 1.1.1's `PlusMarker.AmountBase`; `LEGACY_TYPES` in the generator is the enum in order (85 entries) |
 | Types with no legacy amount | `None`, `Ping`, `AncientCrystal`, `QuestionMark`, `Skull`, `FlagGreen` | MapMarkers+ let the game create these, so they carry `Amount` 1 (`LEGACY_EXCLUDED`) |
 | `MapMarkerIconDataBlock` script reference | `{fileID: 1194909520, guid: 5a7e404e57a3ed387bf565f46c30b9c1, type: 3}` | written into every generated asset |
-| `requiredOn` | `1` (Client) | the server stores icon addresses without checking them, so it does not need the mod |
+| `requiredOn` | `1` (Client) | the server stores icon addresses without checking them, so a dedicated server does not need the mod; a hosting player does, to see the icons |
 | `skipSafetyChecks` | `false` | no `System.IO`, no `System.Reflection` — not even `GetType().Name` — no `AccessTools`/`Traverse` |
 
 Restoration clears `Amount` to `1`, vanilla's value. That is what makes it run

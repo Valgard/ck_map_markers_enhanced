@@ -130,7 +130,13 @@ player without the mod on a shared world.
 
 **Result, 2026-09-29 (CK 1.3.0.2):**
 
-Such a marker shows the marker prefab's default sprite — a blue diamond — not
+Right after launch such a marker showed a blue diamond — the marker prefab's
+default sprite, since its display element was freshly instantiated — not
 nothing, and `Player.log` repeats `Failed to resolve MapMarkerIconDataBlock at
 address <address> for map marker entity …` on every redraw (over 1000 lines in a
 few minutes for two markers). Re-enabling the mod brings the icons back.
+
+The diamond is not guaranteed: the game assigns no sprite when the icon cannot
+be resolved, and it reuses display elements from a pool without resetting their
+sprite, so a reused element can go on showing another marker's icon. That case
+was not observed in this run.
