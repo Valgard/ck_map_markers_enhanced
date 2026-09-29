@@ -4,7 +4,7 @@ All notable changes to this mod are documented here. The format is loosely based
 on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the topmost `## [x.y.z]` entry is the current published
 version.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-09-29
 
 First release, for Core Keeper 1.3: moorowl's MapMarkers+ marker art as native
 map-marker icons, and the old MapMarkers+ markers restored.
