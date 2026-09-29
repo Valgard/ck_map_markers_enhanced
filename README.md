@@ -13,8 +13,9 @@ turned into the same yellow question mark.
   Letters (26, A–Z). Pick an icon in the upper row, then the marker in the lower
   one.
 - **Everything else is the game's own.** Naming a marker, the five presets, the
-  minimap, multiplayer and saving work exactly as they do for vanilla markers,
-  because the mod adds icons and nothing else.
+  minimap, multiplayer and saving work exactly as they do for vanilla markers:
+  the mod adds icons, keeps the dialog scrolled to your selection and restores
+  old markers, and leaves the rest to the game.
 - **The dialog opens on your selection.** When you open a preset that uses one
   of the mod's icons, the dialog scrolls so the selected icon and marker are in
   view instead of starting at the left end.

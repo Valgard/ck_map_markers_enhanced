@@ -24,9 +24,11 @@ buttons with no glyph, so they were left unused for 1.0.0.
 Core Keeper 1.3.0.2 cannot edit a marker once it is placed: the only way to
 rename it or change its icon is to delete it and place a new one from a preset.
 The game already contains the edit path — `MapUI.ApplyEditToExistingMarker`
-(`Pug.Other:345602`) and the `EditCustomMapMarker` command, whose server handler
-updates icon, variant and name of an existing marker (`Pug.Other:413849`) — but
-nothing calls it.
+(`Pug.Other:345602`) calls `PlayerCommandSystem.EditCustomMapMarker`
+(`Pug.Other:413566`), which sends the same `MapMarkerRpc` as placing a marker,
+with a target entity set; the server's edit branch then overwrites that marker's
+icon, variant and name (`Pug.Other:413869`) — but nothing calls
+`ApplyEditToExistingMarker`.
 
 - **Idea:** open the customization dialog on an existing marker (e.g. from its
   context action on the map) and route the confirm to `ApplyEditToExistingMarker`.

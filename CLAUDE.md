@@ -51,11 +51,13 @@ by hand.
 address that has shipped never changes, and an icon is never removed — either
 turns every marker using it into the blue fallback diamond. Within the mod, the
 dialog order is the address order (the game sorts each loader's blocks by
-address), so a new icon appended after Letters needs an address greater than
-the last one, and every address starts with a hex digit `0`–`7`, which the
-generator enforces. Mint one with `uuid4()`, regenerating until both hold. Variants
-can be appended to an icon freely; reordering or removing them changes what
-existing markers show, since a marker stores the variant's index.
+address), so a new icon appended after Letters needs an address greater than the
+last one, and every address starts with a hex digit `0`–`7`, which the generator
+enforces — `Guid.CompareTo` compares the first field unsigned today, and the
+rule keeps the order right should anything ever compare it signed. Mint one with
+`uuid4()`, regenerating until both hold. Variants can be appended to an icon
+freely; reordering or removing them changes what existing markers show, since a
+marker stores the variant's index.
 
 The asset `.meta` GUIDs are derived from the icon names (`uuid5`), so renaming
 an icon changes its asset GUID. Nothing references those GUIDs today; the
@@ -102,10 +104,12 @@ this history — its hashes differ by design.
 - **In game:** `docs/manual-tests.md`, written before each piece was built and
   holding the recorded results. Read it before an in-game check.
 - **Restoration only ever on a copy of a world**, never on a live save. How the
-  copy was made and scanned is in the Task 5 result there.
-- **Server without the mod:** put the mod on the client's `disabledMods` for the
-  duration of `utils/server.sh start` only — `relink` mirrors every mod the
-  client has enabled — then switch it back on for the client.
+  copy is made is in the "Legacy restoration" section there; the scan method is
+  `docs/ck/savegame-formats.md` in the parent repository.
+- **Server without the mod** (its own section there): put the mod on the
+  client's `disabledMods` for the duration of `utils/server.sh start` only —
+  `relink` mirrors every mod the client has enabled — then switch it back on for
+  the client.
 - Keep MapMarkers+ disabled in the client: it no longer compiles on 1.3, and
   its load failure would accompany every launch.
 

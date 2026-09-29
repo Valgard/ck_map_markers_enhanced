@@ -62,8 +62,8 @@ Four decisions follow from it:
 - **Icons behind vanilla's.** In practice the game lists mod blocks before its
   own, for reasons the decompile does not explain. `TryGetDataBlocks` hands out
   its live list, so a Harmony prefix on the dialog's only reader of it moves
-  the mod's blocks to the end, stably, and warns once if a later version hands
-  out a copy instead.
+  the mod's blocks to the end, stably, and warns if a later version hands out a
+  copy instead.
 - **Restoration on the server.** An ECS system in the server world restores any
   marker that is a `MapMarker`, carries a known legacy `Amount`, and still shows
   the migration's question mark. It then sets `Amount` to `1`, vanilla's value,
@@ -87,12 +87,19 @@ Four decisions follow from it:
 
 ### Confirmation
 
-Verified in game on Core Keeper 1.3.0.2 (`docs/manual-tests.md`): the dialog
-order, restart persistence, restoration of 62 legacy markers on a world copy
-with the changed `Amount` confirmed in the saved file, no second restoration on
-the next launch, and a marker surviving a restart of a dedicated server without
-the mod. Not testable on 1.3.0.2: restoration of a renamed or restyled question
-mark, because the game cannot edit a placed marker.
+Verified in game on Core Keeper 1.3.0.2, each under its section in
+`docs/manual-tests.md`: every icon and variant in the dialog, and one placed
+marker per icon keeping its icon on the large map across a restart ("Icons in
+the dialog and on the map"); the dialog order and the scroll to a selected mod
+icon ("Icon order and scrolling"); restoration of 62 legacy markers on a world
+copy, with the changed `Amount` confirmed in the saved file and no second
+restoration on the next launch ("Legacy restoration"), and restoration on a
+dedicated server ("Legacy restoration on a dedicated server"); a marker
+surviving a restart of a dedicated server without the mod ("Server without the
+mod"); and the default sprite with an error per redraw on a client without the
+mod ("Without the mod on the client"). Not testable on 1.3.0.2: restoration of
+a renamed or restyled question mark, because the game cannot edit a placed
+marker.
 
 ## Pros and Cons of the Options
 
