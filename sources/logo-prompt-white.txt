@@ -1,0 +1,7 @@
+A square mod logo in the exact hand-painted "sticker" concept-art style of the two reference images: same palette, same thick dark outline weight, same painterly shading, same warm golden radial glow behind the subject, same scattered golden 4-point sparkles. Not pixel art.
+
+Hero object, centred with generous margin on all sides: a large map location pin (teardrop-shaped map marker pin) in teal / petrol-green with a thick dark outline and polished brass-gold trim, standing slightly tilted in front of a small rolled-open parchment treasure map sheet.
+
+Gesture, small and in gold: three small square map-marker tiles fanned out like a hand of cards beside the base of the pin, each tile framed in brass-gold and carrying a simple emblem — a faceted ore crystal, a small treasure chest, a heart.
+
+Plain pure white background (#FFFFFF), nothing else in the background. No text, no letters, no words, no watermark, no frame, no border.

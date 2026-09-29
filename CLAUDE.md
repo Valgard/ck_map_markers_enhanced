@@ -127,5 +127,11 @@ source ../../../.envrc && source .envrc && ../../../utils/build.sh
 
 ## Logo
 
-Not made yet; the scaffold's placeholder is in `Editor/logo.png`. The planned
-gesture for the family style is a map pin with small gold marker symbols.
+`Editor/logo.png` follows the family style: a teal map pin with gold trim in
+front of a parchment map, and as the gesture three marker tiles fanned below it
+— ore, chest, heart — after the three fanned tiles of moorowl's original
+MapMarkers+ logo. It is candidate 4 of `sources/`, generated with the
+reusable-cattle-box and caveling-divining-rod logos as references (prompt:
+`sources/logo-prompt-white.txt`) and matted from `logo 4 - white background.jpeg`
+and `logo 4 - black background.jpeg`, the black render that registered best with
+the white one of three. The other candidates stay in `sources/`.
