@@ -39,8 +39,13 @@ uv run --with pytest pytest tools/tests -q
 
 The tests compare the table with MapMarkers+ 1.1.1's category lists, copied
 into the test file as literals, so they check the table against upstream rather
-than against itself. A sprite name the sheet does not have aborts generation
-instead of shipping a blank tile.
+than against itself; the same goes for `LEGACY_TYPES` against MapMarkers+'s
+`PlusMarkerType`, and for the five shipped addresses. A sprite name the sheet
+does not have aborts generation instead of shipping a blank tile, and so does a
+table that breaks an address rule below (exit 2). An `.asset` the table no
+longer generates — the leftover of a renamed icon, which the game would load
+beside the new one at the same address — fails both modes (exit 1); delete it
+by hand.
 
 **Addresses are identities.** A saved marker stores its icon's address, so an
 address that has shipped never changes, and an icon is never removed — either
@@ -48,7 +53,7 @@ turns every marker using it into the blue fallback diamond. Within the mod, the
 dialog order is the address order (the game sorts each loader's blocks by
 address), so a new icon appended after Letters needs an address greater than
 the last one, and every address starts with a hex digit `0`–`7`, which the
-tests enforce. Mint one with `uuid4()`, regenerating until both hold. Variants
+generator enforces. Mint one with `uuid4()`, regenerating until both hold. Variants
 can be appended to an icon freely; reordering or removing them changes what
 existing markers show, since a marker stores the variant's index.
 
