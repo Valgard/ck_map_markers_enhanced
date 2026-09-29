@@ -43,7 +43,7 @@ export MOD_NAME="MapMarkersEnhanced"
 export MOD_NAME_ID="map-markers-enhanced"
 
 # One-line summary, written into state.json by utils/install-macos.sh.
-export MOD_SUMMARY="MapMarkers+'s 83 marker icons as native Core Keeper 1.3 map markers, and your old MapMarkers+ markers restored"
+export MOD_SUMMARY="MapMarkers+'s 83 markers as native Core Keeper 1.3 map-marker icons, and your old MapMarkers+ markers restored"
 
 # --- Game versions (overrides the parent's list) -----------------------------
 # This mod runs on Core Keeper 1.3 only: its icons are MapMarkerIconDataBlocks

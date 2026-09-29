@@ -9,7 +9,7 @@ mark.
 ## Five extra marker icons
 Pick an icon in the upper row of the marker dialog, then the marker in the
 lower one. The mod's icons sit after the game's own:
-- **General** (22) — question and exclamation marks, arrows, chest, sign,
+- **General** (22) — question and exclamation marks, music note, cross, arrows, chest, sign,
   structures, leaf, fish, cog, heart, skulls, flames, shield, dagger, axe
 - **Ores and Gems** (11) — from Copper to Relucite, plus Ancient Crystal
 - **Flags** (14 colours)
