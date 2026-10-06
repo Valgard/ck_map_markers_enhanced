@@ -203,8 +203,9 @@ namespace MapMarkersEnhanced
         /// <summary>
         /// Puts the row back the way vanilla's <c>BuildVariantRow</c> left it before the postfix:
         /// every tile below the variant count active, in the toggle group in index order, linked
-        /// left/right over those tiles as vanilla's <c>UpdateHorizontalNavigation</c> links them,
-        /// and vanilla's selected tile switched on. Each step is guarded on its own, so the
+        /// left/right in index order over those tiles, and vanilla's selected tile switched on. The
+        /// links follow vanilla's <c>UpdateHorizontalNavigation</c>, except that vanilla, which runs
+        /// it only when the pool grows, also links the inactive pool tiles beyond the count. Each step is guarded on its own, so the
         /// restore cannot throw; returns whether every step succeeded.
         /// </summary>
         private static bool RestoreVanillaRow(
