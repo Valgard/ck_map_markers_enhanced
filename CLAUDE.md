@@ -112,7 +112,7 @@ marker buttons") has what to change once the art exists.
 
 | Constant | Value | Where it comes from |
 |---|---|---|
-| The eight vanilla icon blocks and the five hidden-variant targets | `[vanilla]` table and the `vanilla` fields of `tools/icons.toml` | addresses read at runtime on 1.3.0.4 with a probe; each vanilla block has ten variants, variant *n* is colour column *n* of the large marker sheet. Details in `docs/ck/world-and-mechanics.md` in the parent repository |
+| The eight vanilla icon blocks and the five hidden-variant targets | `[vanilla]` table and the `vanilla` fields of `tools/icons.toml` | addresses read at runtime on 1.3.0.4 with a probe (five of them, Pickaxe included, are also stored in the game's `MapUI.defaultPresets`); each vanilla block has ten variants, variant *n* is colour column *n* of the large marker sheet. Details in `docs/ck/world-and-mechanics.md` in the parent repository |
 | Question mark the migration writes | icon `7e09f30c-8838-5604-2b46-8c13b0ef771e`, variant `9` | `ConvertOldMapMarkersSystem.GetDefaultIconForVariation(1)` / `GetDefaultVariantForOldVariation(1)` — MapMarkers+ stored its markers in slot `Marker2`, variation 1 |
 | Legacy amount | `6000 + (int)PlusMarkerType` | MapMarkers+ 1.1.1's `PlusMarker.AmountBase`; `LEGACY_TYPES` in the generator is the enum in order (85 entries) |
 | Types with no legacy amount | `None`, `Ping`, `AncientCrystal`, `QuestionMark`, `Skull`, `FlagGreen` | MapMarkers+ let the game create these, so they carry `Amount` 1 (`LEGACY_EXCLUDED`) |

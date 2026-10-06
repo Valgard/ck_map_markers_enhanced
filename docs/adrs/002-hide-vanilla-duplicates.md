@@ -85,8 +85,11 @@ Two related decisions:
 - A conversion is one-way. A converted marker no longer records that it was
   once the mod's.
 - Vanilla's colour variants are read from the sprite sheet and the game's own
-  conversion of 1.2 markers, not from fields: the extracted block assets carry
-  none. The cross's address rests on a runtime probe alone. So every target is
+  conversion of 1.2 markers, not from the block assets: the extraction drops a
+  data block's fields, so those carry none. Five addresses are also recorded in
+  the extracted resources, in `MapUI.defaultPresets` (Dot 2, Question 9, Skull
+  0, Flag 3, Pickaxe 1), which confirms the pickaxe's independently; the
+  cross's, the home's and the star's rest on a runtime probe alone. So every target is
   looked up in the game's data before anything is written — by conversion, by
   restoration and by the preset rewrite alike: should an update drop or
   renumber a vanilla block, the markers and presets that would be written onto
