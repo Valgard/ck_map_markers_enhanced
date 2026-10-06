@@ -50,7 +50,6 @@ namespace MapMarkersEnhanced
 
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
-        private bool _legacyParseLogged;
         private bool _passFailureLogged;
         private bool _conversionOff;
         private bool _skippedLogged;
@@ -69,7 +68,6 @@ namespace MapMarkersEnhanced
             {
                 // With an empty table every amount falls through and the system restores nothing.
                 _legacy.Clear();
-                _legacyParseLogged = true;
                 Debug.LogError("[MapMarkersEnhanced] legacy marker table could not be parsed; restoration is off");
                 Debug.LogException(e);
             }
