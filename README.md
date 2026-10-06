@@ -17,10 +17,11 @@ turned into the same yellow question mark.
   so the mod no longer offers its copies of them — five markers in all — and
   converts existing ones, see below. The flags, including the green one, are
   unchanged.
-- **Everything else is the game's own.** Naming a marker, the five presets, the
+- **The rest is the game's own.** Naming a marker, the five presets, the
   minimap, multiplayer and saving work exactly as they do for vanilla markers:
   the mod adds icons, keeps the dialog scrolled to your selection and restores
-  old markers, and leaves the rest to the game.
+  old markers, hides the five duplicates and converts markers and presets that
+  use them, and leaves the rest to the game.
 - **The dialog opens on your selection.** When you open a preset that uses one
   of the mod's icons, the dialog scrolls so the selected icon and marker are in
   view instead of starting at the left end.

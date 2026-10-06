@@ -8,7 +8,7 @@ then what the last run found.
 
 Every line the mod writes starts with `[MapMarkersEnhanced]`, so
 `grep MapMarkersEnhanced Player.log` shows all of them. A healthy session prints
-only these, each at most once:
+only these, each at most once except the conversion line below:
 
 - `Mod initialized.` — at load.
 - `icons: 5 <addresses> (indices: <i> … of <count>)` — once the game data is
@@ -23,7 +23,9 @@ only these, each at most once:
   the dialog no longer offers, and then once per session.
 - `converted <n> markers to vanilla icons` — only on a world with markers that
   use one of those variants. It comes from the server world, so with a dedicated
-  server it is in the server's log, not the client's.
+  server it is in the server's log, not the client's. Unlike the others it can
+  appear on any pass that converts something, so again whenever such a marker
+  turns up later (for instance one placed by a 1.0.0 client).
 
 Anything else is a warning or an error. Each is logged once per session (the
 restoration ones once per world), never per frame:

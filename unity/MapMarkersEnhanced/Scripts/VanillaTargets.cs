@@ -5,7 +5,7 @@ namespace MapMarkersEnhanced
     /// <summary>
     /// Lookup over <see cref="IconTable.ToVanilla"/>: which of the mod's icon variants have a
     /// vanilla twin. A variant is hidden from the customisation dialog exactly when it has a
-    /// target here (spec "vanilla icon migration"). Built once, on first use; a parse failure
+    /// target here (see docs/adrs/002-hide-vanilla-duplicates.md). Built once, on first use; a parse failure
     /// surfaces as a <see cref="System.TypeInitializationException"/> at the caller, which
     /// each consumer catches.
     /// </summary>
