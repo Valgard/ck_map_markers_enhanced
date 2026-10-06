@@ -66,7 +66,7 @@ markers keep showing the mod's icon to players who have the mod.
 
 ## Requirements
 
-- Core Keeper 1.3 (verified on 1.3.0.2)
+- Core Keeper 1.3 (verified on 1.3.0.4)
 - No other mods. MapMarkers+ itself is not needed — it does not load on 1.3 —
   and is best disabled.
 
@@ -84,13 +84,15 @@ Every player who wants to see the mod's icons needs the mod.
 ## Uninstalling
 
 A marker that still uses one of the mod's icons — one you placed, or one the
-mod restored — loses its icon without the mod. Markers the mod converted to the
-game's own question mark, cross, skull, red skull or diamond keep theirs, and
-so do the old MapMarkers+ crosses and red skulls. It shows a stand-in instead, usually
-a blue diamond but at times the icon of another marker, and the game logs an
+mod restored — loses its icon without the mod. It shows a stand-in instead,
+usually a blue diamond but at times the icon of another marker, and the game logs an
 error for it every time it draws it. Reinstalling brings the icons back: each
 icon has a fixed identity that saved markers refer to. What does not come back
 is the MapMarkers+ type a restored marker once carried, as described above.
+
+Markers that were converted to the game's own question mark, cross, skull, red
+skull or diamond keep their icons, and so do old MapMarkers+ crosses and red
+skulls, which the mod restores as the game's own.
 
 ## Known limitations
 

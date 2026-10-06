@@ -9,7 +9,7 @@ Core Keeper 1.3 ships eight marker icons of its own: cross, dot, flag, home,
 pickaxe, question mark, skull and star, each with ten colour variants. Five
 variants of this mod draw the same motifs — General's question mark, cross,
 skull and red skull, and the ancient crystal in Ores and Gems, which is
-vanilla's blue dot. Offering both is clutter, and a marker with the mod's copy
+vanilla's blue diamond. Offering both is clutter, and a marker with the mod's copy
 loses its icon when the mod is uninstalled, while the game's own never does.
 
 A saved marker stores its icon's address and a variant index, so whatever is
@@ -41,7 +41,7 @@ and client presets are rewritten the same way. The hidden set is not a second
 list: a variant is hidden exactly when the icon table names a vanilla target for
 it, so a hidden variant without a conversion cannot exist.
 
-Option 1 and 2 would leave the visible set right, but every hidden or removed
+Options 1 and 2 would leave the visible set right, but every hidden or removed
 block still has markers pointing at it. Removing the block orphans them, which
 is the failure addresses exist to prevent; keeping it hidden needs the same
 hiding logic as the chosen option plus a second set of addresses to maintain, for
@@ -60,7 +60,8 @@ Two related decisions:
   take over flags players placed on purpose, and a mod-icon marker is lost on
   uninstall. All fourteen flags remain.
   MapMarkers+'s cross and red skull, by contrast, were stored with a legacy
-  type and now restore straight to vanilla.
+  type and now restore straight to vanilla — the red skull was seen doing so in
+  game, the cross was not (see Confirmation).
 
 ### Consequences
 
