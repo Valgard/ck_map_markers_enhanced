@@ -76,7 +76,8 @@ namespace MapMarkersEnhanced
 
         /// <summary>
         /// The index that should be selected, or -1 to leave vanilla's choice. A selection set on
-        /// purpose keeps its index, moved off a hidden tile to the nearest visible one. A user's
+        /// purpose keeps its index, moved off a hidden tile to the next visible one after it, or
+        /// the last visible one before it when none follows. A user's
         /// switch from another icon keeps the selection's visible position, because vanilla
         /// carries the index over and the two differ once tiles are hidden.
         /// </summary>

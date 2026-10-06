@@ -12,7 +12,7 @@ Pick an icon in the upper row of the marker dialog, then the marker in the lower
 Everything else is the game's own: naming a marker, the five presets, the minimap, multiplayer and saving work exactly as they do for vanilla markers. When you open a preset that uses one of the mod's icons, the dialog scrolls to it.
 
 [h2]The game's own question mark, cross, skulls and diamond[/h2]
-Core Keeper 1.3 draws a question mark, a cross, skulls and a blue diamond itself, so the mod no longer offers its own copies of them; the game's are used instead. Markers you already placed or saved in a preset with the old ones are converted to the game's own wherever the world runs with the mod (single-player, the host, or a dedicated server that has it). A dedicated server without the mod converts nothing.
+Core Keeper 1.3 draws a question mark, a cross, skulls and a blue diamond itself, so the mod no longer offers its own copies of them; the game's are used instead. Markers you already placed with the old ones are converted to the game's own wherever the world runs with the mod (single-player, the host, or a dedicated server that has it); a dedicated server without the mod converts none. Presets that use them are rewritten on your own computer, whichever server you play on.
 
 [h2]Your old MapMarkers+ markers come back[/h2]
 Core Keeper 1.3 converted every marker drawn with MapMarkers+'s own art into the same question mark — but the original type survived in the save. The first time a world is loaded with this mod on the side that runs it (single-player, the host, or a dedicated server that has the mod), each of those question marks gets its original icon back, once, and the result is saved with the world.

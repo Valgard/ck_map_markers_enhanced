@@ -15,9 +15,11 @@ is specific to this mod. Why the mod is built this way, and what was rejected: [
 | `IconTable` | `Scripts/Generated/IconTable.g.cs` | The icon addresses and the legacy mapping; generated |
 | `IconOrderPatch` | `Scripts/IconOrderPatch.cs`, `Scripts/IconOrder.cs` | Prefix on `MapMarkerCustomizationPanel.PopulateIconRow`: moves the mod's blocks to the end of the live icon list, stably |
 | `ScrollToSelectionPatch` | `Scripts/ScrollToSelectionPatch.cs` | Postfix on the 8-parameter `MapMarkerCustomizationPanel.Open`, carried out from `IMod.Update`: scrolls both rows to the selected tiles |
-| `HiddenVariantsPatch`, `IconPreviewPatch` | `Scripts/HiddenVariantsPatch.cs` | Postfixes on `MapMarkerCustomizationPanel`: `BuildVariantRow` deactivates the hidden variant tiles, drops them from the toggle group, rewires left/right navigation over the visible ones and moves a selection off a hidden tile; `PopulateIconRow`/`UpdateIconRowSprites` draw an unselected icon whose variant 0 is hidden with its first visible variant |
-| `MarkerMigrationSystem` | `Scripts/MarkerMigrationSystem.cs` | Server-world ECS system: restores legacy question marks once per marker, and converts markers on hidden variants to vanilla |
-| `VanillaTargets` | `Scripts/VanillaTargets.cs` | Lookup over `IconTable.ToVanilla`: which variants have a vanilla target (hidden from the dialog) and what it is |
+| `HiddenVariantsPatch` | `Scripts/HiddenVariantsPatch.cs` | Prefix and postfix on `MapMarkerCustomizationPanel.BuildVariantRow`: the prefix records vanilla's selected index before it is clamped; the postfix deactivates the hidden variant tiles, drops them from the toggle group, rewires left/right navigation over the visible ones, keeps the visible position across icon switches and moves a selection off a hidden tile; on a failure it puts the row back as vanilla built it |
+| `ExplicitOpenPatch`, `ExplicitOpenWithPresetPatch`, `ExplicitResetPatch` | `Scripts/HiddenVariantsPatch.cs` | Prefix and finalizer on both `MapMarkerCustomizationPanel.Open` overloads and on `OnResetToDefaultClicked`: mark the selection as set on purpose (`HiddenVariantsPatch.EnterExplicit`/`ExitExplicit`), so the row keeps its index instead of its visible position |
+| `IconPreviewPatch` | `Scripts/HiddenVariantsPatch.cs` | Postfixes on `MapMarkerCustomizationPanel.PopulateIconRow`/`UpdateIconRowSprites`: draw an unselected icon whose variant 0 is hidden with its first visible variant, guarded per row |
+| `MarkerMigrationSystem` | `Scripts/MarkerMigrationSystem.cs` | Server-world ECS system: restores legacy question marks once per marker, and converts markers on hidden variants to vanilla targets that resolve |
+| `VanillaTargets` | `Scripts/VanillaTargets.cs` | Lookup over `IconTable.ToVanilla`: which variants have a vanilla target (hidden from the dialog), what it is, and whether the game resolves it |
 | `PresetConversion` | `Scripts/PresetConversion.cs` | Client-side: rewrites the five marker presets that sit on a hidden variant to the vanilla twin, through `Manager.prefs` |
 | `MapMarkersEnhancedMod` | `MapMarkersEnhancedMod.cs` | Logs once per session which of the five addresses the game registered, and runs the preset conversion once per session |
 
@@ -106,9 +108,12 @@ marker buttons") has what to change once the art exists.
 
 Restoration clears `Amount` to `1`, vanilla's value. That is what makes it run
 once per marker, and it is also why a restored marker's MapMarkers+ type is gone
-for good — the README says so to players. Conversion needs no marker of its own:
+for good — the README says so to players. Conversion needs no done-flag of its own:
 a converted marker carries a vanilla address and cannot match again, so that
-rule runs on every pass. The two rules fail independently.
+rule runs on every pass. Each rule's writes run under a try of their own, so a
+throw in one never stops the other; only a throw in the shared read-only scan
+stops both for that pass. Conversion writes a target only after
+`ScriptableData` resolves it, and warns instead when it does not.
 
 ## Identity
 

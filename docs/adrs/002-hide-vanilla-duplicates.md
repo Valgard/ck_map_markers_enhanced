@@ -98,7 +98,12 @@ MapMarkers+ restoring to vanilla ("World conversion to vanilla icons"); and no
 conversion on a server without the mod ("Server without the mod"). Not tested:
 controller navigation across the gaps, a second launch without a preset
 conversion, and a MapMarkers+ cross in game, which is covered by the generator
-test alone.
+test alone. Planned in `docs/manual-tests.md` but without a result: opening the
+dialog from a preset that still points at a hidden variant, the Flags tile count
+after switching General → Flags → General, placing a marker from every visible
+tile, and a cross or red skull restored by 1.0.0 and then converted. Nor has a
+failure path been seen in game: the row put back after the hiding patch throws,
+or a conversion target that does not resolve.
 
 ## Pros and Cons of the Options
 

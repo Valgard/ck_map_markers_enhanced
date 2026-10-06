@@ -28,7 +28,7 @@ only these, each at most once except the conversion line below:
   turns up later (for instance one placed by a 1.0.0 client).
 
 Anything else is a warning or an error. Each is logged once per session (the
-restoration ones once per world), never per frame:
+ones from the server world once per world), never per frame:
 
 - `icons: no MapMarkerIconDataBlock list registered` — the game has no icon list
   at all, so the icon type or its loading changed in a game update. Check the
@@ -77,18 +77,52 @@ restoration ones once per world), never per frame:
   the example with `QuestionMarkAddress` and `QuestionMarkVariant` in
   `MarkerMigrationSystem.cs` and with `ConvertOldMapMarkersSystem` in the
   decompile.
+- `vanilla target <address> variant <v> is not a registered map marker icon
+  with that variant; markers that convert to it are left as they are` — from the
+  server world, once per target and world. A game update dropped or renumbered
+  that vanilla block, or gave it fewer variants; nothing was written. Compare the
+  address with the `[vanilla]` table in `tools/icons.toml` and the game's
+  current `MapMarkerIconDataBlock` list.
+- `vanilla target <address> variant <v> is not a registered map marker icon
+  with that variant; preset <n> is left as it is` — the same, for a preset, on
+  the player's computer.
+- `preset conversion failed; remaining presets stay as they are` — followed by
+  the exception; presets before the failing slot may already be rewritten. Check
+  `PrefsManager.GetMapMarkerPreset`/`SetMapMarkerPreset` in the decompile.
+- `hiding marker variants failed for icon <address>; the row was put back as
+  vanilla built it, all variants visible` — followed by the exception. The
+  dialog offers the hidden duplicates again, and a marker placed on one is
+  converted by the world. Check `MapMarkerCustomizationPanel.BuildVariantRow` in
+  the decompile.
+- `hiding marker variants failed for icon <address>, and putting the row back
+  failed too; the variant row may be incomplete` — as above, but some tiles may
+  stay hidden or unreachable by controller until the next icon click.
+- `icon-row preview failed for icon <address>; that tile keeps vanilla's sprite,
+  the other rows are still drawn` — followed by the exception. That icon's tile
+  shows its hidden variant 0 while unselected. Check `PopulateIconRow` and
+  `UpdateIconRowSprites`.
+- `explicit-selection depth would go below 0: a finalizer of Open or
+  OnResetToDefaultClicked ran without its prefix; kept at 0` — Harmony ran a
+  finalizer whose prefix did not run, so a dialog may move the selection by
+  visible position where it should keep the index. Check the `Explicit*Patch`
+  classes against both `Open` overloads in the decompile.
 
-Three errors, each followed by the exception:
+Five errors, each followed by the exception:
 `legacy marker table could not be parsed; restoration is off` (an address in
 `IconTable.g.cs` does not parse — regenerate and check), `vanilla target table
 could not be parsed; conversion is off` (the same for `ToVanilla`; restoration
-keeps running) and `marker migration failed; will keep trying silently` (a pass
-threw; the stack trace names the cause). One cause seen in practice is `Exception:
+keeps running), `legacy restoration failed; conversion still runs, restoration
+will keep trying silently` and `conversion to vanilla icons failed; restoration
+still runs, conversion will keep trying silently` (one rule's writes threw; the
+other rule is unaffected), and `marker migration failed: the scan threw, so
+neither rule ran; will keep trying silently` (the shared scan threw; the stack
+trace names the cause). One cause of the last seen in practice is `Exception:
 This method should have been replaced by codegen`: the build shipped without
 `Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`, so `Player.log` also
-lacks `Replacing method MapMarkersEnhanced.MarkerMigrationSystem/Pass_T0 …`.
-Touch `MarkerMigrationSystem.cs` and rebuild; the build output must contain
-`Adding generated file …MarkerMigrationSystem__System_…g.cs`.
+lacks `Replacing method MapMarkersEnhanced.MarkerMigrationSystem/Scan_T0 …`
+(`Pass_T0` in builds before the scan had a method of its own). Touch
+`MarkerMigrationSystem.cs` and rebuild; the build output must contain `Adding
+generated file …MarkerMigrationSystem__System_…g.cs`.
 
 ## Icons in the dialog and on the map
 
@@ -260,10 +294,12 @@ Only ever on a copy of a world, never on a live save.
   0, plus one FlagGreen. Load the world with the new build: `converted 5 markers
   to vanilla icons`; the five show the vanilla motifs (yellow `?`, yellow `X`,
   white skull, red skull, blue diamond); the FlagGreen is unchanged.
-- On the copy from "Legacy restoration" (62 restored markers): the restored
-  `Cross` and `SkullRed` markers turn vanilla, and the log reads `converted <n>
-  markers to vanilla icons` with `<n>` the number of restored Cross and SkullRed
-  markers on that copy; no new `restored` line appears.
+- **Not applicable to the copy from "Legacy restoration":** its 62 restored
+  markers are all types `6016`–`6028`, with no `Cross` (`6072`) or `SkullRed`
+  (`6073`) among them, so nothing there converts and no `converted` line can
+  appear. The path it was meant to cover — a `Cross` or `SkullRed` restored by
+  1.0.0 and then converted by 1.1.0 — needs a world that holds such a marker,
+  and has not been run in game.
 - With the mod switched off on that copy, the five converted markers still show
   their icons.
 - Dedicated server with the mod, on a copy of the first check's world: after a
@@ -327,8 +363,8 @@ client has enabled — and switched back on for the client afterwards.
   `converted … markers to vanilla icons` line, the marker is not converted, and
   it still renders with its mod icon for a client that has the mod.
 
-**Result, 2026-09-29 (CK 1.3.0.2), first two checks only; the hidden-variant
-check has not been run:**
+**Result, 2026-09-29 (CK 1.3.0.2), first two checks; the hidden-variant check
+did not exist yet and has its own result below:**
 
 Passed. The server log lists 31 loaded mods, none of them MapMarkers — that is
 what shows the server ran without the mod. Both joins raised no mod dialog; the

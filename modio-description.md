@@ -25,10 +25,11 @@ it.
 
 Core Keeper 1.3 draws a question mark, a cross, skulls and a blue diamond
 itself, so the mod no longer offers its own copies of them; the game's are used
-instead. Markers you already placed or saved in a preset with the old ones are
-converted to the game's own wherever the world runs with the mod (single-player,
-the host, or a dedicated server that has it). A dedicated server without the mod
-converts nothing.
+instead. Markers you already placed with the old ones are converted to the
+game's own wherever the world runs with the mod (single-player, the host, or a
+dedicated server that has it); a dedicated server without the mod converts none.
+Presets that use them are rewritten on your own computer, whichever server you
+play on.
 
 ## Your old MapMarkers+ markers come back
 Core Keeper 1.3 converted every marker drawn with MapMarkers+'s own art into
