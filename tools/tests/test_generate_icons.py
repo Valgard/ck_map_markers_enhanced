@@ -1,5 +1,6 @@
 """Tests for tools/generate_icons.py and the table it reads, tools/icons.toml."""
 
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -406,13 +407,20 @@ def _hidden(block, n, kind="QuestionMark"):
 def write_table(tmp_path, *icons, vanilla=None):
     """A minimal icons.toml, one variant per (name, address[, type[, variants]]).
 
-    `vanilla` is a name -> address dict written as the [vanilla] table. A fourth
-    element replaces the single default variant with dicts of `type` and an
-    optional `vanilla` (block, variant) pair.
+    `vanilla` is a name -> address dict written as the [vanilla] table; a str
+    address is quoted, anything else written as given. A fourth element replaces
+    the single default variant with dicts of `type` and an optional `vanilla`
+    (block, variant) pair, or a `vanilla_raw` TOML value written verbatim.
     """
     parts = []
     if vanilla:
-        parts.append("[vanilla]\n" + "".join(f'{k} = "{v}"\n' for k, v in vanilla.items()))
+        parts.append(
+            "[vanilla]\n"
+            + "".join(
+                f'{k} = "{v}"\n' if isinstance(v, str) else f"{k} = {v}\n"
+                for k, v in vanilla.items()
+            )
+        )
     for name, address, *rest in icons:
         kind = rest[0] if rest and rest[0] is not None else "QuestionMark"
         variant_rows = rest[1] if len(rest) > 1 else [{"type": kind}]
@@ -422,6 +430,8 @@ def write_table(tmp_path, *icons, vanilla=None):
             if "vanilla" in row:
                 block, n = row["vanilla"]
                 text += f'vanilla = {{ icon = "{block}", variant = {n} }}\n'
+            if "vanilla_raw" in row:
+                text += f"vanilla = {row['vanilla_raw']}\n"
         parts.append(text)
     path = tmp_path / "icons.toml"
     path.write_text("\n".join(parts), encoding="utf-8")
@@ -481,6 +491,67 @@ def test_vanilla_address_must_not_be_a_mod_address(tmp_path):
         vanilla={"Question": GOOD_A},
     )
     with pytest.raises(ValueError, match="vanilla"):
+        gi.load_table(path)
+
+
+@pytest.mark.parametrize(
+    "address",
+    [QUESTION.upper(), "not-a-uuid", QUESTION.replace("-", ""), "{" + QUESTION + "}", 7],
+    ids=["uppercase", "malformed", "unhyphenated", "braced", "integer"],
+)
+def test_vanilla_address_must_be_canonical(tmp_path, address):
+    """A [vanilla] address is held to the same lowercase canonical form as a mod address."""
+    path = write_table(tmp_path, ("A", GOOD_A), vanilla={"Question": address})
+    with pytest.raises(ValueError, match="canonical"):
+        gi.load_table(path)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        '{ icon = "Question" }',
+        "{ variant = 9 }",
+        '"Question"',
+        '{ icon = "Question", variant = "9" }',
+        '{ icon = "Question", variant = true }',
+        '{ icon = "Question", variant = 9.0 }',
+        "{ icon = 1, variant = 9 }",
+        '{ icon = "Question", variant = 9, note = "x" }',
+    ],
+    ids=[
+        "missing-variant",
+        "missing-icon",
+        "string",
+        "string-variant",
+        "bool-variant",
+        "float-variant",
+        "integer-icon",
+        "extra-key",
+    ],
+)
+def test_malformed_vanilla_target_is_a_value_error(tmp_path, raw, monkeypatch, capsys):
+    """A malformed `vanilla = {...}` is a ValueError, so main exits 2 rather than 1 (drift)."""
+    path = write_table(
+        tmp_path,
+        ("A", GOOD_A, None, [{"type": "QuestionMark", "vanilla_raw": raw}, {"type": "Cross"}]),
+        vanilla={"Question": QUESTION},
+    )
+    with pytest.raises(ValueError, match="vanilla"):
+        gi.load_table(path)
+    monkeypatch.setattr(gi, "TABLE", path)
+    assert gi.main(["--check"]) == 2
+    assert "error:" in capsys.readouterr().err
+
+
+def test_vanilla_table_must_be_a_table(tmp_path):
+    """A top-level `vanilla = ...` that is not a table is a ValueError."""
+    path = tmp_path / "icons.toml"
+    path.write_text(
+        f'vanilla = "x"\n\n[[icon]]\nname = "A"\naddress = "{GOOD_A}"\n\n'
+        '[[icon.variant]]\ntype = "QuestionMark"\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match=r"\[vanilla\]"):
         gi.load_table(path)
 
 
@@ -587,3 +658,20 @@ def test_cross_and_skull_red_restore_to_vanilla(icons):
     text = gi.render_csharp(icons)
     assert '{6072, ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross' in text
     assert '{6073, ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed' in text
+
+
+MIGRATION_SYSTEM = REPO / "unity/MapMarkersEnhanced/Scripts/MarkerMigrationSystem.cs"
+
+
+def test_migration_question_mark_matches_the_table():
+    """MarkerMigrationSystem's question-mark constants agree with [vanilla] Question, variant 9.
+
+    The system hard-codes the address the version-13 migration writes; the table
+    measures the same block. The two must not drift apart.
+    """
+    source = MIGRATION_SYSTEM.read_text(encoding="utf-8")
+    address = re.search(r'const string QuestionMarkAddress = "([^"]+)";', source)
+    variant = re.search(r"const int QuestionMarkVariant = (\d+);", source)
+    assert address and variant, "constants not found in MarkerMigrationSystem.cs"
+    assert address.group(1) == gi.load_vanilla(TABLE)["Question"]
+    assert int(variant.group(1)) == 9

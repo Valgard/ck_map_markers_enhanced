@@ -174,19 +174,43 @@ class Icon:
     variants: tuple[Variant, ...]
 
 
+def _vanilla_table(data: dict) -> dict[str, str]:
+    """The [vanilla] table of parsed icons.toml data ({} if absent).
+
+    Raises:
+        ValueError: [vanilla] is not a table.
+    """
+    table = data.get("vanilla", {})
+    if not isinstance(table, dict):
+        raise ValueError("[vanilla] must be a table of block name = address")
+    return dict(table)
+
+
 def load_vanilla(path: Path) -> dict[str, str]:
     """The [vanilla] table of icons.toml: vanilla block name -> address ({} if absent)."""
-    data = tomllib.loads(path.read_text(encoding="utf-8"))
-    return dict(data.get("vanilla", {}))
+    return _vanilla_table(tomllib.loads(path.read_text(encoding="utf-8")))
 
 
 def _variant(icon: str, row: dict, vanilla: dict[str, str]) -> Variant:
+    """One variant row; a malformed `vanilla` field is a ValueError, not a KeyError.
+
+    `main` maps only ValueError to exit 2, so any other exception would surface
+    as a traceback with exit 1, the code `--check` uses for drift.
+    """
     target = None
     if (ref := row.get("vanilla")) is not None:
-        block = ref["icon"]
+        where = f"icon {icon}: vanilla target of {row.get('type')}"
+        if not isinstance(ref, dict) or set(ref) != {"icon", "variant"}:
+            raise ValueError(f"{where} must be {{ icon = <block>, variant = <int> }}, got {ref!r}")
+        block, index = ref["icon"], ref["variant"]
+        if not isinstance(block, str):
+            raise ValueError(f"{where}: icon {block!r} is not a block name")
+        # bool is a subclass of int, and `true` would render as C# `True`.
+        if not isinstance(index, int) or isinstance(index, bool):
+            raise ValueError(f"{where}: variant {index!r} is not an integer")
         if block not in vanilla:
             raise ValueError(f"icon {icon}: vanilla block {block} is not in [vanilla]")
-        target = VanillaTarget(block, vanilla[block], ref["variant"])
+        target = VanillaTarget(block, vanilla[block], index)
     return Variant(row["type"], row.get("small"), target)
 
 
@@ -194,11 +218,13 @@ def load_table(path: Path) -> tuple[Icon, ...]:
     """Read icons.toml into icons, in table order, and validate them.
 
     Raises:
-        ValueError: the table breaks a rule of `validate`, or a variant names a
-            vanilla block that [vanilla] does not list.
+        ValueError: the table breaks a rule of `validate`; [vanilla] is not a
+            table; a variant's `vanilla` field is not exactly a string `icon`
+            and an integer `variant`, or names a vanilla block that [vanilla]
+            does not list.
     """
     data = tomllib.loads(path.read_text(encoding="utf-8"))
-    vanilla = dict(data.get("vanilla", {}))
+    vanilla = _vanilla_table(data)
     icons = tuple(
         Icon(
             name=icon["name"],
@@ -209,6 +235,14 @@ def load_table(path: Path) -> tuple[Icon, ...]:
     )
     validate(icons, vanilla)
     return icons
+
+
+def _canonical(address: str) -> str | None:
+    """The lowercase canonical form of a UUID string, or None if it is not one."""
+    try:
+        return str(uuid.UUID(address))
+    except ValueError:
+        return None
 
 
 def validate(icons: tuple[Icon, ...], vanilla: dict[str, str] | None = None) -> None:
@@ -224,13 +258,20 @@ def validate(icons: tuple[Icon, ...], vanilla: dict[str, str] | None = None) -> 
         ValueError: a duplicate name or address; an address that is not a
             lowercase canonical UUID, does not ascend in table order, or does
             not start with 0-7; a variant type that is not a PlusMarkerType; a
-            [vanilla] address that is one of the mod's own; a vanilla variant
+            [vanilla] address that is not a lowercase canonical UUID or is one
+            of the mod's own; a vanilla variant
             index outside 0-9; an icon whose variants are all hidden.
     """
     names: set[str] = set()
     addresses: set[str] = set()
     previous = None
     for block, address in (vanilla or {}).items():
+        # The game parses these at runtime; a typo there would switch off conversion
+        # and restoration alike (the Legacy table points hidden types at them too).
+        if not isinstance(address, str) or _canonical(address) != address:
+            raise ValueError(
+                f"vanilla block {block}: address {address!r} is not a lowercase canonical UUID"
+            )
         if address in {icon.address for icon in icons}:
             raise ValueError(f"vanilla block {block}: address {address} is one of the mod's own")
     for icon in icons:
@@ -241,11 +282,7 @@ def validate(icons: tuple[Icon, ...], vanilla: dict[str, str] | None = None) -> 
         if address in addresses:
             raise ValueError(f"address {address} appears twice (icon {icon.name})")
         addresses.add(address)
-        try:
-            canonical = str(uuid.UUID(address))
-        except ValueError:
-            canonical = None
-        if canonical != address:
+        if _canonical(address) != address:
             raise ValueError(
                 f"icon {icon.name}: address {address} is not a lowercase canonical UUID"
             )
