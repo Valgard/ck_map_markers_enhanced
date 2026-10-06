@@ -86,6 +86,11 @@ ones from the server world once per world), never per frame:
   legacy marker keeps its MapMarkers+ amount and is restored once the target
   resolves. Compare the address with `tools/icons.toml` and the game's current
   `MapMarkerIconDataBlock` list.
+- `game data still not loaded after 10 passes; <n> restorations and <m>
+  conversions wait` — from the server world, once per world. Markers need
+  restoring or converting, but `ScriptableData.isLoaded` has stayed false for
+  ten passes, so no target can be checked and nothing is written; the system
+  keeps waiting. Check the game's data loading in the log before this line.
 - `vanilla target <address> variant <v> is not a registered map marker icon
   with that variant; preset <n> is left as it is` — the same, for a preset, on
   the player's computer.

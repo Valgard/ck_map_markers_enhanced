@@ -51,6 +51,9 @@ namespace MapMarkersEnhanced
         /// <summary>Updates between two passes; the first pass runs on the first update.</summary>
         private const int PassInterval = 60;
 
+        /// <summary>Passes with pending work but no loaded game data before that is warned about once; only has to lie well past a normal load.</summary>
+        private const int DataWaitWarnPasses = 10;
+
         /// <summary>The icon the version-13 migration gives an old variation-1 marker (<c>Pug.Other</c> <c>GetDefaultIconForVariation</c>).</summary>
         private const string QuestionMarkAddress = "7e09f30c-8838-5604-2b46-8c13b0ef771e";
 
@@ -71,6 +74,7 @@ namespace MapMarkersEnhanced
         private bool _conversionFailureLogged;
         private bool _conversionOff;
         private bool _skippedLogged;
+        private int _passesWaitingForData;
 
         protected override void OnCreate()
         {
@@ -146,7 +150,14 @@ namespace MapMarkersEnhanced
             if (_matches.Count + _conversions.Count > 0 && !ScriptableData.isLoaded)
             {
                 // No target can be checked before the game data is loaded; nothing is written,
-                // and the next pass retries.
+                // and the next pass retries. Said once, should the data never finish loading.
+                if (++_passesWaitingForData == DataWaitWarnPasses)
+                {
+                    Debug.LogWarning(
+                        $"[MapMarkersEnhanced] game data still not loaded after {DataWaitWarnPasses} passes; "
+                            + $"{_matches.Count} restorations and {_conversions.Count} conversions wait"
+                    );
+                }
                 _matches.Clear();
                 _conversions.Clear();
                 return;
