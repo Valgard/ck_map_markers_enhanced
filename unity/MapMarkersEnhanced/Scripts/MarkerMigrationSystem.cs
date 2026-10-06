@@ -25,7 +25,16 @@ namespace MapMarkersEnhanced
     /// mark onto exactly the icon and variant rule 1 looks for, which is safe because the
     /// game creates every placed marker with <c>Amount</c> 1 and restoration writes 1.
     /// Should a legacy-amount marker ever reach a hidden variant, rule 1 restores it on a
-    /// later pass if rule 2 left it on the question mark. The two rules fail independently.
+    /// later pass if rule 2 left it on the question mark.
+    /// </para>
+    /// <para>
+    /// Both rules share one read-only scan per pass; each rule's writes then run under a try
+    /// of its own with its own once-per-instance error, so a throw in one rule's write loop
+    /// never stops the other. A table that fails to parse in <c>OnCreate</c> turns off its own
+    /// rule; <see cref="IconTable.Legacy"/> also names the vanilla targets of hidden types, so a
+    /// malformed vanilla address would fail both tables, which is why the generator rejects one.
+    /// A throw in the shared scan stops both rules for that pass. Every failure is retried on
+    /// the next pass.
     /// </para>
     /// Runs in the server world only; the serializer and ghost replication carry
     /// the change to the save and to every client.
@@ -51,6 +60,8 @@ namespace MapMarkersEnhanced
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
         private bool _passFailureLogged;
+        private bool _restoreFailureLogged;
+        private bool _conversionFailureLogged;
         private bool _conversionOff;
         private bool _skippedLogged;
 
@@ -96,27 +107,69 @@ namespace MapMarkersEnhanced
             else
             {
                 _updatesUntilPass = PassInterval - 1;
-                try
-                {
-                    Pass();
-                }
-                catch (Exception e)
-                {
-                    if (!_passFailureLogged)
-                    {
-                        _passFailureLogged = true;
-                        Debug.LogError("[MapMarkersEnhanced] marker migration failed; will keep trying silently");
-                        Debug.LogException(e);
-                    }
-                }
+                Pass();
             }
 
             base.OnUpdate();
         }
 
+        /// <summary>
+        /// One scan, then each rule's writes under a try of its own, so a throw in one rule's
+        /// loop never stops the other. A throw in the scan stops both for that pass.
+        /// </summary>
         private void Pass()
         {
-            // Find candidates read-only, so a pass that restores nothing leaves
+            try
+            {
+                Scan();
+            }
+            catch (Exception e)
+            {
+                if (!_passFailureLogged)
+                {
+                    _passFailureLogged = true;
+                    Debug.LogError("[MapMarkersEnhanced] marker migration failed: the scan threw, so neither rule ran; will keep trying silently");
+                    Debug.LogException(e);
+                }
+                _matches.Clear();
+                _conversions.Clear();
+                return;
+            }
+
+            try
+            {
+                RestoreLegacy();
+            }
+            catch (Exception e)
+            {
+                if (!_restoreFailureLogged)
+                {
+                    _restoreFailureLogged = true;
+                    Debug.LogError("[MapMarkersEnhanced] legacy restoration failed; conversion still runs, restoration will keep trying silently");
+                    Debug.LogException(e);
+                }
+            }
+            _matches.Clear();
+
+            try
+            {
+                ConvertHidden();
+            }
+            catch (Exception e)
+            {
+                if (!_conversionFailureLogged)
+                {
+                    _conversionFailureLogged = true;
+                    Debug.LogError("[MapMarkersEnhanced] conversion to vanilla icons failed; restoration still runs, conversion will keep trying silently");
+                    Debug.LogException(e);
+                }
+            }
+            _conversions.Clear();
+        }
+
+        private void Scan()
+        {
+            // Find candidates read-only, so a pass that changes nothing leaves
             // every chunk's change version alone: a write access would make the
             // serializer and ghost replication revisit all markers every pass.
             Dictionary<int, (DataBlockAddress address, int variant)> legacy = _legacy;
@@ -176,12 +229,16 @@ namespace MapMarkersEnhanced
                 );
             }
             skipped.Clear();
+        }
 
+        /// <summary>Rule 1's writes, over the markers the scan matched.</summary>
+        private void RestoreLegacy()
+        {
             int restored = 0;
-            foreach (Entity entity in matches)
+            foreach (Entity entity in _matches)
             {
                 ObjectDataCD data = EntityManager.GetComponentData<ObjectDataCD>(entity);
-                if (!legacy.TryGetValue(data.amount, out var target))
+                if (!_legacy.TryGetValue(data.amount, out var target))
                 {
                     continue;
                 }
@@ -195,15 +252,18 @@ namespace MapMarkersEnhanced
                 EntityManager.SetComponentData(entity, data);
                 restored++;
             }
-            matches.Clear();
 
             if (restored > 0)
             {
                 Debug.Log($"[MapMarkersEnhanced] restored {restored} legacy markers");
             }
+        }
 
+        /// <summary>Rule 2's writes, over the markers the scan found on a hidden variant.</summary>
+        private void ConvertHidden()
+        {
             int converted = 0;
-            foreach (Entity entity in conversions)
+            foreach (Entity entity in _conversions)
             {
                 MapMarkerCustomDataCD custom = EntityManager.GetComponentData<MapMarkerCustomDataCD>(entity);
                 if (!VanillaTargets.TryGet(custom.iconAddress, custom.variantIndex, out DataBlockAddress address, out int variant))
@@ -216,7 +276,6 @@ namespace MapMarkersEnhanced
                 EntityManager.SetComponentData(entity, custom);
                 converted++;
             }
-            conversions.Clear();
 
             if (converted > 0)
             {
