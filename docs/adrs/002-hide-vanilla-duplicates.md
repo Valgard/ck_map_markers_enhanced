@@ -13,12 +13,17 @@ vanilla's blue diamond. Offering both is clutter, and a marker with the mod's co
 loses its icon when the mod is uninstalled, while the game's own never does.
 
 A saved marker stores its icon's address and a variant index, so whatever is
-done to the duplicates must leave every marker already placed with a valid
-icon. How should the mod stop duplicating vanilla?
+done to the duplicates must not change what a stored pair means, and should
+leave every marker already placed with an icon that renders. How should the mod
+stop duplicating vanilla?
 
 ## Decision Drivers
 
-- No marker may lose its icon, now or after an update of this mod.
+- A shipped address is never reused and a variant index never shifts, so no
+  stored marker comes to show another motif. Removing a block is allowed, but
+  costs display: markers on it show the fallback sprite until a migration
+  rewrites them where the world runs with the mod. An option that avoids that
+  cost is preferred.
 - Markers on a server without the mod must keep rendering for clients that have
   it.
 - The fewer stored values change meaning, the fewer ways there are to corrupt a
