@@ -6,7 +6,8 @@
 
 Writes one MapMarkerIconDataBlock asset (plus .meta) per icon into
 unity/MapMarkersEnhanced/Data/MapMarkerIconDataBlock/, and the C# legacy
-mapping into unity/MapMarkersEnhanced/Scripts/Generated/IconTable.g.cs.
+mapping and the ToVanilla table of hidden variants into
+unity/MapMarkersEnhanced/Scripts/Generated/IconTable.g.cs.
 Sprites are resolved through their internalID in markers.png.meta; a sprite
 that does not exist aborts generation instead of shipping a blank icon.
 
@@ -132,11 +133,26 @@ LEGACY_EXCLUDED = frozenset(
 
 
 @dataclass(frozen=True)
+class VanillaTarget:
+    """The vanilla block variant a hidden variant is converted to."""
+
+    block: str
+    address: str
+    variant: int
+
+
+@dataclass(frozen=True)
 class Variant:
-    """One marker: a PlusMarkerType name and, where one exists, its minimap slice."""
+    """One marker: a PlusMarkerType name, its minimap slice if any, its vanilla target if any."""
 
     type: str
     small: str | None
+    vanilla: VanillaTarget | None = None
+
+    @property
+    def hidden(self) -> bool:
+        """Whether the dialog hides this variant and converts it to its vanilla target."""
+        return self.vanilla is not None
 
     @property
     def large(self) -> str:
@@ -158,26 +174,44 @@ class Icon:
     variants: tuple[Variant, ...]
 
 
+def load_vanilla(path: Path) -> dict[str, str]:
+    """The [vanilla] table of icons.toml: vanilla block name -> address ({} if absent)."""
+    data = tomllib.loads(path.read_text(encoding="utf-8"))
+    return dict(data.get("vanilla", {}))
+
+
+def _variant(icon: str, row: dict, vanilla: dict[str, str]) -> Variant:
+    target = None
+    if (ref := row.get("vanilla")) is not None:
+        block = ref["icon"]
+        if block not in vanilla:
+            raise ValueError(f"icon {icon}: vanilla block {block} is not in [vanilla]")
+        target = VanillaTarget(block, vanilla[block], ref["variant"])
+    return Variant(row["type"], row.get("small"), target)
+
+
 def load_table(path: Path) -> tuple[Icon, ...]:
     """Read icons.toml into icons, in table order, and validate them.
 
     Raises:
-        ValueError: the table breaks a rule of `validate`.
+        ValueError: the table breaks a rule of `validate`, or a variant names a
+            vanilla block that [vanilla] does not list.
     """
     data = tomllib.loads(path.read_text(encoding="utf-8"))
+    vanilla = dict(data.get("vanilla", {}))
     icons = tuple(
         Icon(
             name=icon["name"],
             address=icon["address"],
-            variants=tuple(Variant(v["type"], v.get("small")) for v in icon["variant"]),
+            variants=tuple(_variant(icon["name"], v, vanilla) for v in icon["variant"]),
         )
         for icon in data["icon"]
     )
-    validate(icons)
+    validate(icons, vanilla)
     return icons
 
 
-def validate(icons: tuple[Icon, ...]) -> None:
+def validate(icons: tuple[Icon, ...], vanilla: dict[str, str] | None = None) -> None:
     """Reject a table the game would load wrongly without a word.
 
     The game keeps the first block registered at an address and drops the rest
@@ -189,11 +223,16 @@ def validate(icons: tuple[Icon, ...]) -> None:
     Raises:
         ValueError: a duplicate name or address; an address that is not a
             lowercase canonical UUID, does not ascend in table order, or does
-            not start with 0-7; a variant type that is not a PlusMarkerType.
+            not start with 0-7; a variant type that is not a PlusMarkerType; a
+            [vanilla] address that is one of the mod's own; a vanilla variant
+            index outside 0-9; an icon whose variants are all hidden.
     """
     names: set[str] = set()
     addresses: set[str] = set()
     previous = None
+    for block, address in (vanilla or {}).items():
+        if address in {icon.address for icon in icons}:
+            raise ValueError(f"vanilla block {block}: address {address} is one of the mod's own")
     for icon in icons:
         if icon.name in names:
             raise ValueError(f"icon name {icon.name} appears twice")
@@ -220,6 +259,15 @@ def validate(icons: tuple[Icon, ...]) -> None:
         for v in icon.variants:
             if v.type not in LEGACY_TYPES:
                 raise ValueError(f"icon {icon.name}: {v.type} is not a PlusMarkerType")
+            if v.vanilla is not None and not 0 <= v.vanilla.variant <= 9:
+                raise ValueError(
+                    f"icon {icon.name}: vanilla variant {v.vanilla.variant} of {v.type} "
+                    "must be in 0-9"
+                )
+        if all(v.hidden for v in icon.variants):
+            raise ValueError(
+                f"icon {icon.name} has no visible variant; the dialog would show nothing"
+            )
 
 
 _SPRITE_NAME = re.compile(r"^      name: (.*)$")
@@ -328,7 +376,7 @@ def render_meta(icon: Icon) -> str:
 
 
 def render_csharp(icons: tuple[Icon, ...]) -> str:
-    """IconTable.g.cs: the icon addresses and the legacy Amount mapping.
+    """IconTable.g.cs: the icon addresses, the legacy Amount mapping, the hidden variants.
 
     Raises:
         ValueError: a legacy variant's type appears twice, which would otherwise
@@ -370,7 +418,27 @@ def render_csharp(icons: tuple[Icon, ...]) -> str:
                 raise ValueError(f"{v.type} appears twice in the table")
             seen.add(v.type)
             amount = LEGACY_AMOUNT_BASE + LEGACY_TYPES.index(v.type)
-            lines.append(f'            {{{amount}, ("{icon.address}", {index})}}, // {v.type}')
+            address, variant = (
+                (v.vanilla.address, v.vanilla.variant) if v.vanilla else (icon.address, index)
+            )
+            lines.append(f'            {{{amount}, ("{address}", {variant})}}, // {v.type}')
+    lines += [
+        "        };",
+        "",
+        "        /// <summary>Hidden variants (icon address, variant index)"
+        " to the vanilla block variant they are converted to.</summary>",
+        "        public static readonly Dictionary<(string icon, int variant),"
+        " (string address, int variant)> ToVanilla ="
+        " new Dictionary<(string icon, int variant), (string address, int variant)>",
+        "        {",
+    ]
+    for icon in icons:
+        for index, v in enumerate(icon.variants):
+            if v.vanilla:
+                lines.append(
+                    f'            {{("{icon.address}", {index}),'
+                    f' ("{v.vanilla.address}", {v.vanilla.variant})}}, // {v.type}'
+                )
     lines += [
         "        };",
         "    }",

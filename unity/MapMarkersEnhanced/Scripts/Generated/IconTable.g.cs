@@ -101,5 +101,10 @@ namespace MapMarkersEnhanced
             {6060, ("77aea3e9-b732-4217-92f4-1bc153361245", 24)}, // LetterY
             {6061, ("77aea3e9-b732-4217-92f4-1bc153361245", 25)}, // LetterZ
         };
+
+        /// <summary>Hidden variants (icon address, variant index) to the vanilla block variant they are converted to.</summary>
+        public static readonly Dictionary<(string icon, int variant), (string address, int variant)> ToVanilla = new Dictionary<(string icon, int variant), (string address, int variant)>
+        {
+        };
     }
 }

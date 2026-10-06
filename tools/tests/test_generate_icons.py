@@ -335,16 +335,26 @@ def test_csharp_table_agrees(icons):
     """The C# mapping lists exactly the legacy variants, addresses in order."""
     text = gi.render_csharp(icons)
     entries = 0
+    hidden = []
     for icon in icons:
         for index, v in enumerate(icon.variants):
             key = 6000 + gi.LEGACY_TYPES.index(v.type)
-            entry = f'{{{key}, ("{icon.address}", {index})}}'
+            if v.vanilla:
+                entry = f'{{{key}, ("{v.vanilla.address}", {v.vanilla.variant})}}'
+                hidden.append(
+                    f'{{("{icon.address}", {index}), ("{v.vanilla.address}", {v.vanilla.variant})}}'
+                )
+            else:
+                entry = f'{{{key}, ("{icon.address}", {index})}}'
             if v.legacy:
                 assert entry in text, v.type
                 entries += 1
             else:
                 assert f"{{{key}," not in text, v.type
     assert text.count("{60") == entries
+    to_vanilla = text.split("ToVanilla", 1)[1]
+    assert to_vanilla.count('{("') == len(hidden)
+    assert all(h in to_vanilla for h in hidden)
     assert "namespace MapMarkersEnhanced" in text
     assert "internal static class IconTable" in text
     assert "public static readonly string[] ModIconAddresses" in text
@@ -385,17 +395,34 @@ def test_committed_outputs_match_the_generator():
 
 GOOD_A = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
 GOOD_B = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
+QUESTION = "7e09f30c-8838-5604-2b46-8c13b0ef771e"
 
 
-def write_table(tmp_path, *icons):
-    """A minimal icons.toml with one QuestionMark variant per (name, address[, type])."""
+def _hidden(block, n, kind="QuestionMark"):
+    """A variant row of write_table that points at a vanilla block."""
+    return {"type": kind, "vanilla": (block, n)}
+
+
+def write_table(tmp_path, *icons, vanilla=None):
+    """A minimal icons.toml, one variant per (name, address[, type[, variants]]).
+
+    `vanilla` is a name -> address dict written as the [vanilla] table. A fourth
+    element replaces the single default variant with dicts of `type` and an
+    optional `vanilla` (block, variant) pair.
+    """
     parts = []
+    if vanilla:
+        parts.append("[vanilla]\n" + "".join(f'{k} = "{v}"\n' for k, v in vanilla.items()))
     for name, address, *rest in icons:
-        kind = rest[0] if rest else "QuestionMark"
-        parts.append(
-            f'[[icon]]\nname = "{name}"\naddress = "{address}"\n\n'
-            f'[[icon.variant]]\ntype = "{kind}"\n'
-        )
+        kind = rest[0] if rest and rest[0] is not None else "QuestionMark"
+        variant_rows = rest[1] if len(rest) > 1 else [{"type": kind}]
+        text = f'[[icon]]\nname = "{name}"\naddress = "{address}"\n'
+        for row in variant_rows:
+            text += f'\n[[icon.variant]]\ntype = "{row["type"]}"\n'
+            if "vanilla" in row:
+                block, n = row["vanilla"]
+                text += f'vanilla = {{ icon = "{block}", variant = {n} }}\n'
+        parts.append(text)
     path = tmp_path / "icons.toml"
     path.write_text("\n".join(parts), encoding="utf-8")
     return path
@@ -419,6 +446,10 @@ def test_valid_crafted_table_loads(tmp_path):
         ((("A", "8" + GOOD_A[1:]),), "0-7"),
         ((("A", "f" + GOOD_A[1:]),), "0-7"),
         ((("A", GOOD_A, "NoSuchType"),), "NoSuchType"),
+        ((("A", GOOD_A, None, [_hidden("Nope", 9)]),), "Nope"),
+        ((("A", GOOD_A, None, [_hidden("Question", 10), {"type": "Cross"}]),), "0-9"),
+        ((("A", GOOD_A, None, [_hidden("Question", -1), {"type": "Cross"}]),), "0-9"),
+        ((("A", GOOD_A, None, [_hidden("Question", 9)]),), "visible"),
     ],
     ids=[
         "duplicate-name",
@@ -430,12 +461,63 @@ def test_valid_crafted_table_loads(tmp_path):
         "address-from-8",
         "address-from-f",
         "unknown-type",
+        "unknown-vanilla-block",
+        "vanilla-variant-out-of-range-high",
+        "vanilla-variant-out-of-range-negative",
+        "all-hidden",
     ],
 )
 def test_load_table_rejects(tmp_path, rows, message):
     """Every table defect is a ValueError naming it, before anything is rendered."""
     with pytest.raises(ValueError, match=message):
-        gi.load_table(write_table(tmp_path, *rows))
+        gi.load_table(write_table(tmp_path, *rows, vanilla={"Question": QUESTION}))
+
+
+def test_vanilla_address_must_not_be_a_mod_address(tmp_path):
+    """A [vanilla] entry pointing at one of the mod's own icons is rejected."""
+    path = write_table(
+        tmp_path,
+        ("A", GOOD_A, None, [_hidden("Question", 9), {"type": "Cross"}]),
+        vanilla={"Question": GOOD_A},
+    )
+    with pytest.raises(ValueError, match="vanilla"):
+        gi.load_table(path)
+
+
+def test_vanilla_target_resolves(tmp_path):
+    """A variant's vanilla pair resolves to the [vanilla] address and hides the variant."""
+    path = write_table(
+        tmp_path,
+        ("A", GOOD_A, None, [_hidden("Question", 9, "QuestionMark"), {"type": "Cross"}]),
+        vanilla={"Question": QUESTION},
+    )
+    (icon,) = gi.load_table(path)
+    assert icon.variants[0].vanilla == gi.VanillaTarget("Question", QUESTION, 9)
+    assert icon.variants[0].hidden and not icon.variants[1].hidden
+
+
+def test_load_vanilla_reads_the_table(tmp_path):
+    """load_vanilla returns the [vanilla] table, and {} when there is none."""
+    with_table = write_table(tmp_path, ("A", GOOD_A), vanilla={"Question": QUESTION})
+    assert gi.load_vanilla(with_table) == {"Question": QUESTION}
+    assert gi.load_vanilla(write_table(tmp_path, ("A", GOOD_A))) == {}
+
+
+def test_csharp_emits_to_vanilla_and_redirects_legacy(tmp_path):
+    """Hidden variants get a ToVanilla entry, and their Legacy entry points at the target."""
+    path = write_table(
+        tmp_path,
+        ("A", GOOD_A, None, [_hidden("Question", 9, "Cross"), {"type": "ExclamationMark"}]),
+        vanilla={"Question": QUESTION},
+    )
+    text = gi.render_csharp(gi.load_table(path))
+    assert (
+        "public static readonly Dictionary<(string icon, int variant),"
+        " (string address, int variant)> ToVanilla" in text
+    )
+    assert f'{{("{GOOD_A}", 0), ("{QUESTION}", 9)}}, // Cross' in text
+    assert f'{{6072, ("{QUESTION}", 9)}}, // Cross' in text
+    assert f'{{6027, ("{GOOD_A}", 1)}}, // ExclamationMark' in text
 
 
 def test_orphans_flags_files_the_table_does_not_generate(tmp_path):
