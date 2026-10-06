@@ -12,6 +12,7 @@ namespace MapMarkersEnhanced
     public sealed class MapMarkersEnhancedMod : IMod
     {
         private static bool s_iconsLogged;
+        private static bool s_presetsConverted;
 
         public void EarlyInit() { }
 
@@ -30,6 +31,25 @@ namespace MapMarkersEnhanced
             {
                 s_iconsLogged = true;
                 LogIcons();
+            }
+
+            // Own flag: the prefs may not exist yet when the data loads, and the icon log must stay once-only.
+            if (!s_presetsConverted && ScriptableData.isLoaded && Manager.prefs != null)
+            {
+                s_presetsConverted = true;
+                try
+                {
+                    int converted = PresetConversion.Run();
+                    if (converted > 0)
+                    {
+                        Debug.Log($"[MapMarkersEnhanced] converted {converted} presets");
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning("[MapMarkersEnhanced] preset conversion failed; presets stay as they are");
+                    Debug.LogException(e);
+                }
             }
 
             ScrollToSelectionPatch.Tick();

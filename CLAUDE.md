@@ -18,7 +18,8 @@ is specific to this mod. Why the mod is built this way, and what was rejected: [
 | `HiddenVariantsPatch`, `IconPreviewPatch` | `Scripts/HiddenVariantsPatch.cs` | Postfixes on `MapMarkerCustomizationPanel`: `BuildVariantRow` deactivates the hidden variant tiles, drops them from the toggle group, rewires left/right navigation over the visible ones and moves a selection off a hidden tile; `PopulateIconRow`/`UpdateIconRowSprites` draw an unselected icon whose variant 0 is hidden with its first visible variant |
 | `MarkerMigrationSystem` | `Scripts/MarkerMigrationSystem.cs` | Server-world ECS system: restores legacy question marks once per marker, and converts markers on hidden variants to vanilla |
 | `VanillaTargets` | `Scripts/VanillaTargets.cs` | Lookup over `IconTable.ToVanilla`: which variants have a vanilla target (hidden from the dialog) and what it is |
-| `MapMarkersEnhancedMod` | `MapMarkersEnhancedMod.cs` | Logs once per session which of the five addresses the game registered |
+| `PresetConversion` | `Scripts/PresetConversion.cs` | Client-side: rewrites the five marker presets that sit on a hidden variant to the vanilla twin, through `Manager.prefs` |
+| `MapMarkersEnhancedMod` | `MapMarkersEnhancedMod.cs` | Logs once per session which of the five addresses the game registered, and runs the preset conversion once per session |
 
 Every log line starts with `[MapMarkersEnhanced]`; `docs/manual-tests.md`
 lists the ones a healthy session prints.
