@@ -298,8 +298,12 @@ Only ever on a copy of a world, never on a live save.
 - Dedicated server, world "MME Server Test": see "Server without the mod" for
   the server without the mod, then **with** the new mod the server log read
   `converted 5 markers to vanilla icons` and the client showed the five as
-  vanilla. **Not established:** whether the change reaches an already connected
-  client live or only on (re)load.
+  vanilla. Live, same server with the new mod, client on 1.0.0 (which still
+  offers the hidden variants, and may join: the join check matches mods by id or
+  GUID, not by version): three markers placed on hidden variants were each
+  converted on the next pass — server log `converted 1 markers to vanilla icons`
+  three times — and the connected client's map switched to the vanilla icons
+  without reopening it.
 - A build problem met on the way: a rebuild without source changes shipped the
   mod without `Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`. The system
   then logged `marker migration failed` with `Exception: This method should have
