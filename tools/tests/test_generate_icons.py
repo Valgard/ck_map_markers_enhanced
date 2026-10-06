@@ -539,3 +539,51 @@ def test_check_fails_on_an_orphan(tmp_path, monkeypatch, capsys):
     (asset_dir / "Renamed.asset").write_text("x", encoding="utf-8")
     assert gi.main(["--check"]) == 1
     assert "Renamed.asset" in capsys.readouterr().out
+
+
+VANILLA_ADDRESSES = {  # read at runtime on 1.3.0.4; see the handbook, world-and-mechanics.md
+    "Cross": "adbecb0c-1236-bf84-d9ea-0516e188e2d0",
+    "Dot": "f9203606-618b-6384-7a99-a790e5c6de35",
+    "Flag": "3005a608-1b77-8604-8abe-d189ae05a0d8",
+    "Home": "64007694-5b2f-5474-b8ad-9f972e822421",
+    "Pickaxe": "a707985f-1e22-c2f4-e837-0cc32288f9c5",
+    "Question": "7e09f30c-8838-5604-2b46-8c13b0ef771e",
+    "Skull": "169f71d7-f86d-7234-abf0-0120b015262b",
+    "Star": "0eafefb1-8776-40d4-3af9-98637e55183e",
+}
+HIDDEN = {  # (icon, index, type) -> (block, variant)
+    ("General", 0, "QuestionMark"): ("Question", 9),
+    ("General", 3, "Cross"): ("Cross", 9),
+    ("General", 16, "Skull"): ("Skull", 0),
+    ("General", 17, "SkullRed"): ("Skull", 1),
+    ("OresAndGems", 0, "AncientCrystal"): ("Dot", 2),
+}
+
+
+def test_vanilla_table_is_the_measured_one():
+    """The [vanilla] table holds the eight measured vanilla block addresses."""
+    assert gi.load_vanilla(TABLE) == VANILLA_ADDRESSES
+
+
+def test_hidden_variants_are_exactly_the_five(icons):
+    """Exactly five variants are hidden and mapped to vanilla targets."""
+    found = {
+        (i.name, n, v.type): (v.vanilla.block, v.vanilla.variant)
+        for i in icons
+        for n, v in enumerate(i.variants)
+        if v.hidden
+    }
+    assert found == HIDDEN
+
+
+def test_flag_green_stays_visible(icons):
+    """No Flags variants are hidden; FlagGreen in particular stays visible."""
+    flags = next(i for i in icons if i.name == "Flags")
+    assert not any(v.hidden for v in flags.variants)
+
+
+def test_cross_and_skull_red_restore_to_vanilla(icons):
+    """Hidden variants are listed in Legacy as their vanilla targets."""
+    text = gi.render_csharp(icons)
+    assert '{6072, ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross' in text
+    assert '{6073, ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed' in text

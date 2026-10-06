@@ -23,7 +23,7 @@ namespace MapMarkersEnhanced
         {
             {6027, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 1)}, // ExclamationMark
             {6028, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 2)}, // MusicNote
-            {6072, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 3)}, // Cross
+            {6072, ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross
             {6030, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 4)}, // ArrowLeft
             {6031, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 5)}, // ArrowRight
             {6032, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 6)}, // ArrowUp
@@ -36,7 +36,7 @@ namespace MapMarkersEnhanced
             {6082, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 13)}, // Fish
             {6084, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 14)}, // Cog
             {6029, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 15)}, // Heart
-            {6073, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 17)}, // SkullRed
+            {6073, ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed
             {6034, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 18)}, // Flames
             {6083, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 19)}, // Shield
             {6077, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 20)}, // Dagger
@@ -105,6 +105,11 @@ namespace MapMarkersEnhanced
         /// <summary>Hidden variants (icon address, variant index) to the vanilla block variant they are converted to.</summary>
         public static readonly Dictionary<(string icon, int variant), (string address, int variant)> ToVanilla = new Dictionary<(string icon, int variant), (string address, int variant)>
         {
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 0), ("7e09f30c-8838-5604-2b46-8c13b0ef771e", 9)}, // QuestionMark
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 3), ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 16), ("169f71d7-f86d-7234-abf0-0120b015262b", 0)}, // Skull
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 17), ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 0), ("f9203606-618b-6384-7a99-a790e5c6de35", 2)}, // AncientCrystal
         };
     }
 }

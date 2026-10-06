@@ -8,7 +8,19 @@
 #
 # A variant's `type` is a MapMarkers+ PlusMarkerType name; its large sprite is
 # markers_<type>. `small` names the minimap slice; without it the minimap uses
-# the large sprite.
+# the large sprite. A variant with `vanilla` points at a vanilla block and hides
+# that variant from the dialog, converting it to the vanilla target; indices never
+# shift, hiding included.
+
+[vanilla]
+Cross = "adbecb0c-1236-bf84-d9ea-0516e188e2d0"
+Dot = "f9203606-618b-6384-7a99-a790e5c6de35"
+Flag = "3005a608-1b77-8604-8abe-d189ae05a0d8"
+Home = "64007694-5b2f-5474-b8ad-9f972e822421"
+Pickaxe = "a707985f-1e22-c2f4-e837-0cc32288f9c5"
+Question = "7e09f30c-8838-5604-2b46-8c13b0ef771e"
+Skull = "169f71d7-f86d-7234-abf0-0120b015262b"
+Star = "0eafefb1-8776-40d4-3af9-98637e55183e"
 
 [[icon]]
 name = "General"
@@ -17,6 +29,7 @@ address = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
 [[icon.variant]]
 type = "QuestionMark"
 small = "markers_QuestionMark_small"
+vanilla = { icon = "Question", variant = 9 }
 
 [[icon.variant]]
 type = "ExclamationMark"
@@ -29,6 +42,7 @@ small = "markers_MusicNote_small"
 [[icon.variant]]
 type = "Cross"
 small = "markers_Cross_small"
+vanilla = { icon = "Cross", variant = 9 }
 
 [[icon.variant]]
 type = "ArrowLeft"
@@ -81,10 +95,12 @@ small = "markers_Heart_small"
 [[icon.variant]]
 type = "Skull"
 small = "markers_skull_small"
+vanilla = { icon = "Skull", variant = 0 }
 
 [[icon.variant]]
 type = "SkullRed"
 small = "markers_SkullRed_small"
+vanilla = { icon = "Skull", variant = 1 }
 
 [[icon.variant]]
 type = "Flames"
@@ -109,6 +125,7 @@ address = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
 [[icon.variant]]
 type = "AncientCrystal"
 small = "markers_ancient_crystal_small"
+vanilla = { icon = "Dot", variant = 2 }
 
 [[icon.variant]]
 type = "Copper"
