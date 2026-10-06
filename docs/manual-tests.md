@@ -19,6 +19,11 @@ only these, each at most once:
   1.3 migration turned into question marks, and only on the first load there. It
   comes from the server world, so with a dedicated server it is in the server's
   log, not the client's.
+- `converted <n> presets` — only when a preset pointed at one of the variants
+  the dialog no longer offers, and then once per session.
+- `converted <n> markers to vanilla icons` — only on a world with markers that
+  use one of those variants. It comes from the server world, so with a dedicated
+  server it is in the server's log, not the client's.
 
 Anything else is a warning or an error. Each is logged once per session (the
 restoration ones once per world), never per frame:
@@ -68,7 +73,7 @@ restoration ones once per world), never per frame:
   placed marker cannot be edited, so it most likely means a game update changed
   what the version-13 migration writes, and restoration no longer runs. Compare
   the example with `QuestionMarkAddress` and `QuestionMarkVariant` in
-  `LegacyRestoreSystem.cs` and with `ConvertOldMapMarkersSystem` in the
+  `MarkerMigrationSystem.cs` and with `ConvertOldMapMarkersSystem` in the
   decompile.
 
 Two errors, both from restoration, each followed by the exception:
@@ -177,6 +182,57 @@ icons. After a clean server stop, the saved world held no marker at or above
 `6000` and 71 = 9 + 62 player markers at `Amount` 1. The dedicated server's
 later `IMod.Init()` does not affect the restore system: it is a managed system
 that needs no Burst workaround.
+
+## Hidden variants in the marker dialog
+
+Five variants are no longer offered, because vanilla has the same motif: General
+0 (question mark), 3 (cross), 16 (skull), 17 (red skull) and Ores and Gems 0
+(ancient crystal). Open the map-marker dialog.
+
+- General shows 18 variants, none of them the `?`, the `X`, the skull or the red
+  skull; Ores and Gems shows 10, no diamond; Flags 14, Numbers 10, Letters 26.
+- The icon-row preview of General shows `!`, and that of Ores and Gems copper,
+  while the icon is not selected.
+- Select Flags variant 3, then switch to General: the selection lands on index
+  4 (`ArrowLeft`), the next visible tile after the hidden index 3.
+- Switch General, Flags, General: Flags still shows 14 tiles.
+- Move left and right with keyboard or controller across General's gaps (2 to
+  4, 15 to 18) and through all of Flags: the selection never stops on an
+  invisible tile.
+- The row has no visible gap where tiles are hidden.
+- Place a marker from each visible tile: each works and shows its icon.
+
+**Result:** Not run yet.
+
+## Presets on hidden variants
+
+- Before installing the build, with the 1.0.0 mod, set one preset to General 0
+  (`?`) and one to General 3 (`X`).
+- After the first launch with the build: `Player.log` holds `converted 2
+  presets`, and both presets open on the vanilla question mark (yellow) and the
+  vanilla cross (yellow), names kept.
+- Second launch: no `converted … presets` line.
+- Review Focus 3: a dialog opened on a hidden variant selects a visible tile.
+
+**Result:** Not run yet.
+
+## World conversion to vanilla icons
+
+Only ever on a copy of a world, never on a live save.
+
+- With 1.0.0, place one marker each with General 0, 3, 16, 17 and Ores and Gems
+  0, plus one FlagGreen. Load the world with the new build: `converted 5 markers
+  to vanilla icons`; the five show the vanilla motifs (yellow `?`, yellow `X`,
+  white skull, red skull, blue diamond); the FlagGreen is unchanged.
+- On the copy from "Legacy restoration" (62 restored markers): the restored
+  `Cross` and `SkullRed` markers turn vanilla, and no new `restored` line
+  appears.
+- With the mod switched off on that copy, the five converted markers still show
+  their icons.
+- Dedicated server with the mod: the same as the first check, with the log line
+  in the server's log.
+
+**Result:** Not run yet.
 
 ## Server without the mod
 
