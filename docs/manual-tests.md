@@ -212,7 +212,10 @@ Five variants are no longer offered, because vanilla has the same motif: General
   presets`, and both presets open on the vanilla question mark (yellow) and the
   vanilla cross (yellow), names kept.
 - Second launch: no `converted … presets` line.
-- Review Focus 3: a dialog opened on a hidden variant selects a visible tile.
+- Open the marker dialog from a preset that still points at a hidden variant
+  (one the rewrite did not reach), using the map's preset buttons: the variant
+  row selects a visible tile, and a marker placed with it is converted to its
+  vanilla counterpart by the world.
 
 **Result:** Not run yet.
 
@@ -225,12 +228,14 @@ Only ever on a copy of a world, never on a live save.
   to vanilla icons`; the five show the vanilla motifs (yellow `?`, yellow `X`,
   white skull, red skull, blue diamond); the FlagGreen is unchanged.
 - On the copy from "Legacy restoration" (62 restored markers): the restored
-  `Cross` and `SkullRed` markers turn vanilla, and no new `restored` line
-  appears.
+  `Cross` and `SkullRed` markers turn vanilla, and the log reads `converted <n>
+  markers to vanilla icons` with `<n>` the number of restored Cross and SkullRed
+  markers on that copy; no new `restored` line appears.
 - With the mod switched off on that copy, the five converted markers still show
   their icons.
-- Dedicated server with the mod: the same as the first check, with the log line
-  in the server's log.
+- Dedicated server with the mod, on a copy of the first check's world: after a
+  player joins, the server log (not the client's) holds `converted 5 markers to
+  vanilla icons`, and the five show the vanilla motifs.
 
 **Result:** Not run yet.
 
@@ -244,8 +249,13 @@ client has enabled — and switched back on for the client afterwards.
 - Place a marker with one of the mod's icons, stop the server (quit handlers
   run, world written), start it again the same way, rejoin: the marker still
   shows its icon.
+- With a marker that uses a hidden variant already in the world (placed with the
+  1.0.0 mod or an old preset before the rewrite): the server log holds no
+  `converted … markers to vanilla icons` line, the marker is not converted, and
+  it still renders with its mod icon for a client that has the mod.
 
-**Result, 2026-09-29 (CK 1.3.0.2):**
+**Result, 2026-09-29 (CK 1.3.0.2), first two checks only; the hidden-variant
+check has not been run:**
 
 Passed. The server log lists 31 loaded mods, none of them MapMarkers — that is
 what shows the server ran without the mod. Both joins raised no mod dialog; the
