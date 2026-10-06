@@ -1,7 +1,7 @@
 # Map Markers Enhanced
 
 **Map Markers Enhanced** brings the marker art of moorowl's **MapMarkers+** to
-Core Keeper 1.3 — 83 markers in five categories, right in the game's own
+Core Keeper 1.3 — 78 markers in five categories, right in the game's own
 map-marker dialog. It also gives back the markers MapMarkers+ players lost in
 the 1.3 update, when every one of them turned into the same yellow question
 mark.
@@ -9,9 +9,9 @@ mark.
 ## Five extra marker icons
 Pick an icon in the upper row of the marker dialog, then the marker in the
 lower one. The mod's icons sit after the game's own:
-- **General** (22) — question and exclamation marks, music note, cross, arrows, chest, sign,
-  structures, leaf, fish, cog, heart, skulls, flames, shield, dagger, axe
-- **Ores and Gems** (11) — from Copper to Relucite, plus Ancient Crystal
+- **General** (18) — exclamation mark, music note, arrows, chest, sign,
+  structures, leaf, fish, cog, heart, flames, shield, dagger, axe
+- **Ores and Gems** (10) — from Copper to Relucite
 - **Flags** (14 colours)
 - **Numbers** (0–9)
 - **Letters** (A–Z)
@@ -20,6 +20,15 @@ Everything else is the game's own: naming a marker, the five presets, the
 minimap, multiplayer and saving work exactly as they do for vanilla markers.
 When you open a preset that uses one of the mod's icons, the dialog scrolls to
 it.
+
+## The game's own question mark, cross, skulls and diamond
+
+Core Keeper 1.3 draws a question mark, a cross, skulls and a blue diamond
+itself, so the mod no longer offers its own copies of them; the game's are used
+instead. Markers you already placed or saved in a preset with the old ones are
+converted to the game's own wherever the world runs with the mod (single-player,
+the host, or a dedicated server that has it). A dedicated server without the mod
+converts nothing.
 
 ## Your old MapMarkers+ markers come back
 Core Keeper 1.3 converted every marker drawn with MapMarkers+'s own art into

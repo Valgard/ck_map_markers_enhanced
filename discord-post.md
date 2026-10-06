@@ -1,9 +1,16 @@
 # Map Markers Enhanced
 
-moorowl's **MapMarkers+** marker art for Core Keeper 1.3 — 83 markers as five
+moorowl's **MapMarkers+** marker art for Core Keeper 1.3 — 78 markers as five
 extra icons right in the game's own map-marker dialog: General, Ores and Gems,
 Flags, Numbers and Letters. Pick an icon in the upper row, the marker in the
 lower one. Naming, presets, minimap and multiplayer are the game's own.
+
+## The game's own where it has one
+
+The question mark, cross, skulls and blue diamond are the game's own now, not
+copies. Markers you already have with the old ones are converted to the game's
+wherever the world runs with the mod; a dedicated server without it converts
+nothing.
 
 ## Your old MapMarkers+ markers come back
 
