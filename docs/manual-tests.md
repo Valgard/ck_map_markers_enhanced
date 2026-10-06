@@ -77,12 +77,15 @@ ones from the server world once per world), never per frame:
   the example with `QuestionMarkAddress` and `QuestionMarkVariant` in
   `MarkerMigrationSystem.cs` and with `ConvertOldMapMarkersSystem` in the
   decompile.
-- `vanilla target <address> variant <v> is not a registered map marker icon
-  with that variant; markers that convert to it are left as they are` — from the
-  server world, once per target and world. A game update dropped or renumbered
-  that vanilla block, or gave it fewer variants; nothing was written. Compare the
-  address with the `[vanilla]` table in `tools/icons.toml` and the game's
-  current `MapMarkerIconDataBlock` list.
+- `icon target <address> variant <v> is not a registered map marker icon with
+  that variant; markers that would be restored or converted to it are left as
+  they are` — from the server world, once per target and world. The block a
+  restoration or conversion would write is not registered or has fewer
+  variants: a game update dropped or renumbered a vanilla block, or one of the
+  mod's own icons did not load (see the `icons:` lines). Nothing was written; a
+  legacy marker keeps its MapMarkers+ amount and is restored once the target
+  resolves. Compare the address with `tools/icons.toml` and the game's current
+  `MapMarkerIconDataBlock` list.
 - `vanilla target <address> variant <v> is not a registered map marker icon
   with that variant; preset <n> is left as it is` — the same, for a preset, on
   the player's computer.

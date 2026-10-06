@@ -50,9 +50,10 @@ namespace MapMarkersEnhanced
         }
 
         /// <summary>
-        /// Whether a conversion target is registered: a <see cref="MapMarkerIconDataBlock"/> at
+        /// Whether a write target — a conversion's vanilla target or a restoration's mod or vanilla
+        /// target — is registered: a <see cref="MapMarkerIconDataBlock"/> at
         /// <paramref name="address"/> with at least <paramref name="variant"/> + 1 variants. The
-        /// addresses were measured on 1.3.0.4; a game update that drops or renumbers a vanilla block
+        /// vanilla addresses were measured on 1.3.0.4; a game update that drops or renumbers a block
         /// must not get markers or presets written onto an address that shows nothing. Only
         /// meaningful once <c>ScriptableData.isLoaded</c>; callers check that first.
         /// </summary>

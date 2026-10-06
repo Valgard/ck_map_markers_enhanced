@@ -123,8 +123,9 @@ for good — the README says so to players. Conversion needs no done-flag of its
 a converted marker carries a vanilla address and cannot match again, so that
 rule runs on every pass. Each rule's writes run under a try of their own, so a
 throw in one never stops the other; only a throw in the shared read-only scan
-stops both for that pass. Conversion writes a target only after
-`ScriptableData` resolves it, and warns instead when it does not.
+stops both for that pass. Both rules write a target only after `ScriptableData`
+resolves it, and warn instead when it does not; an unresolved restoration keeps
+its legacy `Amount`, so it can still happen later.
 
 ## Identity
 

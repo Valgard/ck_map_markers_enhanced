@@ -82,10 +82,12 @@ Two related decisions:
 - Vanilla's colour variants are read from the sprite sheet and the game's own
   conversion of 1.2 markers, not from fields: the extracted block assets carry
   none. The cross's address rests on a runtime probe alone. So every target is
-  looked up in the game's data before anything is written: should an update
-  drop or renumber a vanilla block, markers and presets on it are left as they
-  are and the log names the address, instead of being rewritten onto an icon
-  that shows nothing.
+  looked up in the game's data before anything is written — by conversion, by
+  restoration and by the preset rewrite alike: should an update drop or
+  renumber a vanilla block, the markers and presets that would be written onto
+  it are left as they are, a legacy marker keeping its MapMarkers+ amount, and
+  the log names the address, instead of being rewritten onto an icon that shows
+  nothing.
 
 ### Confirmation
 

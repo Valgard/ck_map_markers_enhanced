@@ -16,12 +16,15 @@ namespace MapMarkersEnhanced
     /// the first pass in a world that finds legacy-amount markers which are not
     /// the question mark warns how many, with one of them as an example, so a
     /// changed migration default does not leave restoration off without a trace.
+    /// A marker whose target does not resolve (<see cref="VanillaTargets.Resolves"/>) is not
+    /// written at all and keeps its legacy <c>Amount</c>, so a later pass can still restore it.
     /// <para>
     /// Rule 2 converts a marker whose icon and variant are in
     /// <see cref="IconTable.ToVanilla"/> (a variant the dialog hides) to its vanilla
-    /// target, leaving <c>Amount</c> alone, but only once <see cref="VanillaTargets.Resolves"/>
-    /// confirms that target is registered; a target that is not stays unwritten and is warned
-    /// about once per instance. A converted marker carries a vanilla address
+    /// target, leaving <c>Amount</c> alone, under the same check. Both rules resolve each
+    /// distinct target once per pass, write nothing for one that does not resolve, and warn
+    /// about it once per target and instance; while the game data is not loaded neither rule
+    /// writes. A converted marker carries a vanilla address
     /// and cannot match again. The rules are disjoint within a pass (rule 1 needs a
     /// vanilla address, rule 2 a mod address). Across passes rule 2 writes the question
     /// mark onto exactly the icon and variant rule 1 looks for, which is safe because the
@@ -140,6 +143,18 @@ namespace MapMarkersEnhanced
                 return;
             }
 
+            if (_matches.Count + _conversions.Count > 0 && !ScriptableData.isLoaded)
+            {
+                // No target can be checked before the game data is loaded; nothing is written,
+                // and the next pass retries.
+                _matches.Clear();
+                _conversions.Clear();
+                return;
+            }
+
+            // Each distinct target is resolved once per pass, not per marker, and shared by both rules.
+            _resolved.Clear();
+
             try
             {
                 RestoreLegacy();
@@ -247,6 +262,12 @@ namespace MapMarkersEnhanced
                     continue;
                 }
 
+                if (!TargetResolves(target.address, target.variant))
+                {
+                    // Amount stays at its legacy value, so a later pass can still restore the marker.
+                    continue;
+                }
+
                 MapMarkerCustomDataCD custom = EntityManager.GetComponentData<MapMarkerCustomDataCD>(entity);
                 custom.iconAddress = target.address;
                 custom.variantIndex = target.variant;
@@ -266,14 +287,6 @@ namespace MapMarkersEnhanced
         /// <summary>Rule 2's writes, over the markers the scan found on a hidden variant.</summary>
         private void ConvertHidden()
         {
-            if (_conversions.Count == 0 || !ScriptableData.isLoaded)
-            {
-                // Without loaded data no target can be checked; nothing is written, the next pass retries.
-                return;
-            }
-
-            // Each distinct target is resolved once per pass, not per marker.
-            _resolved.Clear();
             int converted = 0;
             foreach (Entity entity in _conversions)
             {
@@ -283,19 +296,7 @@ namespace MapMarkersEnhanced
                     continue;
                 }
 
-                if (!_resolved.TryGetValue((address, variant), out bool resolves))
-                {
-                    resolves = VanillaTargets.Resolves(address, variant);
-                    _resolved[(address, variant)] = resolves;
-                    if (!resolves && _unresolvedWarned.Add((address, variant)))
-                    {
-                        Debug.LogWarning(
-                            $"[MapMarkersEnhanced] vanilla target {address} variant {variant} is not a registered map marker icon with that variant; "
-                                + "markers that convert to it are left as they are"
-                        );
-                    }
-                }
-                if (!resolves)
+                if (!TargetResolves(address, variant))
                 {
                     continue;
                 }
@@ -310,6 +311,28 @@ namespace MapMarkersEnhanced
             {
                 Debug.Log($"[MapMarkersEnhanced] converted {converted} markers to vanilla icons");
             }
+        }
+
+        /// <summary>
+        /// Whether a restoration or conversion target is a registered icon with that variant
+        /// (<see cref="VanillaTargets.Resolves"/>), cached for the pass. An unresolved target is
+        /// warned about once per target and instance; the caller writes nothing for it.
+        /// </summary>
+        private bool TargetResolves(DataBlockAddress address, int variant)
+        {
+            if (!_resolved.TryGetValue((address, variant), out bool resolves))
+            {
+                resolves = VanillaTargets.Resolves(address, variant);
+                _resolved[(address, variant)] = resolves;
+                if (!resolves && _unresolvedWarned.Add((address, variant)))
+                {
+                    Debug.LogWarning(
+                        $"[MapMarkersEnhanced] icon target {address} variant {variant} is not a registered map marker icon with that variant; "
+                            + "markers that would be restored or converted to it are left as they are"
+                    );
+                }
+            }
+            return resolves;
         }
     }
 }
