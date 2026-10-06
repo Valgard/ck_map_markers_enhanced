@@ -16,12 +16,20 @@ namespace MapMarkersEnhanced
     /// the first pass in a world that finds legacy-amount markers which are not
     /// the question mark warns how many, with one of them as an example, so a
     /// changed migration default does not leave restoration off without a trace.
+    /// <para>
+    /// Rule 2 converts a marker whose icon and variant are in
+    /// <see cref="IconTable.ToVanilla"/> (a variant the dialog hides) to its vanilla
+    /// target, leaving <c>Amount</c> alone; a converted marker carries a vanilla address
+    /// and cannot match again. The rules are disjoint within a pass (rule 1 needs a
+    /// vanilla address, rule 2 a mod address), and across passes rule 2 only writes the
+    /// question mark onto markers whose <c>Amount</c> is 1, so rule 1 never sees them.
+    /// </para>
     /// Runs in the server world only; the serializer and ghost replication carry
     /// the change to the save and to every client.
     /// </summary>
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     [UpdateInGroup(typeof(RunSimulationSystemGroup))]
-    public partial class LegacyRestoreSystem : PugSimulationSystemBase
+    public partial class MarkerMigrationSystem : PugSimulationSystemBase
     {
         /// <summary>Updates between two passes; the first pass runs on the first update.</summary>
         private const int PassInterval = 60;
@@ -34,6 +42,7 @@ namespace MapMarkersEnhanced
 
         private readonly Dictionary<int, (DataBlockAddress address, int variant)> _legacy = new Dictionary<int, (DataBlockAddress address, int variant)>();
         private readonly List<Entity> _matches = new List<Entity>();
+        private readonly List<Entity> _conversions = new List<Entity>();
         private readonly List<(DataBlockAddress address, int variant)> _skipped = new List<(DataBlockAddress address, int variant)>();
 
         private DataBlockAddress _questionMark;
@@ -92,11 +101,6 @@ namespace MapMarkersEnhanced
 
         private void Pass()
         {
-            if (_legacy.Count == 0)
-            {
-                return;
-            }
-
             // Find candidates read-only, so a pass that restores nothing leaves
             // every chunk's change version alone: a write access would make the
             // serializer and ghost replication revisit all markers every pass.
@@ -104,14 +108,25 @@ namespace MapMarkersEnhanced
             List<Entity> matches = _matches;
             List<(DataBlockAddress address, int variant)> skipped = _skipped;
             DataBlockAddress questionMark = _questionMark;
+            List<Entity> conversions = _conversions;
             matches.Clear();
             skipped.Clear();
+            conversions.Clear();
 
             Entities
                 .ForEach(
                     (Entity entity, in ObjectDataCD data, in MapMarkerCustomDataCD custom) =>
                     {
-                        if (data.objectID == ObjectID.MapMarker && legacy.ContainsKey(data.amount))
+                        if (data.objectID != ObjectID.MapMarker)
+                        {
+                            return;
+                        }
+
+                        if (VanillaTargets.IsHidden(custom.iconAddress, custom.variantIndex))
+                        {
+                            conversions.Add(entity);
+                        }
+                        else if (legacy.ContainsKey(data.amount))
                         {
                             if (custom.iconAddress == questionMark && custom.variantIndex == QuestionMarkVariant)
                             {
@@ -146,11 +161,6 @@ namespace MapMarkersEnhanced
             }
             skipped.Clear();
 
-            if (matches.Count == 0)
-            {
-                return;
-            }
-
             int restored = 0;
             foreach (Entity entity in matches)
             {
@@ -174,6 +184,27 @@ namespace MapMarkersEnhanced
             if (restored > 0)
             {
                 Debug.Log($"[MapMarkersEnhanced] restored {restored} legacy markers");
+            }
+
+            int converted = 0;
+            foreach (Entity entity in conversions)
+            {
+                MapMarkerCustomDataCD custom = EntityManager.GetComponentData<MapMarkerCustomDataCD>(entity);
+                if (!VanillaTargets.TryGet(custom.iconAddress, custom.variantIndex, out DataBlockAddress address, out int variant))
+                {
+                    continue;
+                }
+
+                custom.iconAddress = address;
+                custom.variantIndex = variant;
+                EntityManager.SetComponentData(entity, custom);
+                converted++;
+            }
+            conversions.Clear();
+
+            if (converted > 0)
+            {
+                Debug.Log($"[MapMarkersEnhanced] converted {converted} markers to vanilla icons");
             }
         }
     }
