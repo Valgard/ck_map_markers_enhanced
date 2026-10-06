@@ -9,9 +9,14 @@ turned into the same yellow question mark.
 ## Features
 
 - **Five extra icons in the marker dialog**, listed after the game's own:
-  General (22 markers), Ores and Gems (11), Flags (14), Numbers (10) and
+  General (18 markers), Ores and Gems (10), Flags (14), Numbers (10) and
   Letters (26, A–Z). Pick an icon in the upper row, then the marker in the lower
   one.
+- **Four motifs are the game's own now.** The question mark, the cross, the
+  skull (white and red) and the blue diamond exist in the game itself since 1.3,
+  so the mod no longer offers its copies of them — five markers in all — and
+  converts existing ones, see below. The flags, including the green one, are
+  unchanged.
 - **Everything else is the game's own.** Naming a marker, the five presets, the
   minimap, multiplayer and saving work exactly as they do for vanilla markers:
   the mod adds icons, keeps the dialog scrolled to your selection and restores
@@ -20,6 +25,7 @@ turned into the same yellow question mark.
   of the mod's icons, the dialog scrolls so the selected icon and marker are in
   view instead of starting at the left end.
 - **Old MapMarkers+ markers are restored** — see below.
+- **Markers with the retired motifs are converted** — see below.
 
 ## Restoring MapMarkers+ markers
 
@@ -35,12 +41,28 @@ the mod — each of those question marks gets its original icon back. This
 happens once per marker and is saved with the world. Markers you placed with
 the game's own icons are not touched, and neither are MapMarkers+'s question
 mark, skull, ancient crystal and green flag: those were the game's own markers
-all along, and 1.3 converted them correctly.
+all along, and 1.3 converted them correctly. MapMarkers+'s cross and red skull
+come back as the game's own cross and red skull, since the mod no longer has
+icons of its own for them.
 
 **Back up the world first if you might want the question marks back.** The
 restoration replaces the stored MapMarkers+ type with the game's normal value,
 so afterwards nothing in the world records which MapMarkers+ marker a restored
 marker used to be.
+
+## Markers that now use the game's own icons
+
+Markers you placed with the mod's question mark, cross, skull, red skull or
+diamond are converted to the game's own marker with the same motif — a yellow
+question mark, a yellow cross, a white skull, a red skull and a blue diamond.
+Like the restoration, this happens where the world runs with the mod:
+single-player, the host of a multiplayer game, or a dedicated server that has
+it. The marker keeps its position and name. Your five presets are rewritten the
+same way on your own computer, keeping their names.
+
+A converted marker is the game's own, so it keeps its icon if you uninstall the
+mod. On a dedicated server without the mod nothing is converted, and such
+markers keep showing the mod's icon to players who have the mod.
 
 ## Requirements
 
@@ -61,8 +83,10 @@ Every player who wants to see the mod's icons needs the mod.
 
 ## Uninstalling
 
-A marker that uses one of the mod's icons — one you placed, or one the mod
-restored — loses its icon without the mod. It shows a stand-in instead, usually
+A marker that still uses one of the mod's icons — one you placed, or one the
+mod restored — loses its icon without the mod. Markers the mod converted to the
+game's own question mark, cross, skull, red skull or diamond keep theirs, and
+so do the old MapMarkers+ crosses and red skulls. It shows a stand-in instead, usually
 a blue diamond but at times the icon of another marker, and the game logs an
 error for it every time it draws it. Reinstalling brings the icons back: each
 icon has a fixed identity that saved markers refer to. What does not come back
@@ -102,5 +126,6 @@ Built with the official Pugstorm Core Keeper Mod SDK.
 - [Mod-internal CLAUDE.md](CLAUDE.md) — the icon generator, the constants the
   code relies on, and how to test
 - [ADR 001 — a data-native port](docs/adrs/001-data-native-port.md)
+- [ADR 002 — hiding vanilla duplicates](docs/adrs/002-hide-vanilla-duplicates.md)
 - [Manual in-game tests](docs/manual-tests.md)
 - [Roadmap](docs/roadmap.md)

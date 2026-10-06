@@ -64,6 +64,20 @@ rule keeps the order right should anything ever compare it signed. Mint one with
 freely; reordering or removing them changes what existing markers show, since a
 marker stores the variant's index.
 
+**Hidden variants.** Five variants duplicate a motif the game itself draws
+(General 0, 3, 16, 17 and Ores and Gems 0). Each carries `vanilla = {icon,
+variant}` in the table, naming the vanilla block from the `[vanilla]` table and
+its variant; **a variant is hidden exactly when it has such a target**, there is
+no second field. Hidden means the dialog skips the tile and the world converts
+markers on it. The variant stays in its icon block at its index and the block
+keeps its address, so **indices never shift, hiding included**: markers already
+placed still resolve, and a hidden variant still needs its sprite. The generator
+emits the mapping as `IconTable.ToVanilla`, points the `Legacy` entries of a
+hidden type at the vanilla target, and aborts (exit 2) on an unknown
+`vanilla.icon`, a variant outside 0–9, a vanilla address equal to a mod address,
+or an icon left without a visible variant. Why hide rather than remove: [`docs/adrs/002-hide-vanilla-duplicates.md`](docs/adrs/002-hide-vanilla-duplicates.md).
+The flags, `FlagGreen` included, are deliberately not hidden.
+
 The asset `.meta` GUIDs are derived from the icon names (`uuid5`), so renaming
 an icon changes its asset GUID. Nothing references those GUIDs today; the
 address is what matters.
@@ -82,6 +96,7 @@ marker buttons") has what to change once the art exists.
 
 | Constant | Value | Where it comes from |
 |---|---|---|
+| The eight vanilla icon blocks and the five hidden-variant targets | `[vanilla]` table and the `vanilla` fields of `tools/icons.toml` | addresses read at runtime on 1.3.0.4 with a probe; each vanilla block has ten variants, variant *n* is colour column *n* of the large marker sheet. Details in `docs/ck/world-and-mechanics.md` in the parent repository |
 | Question mark the migration writes | icon `7e09f30c-8838-5604-2b46-8c13b0ef771e`, variant `9` | `ConvertOldMapMarkersSystem.GetDefaultIconForVariation(1)` / `GetDefaultVariantForOldVariation(1)` — MapMarkers+ stored its markers in slot `Marker2`, variation 1 |
 | Legacy amount | `6000 + (int)PlusMarkerType` | MapMarkers+ 1.1.1's `PlusMarker.AmountBase`; `LEGACY_TYPES` in the generator is the enum in order (85 entries) |
 | Types with no legacy amount | `None`, `Ping`, `AncientCrystal`, `QuestionMark`, `Skull`, `FlagGreen` | MapMarkers+ let the game create these, so they carry `Amount` 1 (`LEGACY_EXCLUDED`) |
@@ -91,7 +106,9 @@ marker buttons") has what to change once the art exists.
 
 Restoration clears `Amount` to `1`, vanilla's value. That is what makes it run
 once per marker, and it is also why a restored marker's MapMarkers+ type is gone
-for good — the README says so to players.
+for good — the README says so to players. Conversion needs no marker of its own:
+a converted marker carries a vanilla address and cannot match again, so that
+rule runs on every pass. The two rules fail independently.
 
 ## Identity
 
@@ -117,6 +134,13 @@ this history — its hashes differ by design.
   the client.
 - Keep MapMarkers+ disabled in the client: it no longer compiles on 1.3, and
   its load failure would accompany every launch.
+- **A rebuild without source changes can drop the generated system code.** The
+  build then ships the mod without `Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`
+  and the system throws at runtime (`marker migration failed`, `This method
+  should have been replaced by codegen`). After every build check the output for
+  `Adding generated file …MarkerMigrationSystem__System_…g.cs`; if it is missing,
+  `touch Scripts/MarkerMigrationSystem.cs` and rebuild. Not fixed — only
+  worked around.
 
 ## Working in a worktree
 
