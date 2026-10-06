@@ -76,11 +76,12 @@ restoration ones once per world), never per frame:
   `MarkerMigrationSystem.cs` and with `ConvertOldMapMarkersSystem` in the
   decompile.
 
-Two errors, both from restoration, each followed by the exception:
+Three errors, each followed by the exception:
 `legacy marker table could not be parsed; restoration is off` (an address in
-`IconTable.g.cs` does not parse — regenerate and check) and `legacy marker
-restoration failed; will keep trying silently` (the pass threw; the stack trace
-names the cause).
+`IconTable.g.cs` does not parse — regenerate and check), `vanilla target table
+could not be parsed; conversion is off` (the same for `ToVanilla`; restoration
+keeps running) and `marker migration failed; will keep trying silently` (a pass
+threw; the stack trace names the cause).
 
 ## Icons in the dialog and on the map
 

@@ -21,8 +21,11 @@ namespace MapMarkersEnhanced
     /// <see cref="IconTable.ToVanilla"/> (a variant the dialog hides) to its vanilla
     /// target, leaving <c>Amount</c> alone; a converted marker carries a vanilla address
     /// and cannot match again. The rules are disjoint within a pass (rule 1 needs a
-    /// vanilla address, rule 2 a mod address), and across passes rule 2 only writes the
-    /// question mark onto markers whose <c>Amount</c> is 1, so rule 1 never sees them.
+    /// vanilla address, rule 2 a mod address). Across passes rule 2 writes the question
+    /// mark onto exactly the icon and variant rule 1 looks for, which is safe because the
+    /// game creates every placed marker with <c>Amount</c> 1 and restoration writes 1.
+    /// Should a legacy-amount marker ever reach a hidden variant, rule 1 restores it on a
+    /// later pass if rule 2 left it on the question mark. The two rules fail independently.
     /// </para>
     /// Runs in the server world only; the serializer and ghost replication carry
     /// the change to the save and to every client.
@@ -47,7 +50,9 @@ namespace MapMarkersEnhanced
 
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
-        private bool _failureLogged;
+        private bool _legacyParseLogged;
+        private bool _passFailureLogged;
+        private bool _conversionOff;
         private bool _skippedLogged;
 
         protected override void OnCreate()
@@ -64,8 +69,20 @@ namespace MapMarkersEnhanced
             {
                 // With an empty table every amount falls through and the system restores nothing.
                 _legacy.Clear();
-                _failureLogged = true;
+                _legacyParseLogged = true;
                 Debug.LogError("[MapMarkersEnhanced] legacy marker table could not be parsed; restoration is off");
+                Debug.LogException(e);
+            }
+
+            try
+            {
+                // Forces VanillaTargets' static initialisation here, so a parse failure turns off rule 2 alone.
+                VanillaTargets.HasHidden(default);
+            }
+            catch (Exception e)
+            {
+                _conversionOff = true;
+                Debug.LogError("[MapMarkersEnhanced] vanilla target table could not be parsed; conversion is off");
                 Debug.LogException(e);
             }
 
@@ -87,10 +104,10 @@ namespace MapMarkersEnhanced
                 }
                 catch (Exception e)
                 {
-                    if (!_failureLogged)
+                    if (!_passFailureLogged)
                     {
-                        _failureLogged = true;
-                        Debug.LogError("[MapMarkersEnhanced] legacy marker restoration failed; will keep trying silently");
+                        _passFailureLogged = true;
+                        Debug.LogError("[MapMarkersEnhanced] marker migration failed; will keep trying silently");
                         Debug.LogException(e);
                     }
                 }
@@ -108,6 +125,7 @@ namespace MapMarkersEnhanced
             List<Entity> matches = _matches;
             List<(DataBlockAddress address, int variant)> skipped = _skipped;
             DataBlockAddress questionMark = _questionMark;
+            bool conversionOn = !_conversionOff;
             List<Entity> conversions = _conversions;
             matches.Clear();
             skipped.Clear();
@@ -122,7 +140,7 @@ namespace MapMarkersEnhanced
                             return;
                         }
 
-                        if (VanillaTargets.IsHidden(custom.iconAddress, custom.variantIndex))
+                        if (conversionOn && VanillaTargets.IsHidden(custom.iconAddress, custom.variantIndex))
                         {
                             conversions.Add(entity);
                         }
