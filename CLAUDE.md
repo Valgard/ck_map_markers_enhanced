@@ -53,18 +53,29 @@ beside the new one at the same address — fails both modes (exit 1); delete it
 by hand.
 
 **Addresses are identities.** A saved marker stores its icon's address, so an
-address that has shipped never changes, and an icon is never removed: either
-leaves every marker using it without its icon. Such a marker shows whatever
-sprite its display element last had — a blue diamond on a fresh one, another
-marker's icon on a reused one — and logs an error every frame. Within the mod,
-the dialog order is the address order (the game sorts each loader's blocks by
-address), so a new icon appended after Letters needs an address greater than the
-last one, and every address starts with a hex digit `0`–`7`, which the generator
-enforces — `Guid.CompareTo` compares the first field unsigned today, and the
-rule keeps the order right should anything ever compare it signed. Mint one with
-`uuid4()`, regenerating until both hold. Variants can be appended to an icon
-freely; reordering or removing them changes what existing markers show, since a
-marker stores the variant's index.
+address that has shipped is never reused for anything else, and the variant
+indices inside a shipped block never shift. The game never resolves or drops the
+address on load, save or network receive; a marker whose address has no
+registered block is written back unchanged and merely displays whatever sprite
+its display element last had — a blue diamond on a fresh one, another marker's
+icon on a reused one — while the client logs an error every frame. So removing a
+block costs display, not data: reinstalling the mod brings the icon back. A real
+redesign (reorder, remove, merge, split) therefore gives the changed icons new
+addresses and a migration rewriting old (address, index) to new (address, index)
+wherever the world runs with the mod; the old blocks need not stay registered.
+The accepted cost is that markers not yet migrated — a dedicated server without
+the mod, a world not loaded since — show the fallback and spam the log until the
+world runs with the mod once; the migration still works later, as it matches the
+stored address, not the block. Appending variants, swapping art at the same
+index and hiding variants need no new address. Within the mod, the dialog order
+is the address order (the game sorts each loader's blocks by address), so a new
+icon appended after Letters needs an address greater than the last one, and
+every address starts with a hex digit `0`–`7`, which the generator enforces —
+`Guid.CompareTo` compares the first field unsigned today, and the rule keeps the
+order right should anything ever compare it signed. Mint one with `uuid4()`,
+regenerating until both hold. Variants can be appended to an icon freely;
+reordering or removing them changes what existing markers show, since a marker
+stores the variant's index.
 
 **Hidden variants.** Five variants duplicate a motif the game itself draws
 (General 0, 3, 16, 17 and Ores and Gems 0). Each carries `vanilla = {icon,

@@ -42,11 +42,12 @@ list: a variant is hidden exactly when the icon table names a vanilla target for
 it, so a hidden variant without a conversion cannot exist.
 
 Options 1 and 2 would leave the visible set right, but every hidden or removed
-block still has markers pointing at it. Removing the block orphans them, which
-is the failure addresses exist to prevent; keeping it hidden needs the same
-hiding logic as the chosen option plus a second set of addresses to maintain, for
-no gain. Option 3 changes what a stored index means, so every existing marker on
-a shifted variant would silently show another motif.
+block still has markers pointing at it. Removing the block leaves them showing
+the fallback sprite and logging an error every frame until the world runs with
+the mod; keeping it hidden needs the same hiding logic as the chosen option plus
+a second set of addresses to maintain, for no gain. Option 3 changes what a
+stored index means, so every existing marker on a shifted variant would silently
+show another motif.
 
 Two related decisions:
 
@@ -115,7 +116,8 @@ or a conversion target that does not resolve.
 
 ### 2. New addresses, old blocks removed
 
-- Bad, because every marker on a removed block loses its icon.
+- Bad, because every marker on a removed block shows the fallback sprite and
+  logs an error until the world runs with the mod and migrates it.
 
 ### 3. Rewriting indices in place
 
