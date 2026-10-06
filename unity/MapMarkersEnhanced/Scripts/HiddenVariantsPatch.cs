@@ -26,7 +26,35 @@ namespace MapMarkersEnhanced
 
         // Number of Open/OnResetToDefaultClicked calls in progress: while non-zero, the selection
         // was set on purpose and is kept by index. Open nests (the 8-parameter one calls the other).
-        internal static int s_explicitDepth;
+        private static int s_explicitDepth;
+        private static bool s_depthUnderflowLogged;
+
+        /// <summary>An explicit selection (Open, OnResetToDefaultClicked) starts; called from a prefix.</summary>
+        internal static void EnterExplicit()
+        {
+            s_explicitDepth++;
+        }
+
+        /// <summary>
+        /// An explicit selection ends; called from a finalizer. Clamps at 0, and warns once per
+        /// session when an exit has no matching enter, which would mean a prefix did not run.
+        /// </summary>
+        internal static void ExitExplicit()
+        {
+            if (s_explicitDepth > 0)
+            {
+                s_explicitDepth--;
+                return;
+            }
+
+            if (!s_depthUnderflowLogged)
+            {
+                s_depthUnderflowLogged = true;
+                Debug.LogWarning(
+                    "[MapMarkersEnhanced] explicit-selection depth would go below 0: a finalizer of Open or OnResetToDefaultClicked ran without its prefix; kept at 0"
+                );
+            }
+        }
 
         private static bool s_hasPrev;
         private static DataBlockAddress s_prevIcon;
@@ -473,13 +501,13 @@ namespace MapMarkersEnhanced
         private static void Prefix()
         {
             HiddenVariantsPatch.ForgetPrevious();
-            HiddenVariantsPatch.s_explicitDepth++;
+            HiddenVariantsPatch.EnterExplicit();
         }
 
         [HarmonyFinalizer]
         private static void Finalizer()
         {
-            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
+            HiddenVariantsPatch.ExitExplicit();
         }
     }
 
@@ -503,13 +531,13 @@ namespace MapMarkersEnhanced
         [HarmonyPrefix]
         private static void Prefix()
         {
-            HiddenVariantsPatch.s_explicitDepth++;
+            HiddenVariantsPatch.EnterExplicit();
         }
 
         [HarmonyFinalizer]
         private static void Finalizer()
         {
-            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
+            HiddenVariantsPatch.ExitExplicit();
         }
     }
 
@@ -519,13 +547,13 @@ namespace MapMarkersEnhanced
         [HarmonyPrefix]
         private static void Prefix()
         {
-            HiddenVariantsPatch.s_explicitDepth++;
+            HiddenVariantsPatch.EnterExplicit();
         }
 
         [HarmonyFinalizer]
         private static void Finalizer()
         {
-            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
+            HiddenVariantsPatch.ExitExplicit();
         }
     }
 }
