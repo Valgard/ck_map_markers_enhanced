@@ -19,7 +19,9 @@ namespace MapMarkersEnhanced
     /// <para>
     /// Rule 2 converts a marker whose icon and variant are in
     /// <see cref="IconTable.ToVanilla"/> (a variant the dialog hides) to its vanilla
-    /// target, leaving <c>Amount</c> alone; a converted marker carries a vanilla address
+    /// target, leaving <c>Amount</c> alone, but only once <see cref="VanillaTargets.Resolves"/>
+    /// confirms that target is registered; a target that is not stays unwritten and is warned
+    /// about once per instance. A converted marker carries a vanilla address
     /// and cannot match again. The rules are disjoint within a pass (rule 1 needs a
     /// vanilla address, rule 2 a mod address). Across passes rule 2 writes the question
     /// mark onto exactly the icon and variant rule 1 looks for, which is safe because the
@@ -56,6 +58,8 @@ namespace MapMarkersEnhanced
         private readonly List<Entity> _matches = new List<Entity>();
         private readonly List<Entity> _conversions = new List<Entity>();
         private readonly List<(DataBlockAddress address, int variant)> _skipped = new List<(DataBlockAddress address, int variant)>();
+        private readonly Dictionary<(DataBlockAddress address, int variant), bool> _resolved = new Dictionary<(DataBlockAddress address, int variant), bool>();
+        private readonly HashSet<(DataBlockAddress address, int variant)> _unresolvedWarned = new HashSet<(DataBlockAddress address, int variant)>();
 
         private DataBlockAddress _questionMark;
         private int _updatesUntilPass;
@@ -262,11 +266,36 @@ namespace MapMarkersEnhanced
         /// <summary>Rule 2's writes, over the markers the scan found on a hidden variant.</summary>
         private void ConvertHidden()
         {
+            if (_conversions.Count == 0 || !ScriptableData.isLoaded)
+            {
+                // Without loaded data no target can be checked; nothing is written, the next pass retries.
+                return;
+            }
+
+            // Each distinct target is resolved once per pass, not per marker.
+            _resolved.Clear();
             int converted = 0;
             foreach (Entity entity in _conversions)
             {
                 MapMarkerCustomDataCD custom = EntityManager.GetComponentData<MapMarkerCustomDataCD>(entity);
                 if (!VanillaTargets.TryGet(custom.iconAddress, custom.variantIndex, out DataBlockAddress address, out int variant))
+                {
+                    continue;
+                }
+
+                if (!_resolved.TryGetValue((address, variant), out bool resolves))
+                {
+                    resolves = VanillaTargets.Resolves(address, variant);
+                    _resolved[(address, variant)] = resolves;
+                    if (!resolves && _unresolvedWarned.Add((address, variant)))
+                    {
+                        Debug.LogWarning(
+                            $"[MapMarkersEnhanced] vanilla target {address} variant {variant} is not a registered map marker icon with that variant; "
+                                + "markers that convert to it are left as they are"
+                        );
+                    }
+                }
+                if (!resolves)
                 {
                     continue;
                 }

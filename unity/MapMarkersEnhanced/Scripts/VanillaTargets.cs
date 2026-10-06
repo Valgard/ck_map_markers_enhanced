@@ -49,6 +49,23 @@ namespace MapMarkersEnhanced
             return false;
         }
 
+        /// <summary>
+        /// Whether a conversion target is registered: a <see cref="MapMarkerIconDataBlock"/> at
+        /// <paramref name="address"/> with at least <paramref name="variant"/> + 1 variants. The
+        /// addresses were measured on 1.3.0.4; a game update that drops or renumbers a vanilla block
+        /// must not get markers or presets written onto an address that shows nothing. Only
+        /// meaningful once <c>ScriptableData.isLoaded</c>; callers check that first.
+        /// </summary>
+        internal static bool Resolves(DataBlockAddress address, int variant)
+        {
+            // TryGetDataBlock reports any block at the address; the cast leaves null for another type.
+            return ScriptableData.TryGetDataBlock<MapMarkerIconDataBlock>(address, out MapMarkerIconDataBlock block)
+                && block != null
+                && block.variants != null
+                && variant >= 0
+                && variant < block.variants.Count;
+        }
+
         /// <summary>Whether the variant has a vanilla target, i.e. is hidden from the dialog.</summary>
         internal static bool IsHidden(DataBlockAddress icon, int variant) => Targets.ContainsKey((icon, variant));
 

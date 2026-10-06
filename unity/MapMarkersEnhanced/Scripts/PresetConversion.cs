@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace MapMarkersEnhanced
 {
     /// <summary>
@@ -12,7 +14,14 @@ namespace MapMarkersEnhanced
     {
         internal const int PresetSlots = 5;
 
-        /// <summary>Converts every preset on a hidden variant; returns how many were rewritten.</summary>
+        private static bool s_unresolvedLogged;
+
+        /// <summary>
+        /// Converts every preset on a hidden variant whose vanilla target resolves
+        /// (<see cref="VanillaTargets.Resolves"/>; needs <c>ScriptableData.isLoaded</c>, which the
+        /// caller checks); returns how many were rewritten. A preset whose target does not resolve
+        /// is left as it is, with one warning per session.
+        /// </summary>
         internal static int Run()
         {
             int converted = 0;
@@ -26,6 +35,19 @@ namespace MapMarkersEnhanced
 
                 if (VanillaTargets.TryGet(preset.iconAddress, preset.variantIndex, out DataBlockAddress address, out int vanillaVariant))
                 {
+                    if (!VanillaTargets.Resolves(address, vanillaVariant))
+                    {
+                        if (!s_unresolvedLogged)
+                        {
+                            s_unresolvedLogged = true;
+                            Debug.LogWarning(
+                                $"[MapMarkersEnhanced] vanilla target {address} variant {vanillaVariant} is not a registered map marker icon with that variant; "
+                                    + $"preset {i + 1} is left as it is"
+                            );
+                        }
+                        continue;
+                    }
+
                     Manager.prefs.SetMapMarkerPreset(
                         i,
                         new MapMarkerPreset
