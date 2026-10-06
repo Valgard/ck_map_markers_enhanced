@@ -33,8 +33,9 @@ namespace MapMarkersEnhanced
                 LogIcons();
             }
 
-            // Own flag: the prefs may not exist yet when the data loads, and the icon log must stay once-only.
-            if (!s_presetsConverted && ScriptableData.isLoaded && Manager.prefs != null)
+            // Own flag: the prefs file is read by PrefsManager.Init inside Manager's startup, which can finish after
+            // the data loads; Manager.Initialized is set only once every manager's Init has run. The icon log stays once-only.
+            if (!s_presetsConverted && ScriptableData.isLoaded && Manager.main != null && Manager.main.Initialized && Manager.prefs != null)
             {
                 s_presetsConverted = true;
                 try
@@ -47,7 +48,7 @@ namespace MapMarkersEnhanced
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogWarning("[MapMarkersEnhanced] preset conversion failed; presets stay as they are");
+                    Debug.LogWarning("[MapMarkersEnhanced] preset conversion failed; remaining presets stay as they are");
                     Debug.LogException(e);
                 }
             }
