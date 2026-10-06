@@ -356,6 +356,19 @@ Only ever on a copy of a world, never on a live save.
   and rebuild, and check the build output for `Adding generated file
   …MarkerMigrationSystem__System_…g.cs`.
 
+**Re-check after the review-gate fixes, 2026-10-06 (CK 1.3.0.4, branch build
+with target resolution and per-rule failure isolation):**
+
+- Dedicated server with the new build, client on 1.0.0, world "MME Server Test":
+  the server log read `Replacing method
+  MapMarkersEnhanced.MarkerMigrationSystem/Scan_T0 with __Scan_…`; twelve
+  markers placed on hidden variants each produced one `converted 1 markers to
+  vanilla icons` line and became the vanilla icons. No new warning.
+- Single-player with the new build on a fresh copy of the 2026-08-16 backup
+  ("MME Final Test"): `converted 1 presets`, the game's `Converted 67 old map
+  markers`, then `restored 60 legacy markers` — the same count as before the
+  fixes; the dialog still hid the five variants. No new warning.
+
 ## Server without the mod
 
 Local dedicated server (`utils/server.sh`), started with the mod on the client's
