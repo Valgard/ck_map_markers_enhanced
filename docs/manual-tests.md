@@ -81,7 +81,12 @@ Three errors, each followed by the exception:
 `IconTable.g.cs` does not parse — regenerate and check), `vanilla target table
 could not be parsed; conversion is off` (the same for `ToVanilla`; restoration
 keeps running) and `marker migration failed; will keep trying silently` (a pass
-threw; the stack trace names the cause).
+threw; the stack trace names the cause). One cause seen in practice is `Exception:
+This method should have been replaced by codegen`: the build shipped without
+`Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`, so `Player.log` also
+lacks `Replacing method MapMarkersEnhanced.MarkerMigrationSystem/Pass_T0 …`.
+Touch `MarkerMigrationSystem.cs` and rebuild; the build output must contain
+`Adding generated file …MarkerMigrationSystem__System_…g.cs`.
 
 ## Icons in the dialog and on the map
 
@@ -207,7 +212,21 @@ Five variants are no longer offered, because vanilla has the same motif: General
 - The row has no visible gap where tiles are hidden.
 - Place a marker from each visible tile: each works and shows its icon.
 
-**Result:** Not run yet.
+**Result, 2026-10-06 (CK 1.3.0.4, single-player, build edcc457):**
+
+- The dialog offers 18 variants in General (no `?`, `X`, skull or red skull), 10
+  in Ores and Gems (no diamond), 14 in Flags, 10 in Numbers and 26 in Letters.
+  The icon-row preview shows `!` for General and copper for Ores and Gems; the
+  row has no visible gaps.
+- A first build carried the selected index across icon switches, so switching
+  from General to another icon landed one tile too far (Ores and Gems happened to
+  be right). edcc457 keeps the visible position instead. Retested: General's
+  first visible tile selects Flags' first flag, and Flags' 4th flag selects
+  General's 4th visible tile (index 5, the right arrow).
+- The dialog has no keyboard navigation, so that check does not apply.
+  **Controller navigation was not tested** (no controller available).
+- No result was recorded for the Flags tile count after switching back, or for
+  placing a marker from every visible tile.
 
 ## Presets on hidden variants
 
@@ -222,7 +241,14 @@ Five variants are no longer offered, because vanilla has the same motif: General
   row selects a visible tile, and a marker placed with it is converted to its
   vanilla counterpart by the world.
 
-**Result:** Not run yet.
+**Result, 2026-10-06 (CK 1.3.0.4, single-player):**
+
+- `Player.log` holds `[MapMarkersEnhanced] converted 2 presets`. The two presets
+  set with 1.0.0 on `?` and `X` showed the yellow vanilla question mark and the
+  yellow vanilla cross, names kept. Presets can only be checked inside a world,
+  because the map exists only there.
+- Not tested: the second launch (absence of the line) and a preset that still
+  points at a hidden variant.
 
 ## World conversion to vanilla icons
 
@@ -242,7 +268,43 @@ Only ever on a copy of a world, never on a live save.
   player joins, the server log (not the client's) holds `converted 5 markers to
   vanilla icons`, and the five show the vanilla motifs.
 
-**Result:** Not run yet.
+**Result, 2026-10-06 (CK 1.3.0.4):**
+
+- Single-player copy "MME Vanilla Test", markers placed with 1.0.0: `converted 5
+  markers to vanilla icons`. The five became a yellow `?`, a yellow `X`, a white
+  skull, a red skull and a blue diamond, as vanilla, without a frame; the MME
+  green flag stayed.
+- Uninstall check, with the MME dev build uninstalled and the mod.io
+  subscription disabled: the five converted markers kept their icons. The MME
+  green flag showed the fallback sprite, the blue diamond — the prefab default
+  `map_markers_1`, 1.2's first user marker (see `docs/ck/world-and-mechanics.md`
+  in the parent repository).
+- Legacy chain on a pre-1.3 backup (a copy of a 2026-08-16 world, loaded in
+  1.3.0.4): the game logged `Converted 67 old map markers` and the mod `restored
+  60 legacy markers`. The map showed ores, notes and so on instead of question
+  marks; the question marks and white skulls that remain were created by vanilla.
+- Cross and SkullRed through a 1.2.1.5 round trip (Steam branch 1.2.1.5,
+  MapMarkers+ enabled, a fresh copy of the same backup): 12 markers placed with
+  MapMarkers+, including a red skull. **No cross was placed** (forgotten). Back on
+  1.3.0.4 the game logged `Converted 79 old map markers` and the mod `restored 68
+  legacy markers` (8 new). The red skull came back as the vanilla red skull, no
+  frame; `!`, a note, a heart, copper, 5, 1 and a white flag came back as MME
+  icons; `?`, the white skull, the diamond and the green flag were vanilla (the
+  game's own conversion). The cross is covered by the generator test (6072 to
+  Cross 9) and the same code path, which was agreed with the owner, not by an
+  in-game marker.
+- Dedicated server, world "MME Server Test": see "Server without the mod" for
+  the server without the mod, then **with** the new mod the server log read
+  `converted 5 markers to vanilla icons` and the client showed the five as
+  vanilla. **Not established:** whether the change reaches an already connected
+  client live or only on (re)load.
+- A build problem met on the way: a rebuild without source changes shipped the
+  mod without `Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`. The system
+  then logged `marker migration failed` with `Exception: This method should have
+  been replaced by codegen`, and `Player.log` lacked `Replacing method
+  MapMarkersEnhanced.MarkerMigrationSystem/Pass_T0 …`. Touch the system's `.cs`
+  and rebuild, and check the build output for `Adding generated file
+  …MarkerMigrationSystem__System_…g.cs`.
 
 ## Server without the mod
 
@@ -265,6 +327,15 @@ check has not been run:**
 Passed. The server log lists 31 loaded mods, none of them MapMarkers — that is
 what shows the server ran without the mod. Both joins raised no mod dialog; the
 client log shows no unresolved icon and no join error.
+
+**Result, hidden-variant check, 2026-10-06 (CK 1.3.0.4, world "MME Server
+Test"):**
+
+Passed. With the server without the mod, the 1.0.0 client placed `?`, `X`, a
+skull, a red skull and a diamond; the server log had no `[MapMarkersEnhanced]`
+line. With the server still without the mod, the client switched to the new
+build: the markers kept their MME icons, and the client log showed no conversion
+and no unresolved icon.
 
 ## Without the mod on the client
 
