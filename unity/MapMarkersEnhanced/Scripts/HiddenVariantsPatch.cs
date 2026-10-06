@@ -22,6 +22,67 @@ namespace MapMarkersEnhanced
     {
         private static bool s_failedLogged;
 
+        // Number of Open/OnResetToDefaultClicked calls in progress: while non-zero, the selection
+        // was set on purpose and is kept by index. Open nests (the 8-parameter one calls the other).
+        internal static int s_explicitDepth;
+
+        private static bool s_hasPrev;
+        private static DataBlockAddress s_prevIcon;
+        private static int s_prevCount;
+        private static int s_oldIndex;
+
+        /// <summary>Forgets the previously built icon; the dialog is being opened afresh.</summary>
+        internal static void ForgetPrevious()
+        {
+            s_hasPrev = false;
+        }
+
+        /// <summary>Records vanilla's selected index before <c>BuildVariantRow</c> clamps it.</summary>
+        [HarmonyPrefix]
+        private static void Prefix(int ____selectedVariantIndex)
+        {
+            s_oldIndex = ____selectedVariantIndex;
+        }
+
+        /// <summary>
+        /// The index that should be selected, or -1 to leave vanilla's choice. A selection set on
+        /// purpose keeps its index, moved off a hidden tile to the nearest visible one. A user's
+        /// switch from another icon keeps the selection's visible position, because vanilla
+        /// carries the index over and the two differ once tiles are hidden.
+        /// </summary>
+        private static int ChooseSelection(DataBlockAddress icon, int count, bool hasHidden, int selected)
+        {
+            if (s_explicitDepth > 0 || !s_hasPrev)
+            {
+                return hasHidden && selected >= 0 && selected < count && VanillaTargets.IsHidden(icon, selected) ? NearestVisible(icon, count, selected) : -1;
+            }
+
+            int position = 0;
+            int limit = Math.Min(s_oldIndex, s_prevCount);
+            for (int i = 0; i < limit; i++)
+            {
+                if (!VanillaTargets.IsHidden(s_prevIcon, i))
+                {
+                    position++;
+                }
+            }
+
+            int last = -1;
+            for (int i = 0; i < count; i++)
+            {
+                if (VanillaTargets.IsHidden(icon, i))
+                {
+                    continue;
+                }
+                last = i;
+                if (position-- == 0)
+                {
+                    break;
+                }
+            }
+            return last;
+        }
+
         [HarmonyPostfix]
         private static void Postfix(
             MapMarkerCustomizationPanel __instance,
@@ -65,14 +126,14 @@ namespace MapMarkersEnhanced
 
                 RewireNavigation(____variantOptions, icon, count, hasHidden);
 
-                if (hasHidden && ____selectedVariantIndex >= 0 && ____selectedVariantIndex < count && VanillaTargets.IsHidden(icon, ____selectedVariantIndex))
+                int wanted = ChooseSelection(icon, count, hasHidden, ____selectedVariantIndex);
+                if (wanted >= 0 && wanted != ____selectedVariantIndex && ____variantOptions[wanted] != null)
                 {
-                    int target = NearestVisible(icon, count, ____selectedVariantIndex);
-                    if (target >= 0 && ____variantOptions[target] != null)
-                    {
-                        ____variantOptions[target].OnLeftClicked(false, false);
-                    }
+                    ____variantOptions[wanted].OnLeftClicked(false, false);
                 }
+                s_prevIcon = icon;
+                s_prevCount = count;
+                s_hasPrev = true;
 
                 if (__instance.variantRowParent != null)
                 {
@@ -237,6 +298,78 @@ namespace MapMarkersEnhanced
                     renderer.color = color;
                 }
             }
+        }
+    }
+}
+
+namespace MapMarkersEnhanced
+{
+    // The selection is set on purpose by these three; the row they build keeps its index.
+    // The depth counter is released in a finalizer, so an exception cannot leave it raised.
+    [HarmonyPatch(
+        typeof(MapMarkerCustomizationPanel),
+        "Open",
+        new[] { typeof(MapMarkerPreset), typeof(Action<DataBlockAddress, int, string>), typeof(Action), typeof(string), typeof(string) }
+    )]
+    internal static class ExplicitOpenPatch
+    {
+        [HarmonyPrefix]
+        private static void Prefix()
+        {
+            HiddenVariantsPatch.ForgetPrevious();
+            HiddenVariantsPatch.s_explicitDepth++;
+        }
+
+        [HarmonyFinalizer]
+        private static void Finalizer()
+        {
+            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
+        }
+    }
+
+    [HarmonyPatch(
+        typeof(MapMarkerCustomizationPanel),
+        "Open",
+        new[]
+        {
+            typeof(DataBlockAddress),
+            typeof(int),
+            typeof(string),
+            typeof(MapMarkerPreset),
+            typeof(Action<DataBlockAddress, int, string>),
+            typeof(Action),
+            typeof(string),
+            typeof(string),
+        }
+    )]
+    internal static class ExplicitOpenWithPresetPatch
+    {
+        [HarmonyPrefix]
+        private static void Prefix()
+        {
+            HiddenVariantsPatch.s_explicitDepth++;
+        }
+
+        [HarmonyFinalizer]
+        private static void Finalizer()
+        {
+            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
+        }
+    }
+
+    [HarmonyPatch(typeof(MapMarkerCustomizationPanel), "OnResetToDefaultClicked")]
+    internal static class ExplicitResetPatch
+    {
+        [HarmonyPrefix]
+        private static void Prefix()
+        {
+            HiddenVariantsPatch.s_explicitDepth++;
+        }
+
+        [HarmonyFinalizer]
+        private static void Finalizer()
+        {
+            HiddenVariantsPatch.s_explicitDepth = Math.Max(0, HiddenVariantsPatch.s_explicitDepth - 1);
         }
     }
 }

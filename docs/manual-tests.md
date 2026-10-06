@@ -194,12 +194,16 @@ Five variants are no longer offered, because vanilla has the same motif: General
   skull; Ores and Gems shows 10, no diamond; Flags 14, Numbers 10, Letters 26.
 - The icon-row preview of General shows `!`, and that of Ores and Gems copper,
   while the icon is not selected.
-- Select Flags variant 3, then switch to General: the selection lands on index
-  4 (`ArrowLeft`), the next visible tile after the hidden index 3.
+- Switching icons keeps the selection's visible position, not its index. With
+  General's first visible tile (`!`, index 1) selected, switch to Flags: the
+  first flag is selected. Select Flags' 4th flag (index 3), switch to General:
+  its 4th visible tile is selected, which is index 5 (General's visible order is
+  1, 2, 4, 5, ...). Ores and Gems behaves the same way. Reopening the dialog or
+  resetting to the default still selects by index.
 - Switch General, Flags, General: Flags still shows 14 tiles.
-- Move left and right with keyboard or controller across General's gaps (2 to
-  4, 15 to 18) and through all of Flags: the selection never stops on an
-  invisible tile.
+- Move left and right with the controller (the dialog has no keyboard
+  navigation) across General's gaps (2 to 4, 15 to 18) and through all of Flags:
+  the selection never stops on an invisible tile.
 - The row has no visible gap where tiles are hidden.
 - Place a marker from each visible tile: each works and shows its icon.
 
