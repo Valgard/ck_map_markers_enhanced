@@ -15,6 +15,7 @@ is specific to this mod. Why the mod is built this way, and what was rejected: [
 | `IconTable` | `Scripts/Generated/IconTable.g.cs` | The icon addresses and the legacy mapping; generated |
 | `IconOrderPatch` | `Scripts/IconOrderPatch.cs`, `Scripts/IconOrder.cs` | Prefix on `MapMarkerCustomizationPanel.PopulateIconRow`: moves the mod's blocks to the end of the live icon list, stably |
 | `ScrollToSelectionPatch` | `Scripts/ScrollToSelectionPatch.cs` | Postfix on the 8-parameter `MapMarkerCustomizationPanel.Open`, carried out from `IMod.Update`: scrolls both rows to the selected tiles |
+| `HiddenVariantsPatch`, `IconPreviewPatch` | `Scripts/HiddenVariantsPatch.cs` | Postfixes on `MapMarkerCustomizationPanel`: `BuildVariantRow` deactivates the hidden variant tiles, drops them from the toggle group, rewires left/right navigation over the visible ones and moves a selection off a hidden tile; `PopulateIconRow`/`UpdateIconRowSprites` draw an unselected icon whose variant 0 is hidden with its first visible variant |
 | `MarkerMigrationSystem` | `Scripts/MarkerMigrationSystem.cs` | Server-world ECS system: restores legacy question marks once per marker, and converts markers on hidden variants to vanilla |
 | `VanillaTargets` | `Scripts/VanillaTargets.cs` | Lookup over `IconTable.ToVanilla`: which variants have a vanilla target (hidden from the dialog) and what it is |
 | `MapMarkersEnhancedMod` | `MapMarkersEnhancedMod.cs` | Logs once per session which of the five addresses the game registered |
