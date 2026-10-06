@@ -14,8 +14,10 @@ namespace MapMarkersEnhanced
     /// left/right navigation over the visible tiles, and moves the selection off a hidden
     /// tile. The tile pool is shared by all icons, so the navigation is rewired on every
     /// call, also for icons without hidden variants — otherwise an earlier rewire would stay.
-    /// Never throws into the game; a failure is warned about once per session and leaves
-    /// every variant visible.
+    /// Never throws into the game. On a failure the row is put back the way vanilla built it —
+    /// every variant tile active, in the toggle group and linked left/right, vanilla's
+    /// selection on — so every variant is visible; the first failure of a session is warned
+    /// about with the icon's address, and says so if putting the row back failed as well.
     /// </summary>
     [HarmonyPatch(typeof(MapMarkerCustomizationPanel), "BuildVariantRow")]
     internal static class HiddenVariantsPatch
@@ -142,13 +144,136 @@ namespace MapMarkersEnhanced
             }
             catch (Exception e)
             {
+                bool restored = RestoreVanillaRow(__instance, iconBlock, ____variantOptions, ____selectedVariantIndex);
                 if (!s_failedLogged)
                 {
                     s_failedLogged = true;
-                    Debug.LogWarning("[MapMarkersEnhanced] hiding marker variants failed; all variants stay visible");
+                    string address = SafeAddress(iconBlock);
+                    Debug.LogWarning(
+                        restored
+                            ? $"[MapMarkersEnhanced] hiding marker variants failed for icon {address}; the row was put back as vanilla built it, all variants visible"
+                            : $"[MapMarkersEnhanced] hiding marker variants failed for icon {address}, and putting the row back failed too; the variant row may be incomplete"
+                    );
                     Debug.LogException(e);
                 }
             }
+        }
+
+        private static string SafeAddress(MapMarkerIconDataBlock iconBlock)
+        {
+            try
+            {
+                return iconBlock != null ? iconBlock.address.ToString() : "<null>";
+            }
+            catch (Exception)
+            {
+                return "<unknown>";
+            }
+        }
+
+        /// <summary>
+        /// Puts the row back the way vanilla's <c>BuildVariantRow</c> left it before the postfix:
+        /// every tile below the variant count active, in the toggle group in index order, linked
+        /// left/right over those tiles as vanilla's <c>UpdateHorizontalNavigation</c> links them,
+        /// and vanilla's selected tile switched on. Each step is guarded on its own, so the
+        /// restore cannot throw; returns whether every step succeeded.
+        /// </summary>
+        private static bool RestoreVanillaRow(
+            MapMarkerCustomizationPanel panel,
+            MapMarkerIconDataBlock iconBlock,
+            List<MapMarkerColorToggleElement> tiles,
+            int selected
+        )
+        {
+            if (tiles == null)
+            {
+                return true;
+            }
+
+            bool ok = true;
+            int count;
+            try
+            {
+                count = Math.Min(iconBlock.variants.Count, tiles.Count);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                try
+                {
+                    if (tiles[i] != null)
+                    {
+                        tiles[i].gameObject.SetActive(true);
+                    }
+                }
+                catch (Exception)
+                {
+                    ok = false;
+                }
+            }
+
+            try
+            {
+                if (panel.variantToggleGroup != null)
+                {
+                    if (panel.variantToggleGroup.toggleUIElements == null)
+                    {
+                        panel.variantToggleGroup.toggleUIElements = new List<ToggleUIElement>();
+                    }
+                    List<ToggleUIElement> group = panel.variantToggleGroup.toggleUIElements;
+                    group.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (tiles[i] != null)
+                        {
+                            group.Add(tiles[i]);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ok = false;
+            }
+
+            try
+            {
+                RewireNavigation(tiles, default, count, false);
+            }
+            catch (Exception)
+            {
+                ok = false;
+            }
+
+            try
+            {
+                if (selected >= 0 && selected < count && tiles[selected] != null && !tiles[selected].isOn)
+                {
+                    tiles[selected].OnLeftClicked(false, false);
+                }
+            }
+            catch (Exception)
+            {
+                ok = false;
+            }
+
+            try
+            {
+                if (panel.variantRowParent != null)
+                {
+                    panel.variantRowParent.RenderUIComponent(true);
+                }
+            }
+            catch (Exception)
+            {
+                ok = false;
+            }
+
+            return ok;
         }
 
         /// <summary>The first visible index after <paramref name="from"/>, else the last visible one before it, else -1.</summary>
@@ -214,7 +339,9 @@ namespace MapMarkersEnhanced
     /// Shows a visible variant on the icon-row tile of an icon whose variant 0 is hidden.
     /// Vanilla draws every unselected tile with variant 0, which for such an icon is a
     /// duplicate the dialog no longer offers; the first visible variant is drawn instead.
-    /// The selected tile shows the chosen variant through vanilla. Never throws into the game.
+    /// The selected tile shows the chosen variant through vanilla. Never throws into the game:
+    /// each row is guarded on its own, so a failing row keeps vanilla's sprite while the rest
+    /// are still drawn, and the first failure of a session is warned about with the icon's address.
     /// </summary>
     [HarmonyPatch(typeof(MapMarkerCustomizationPanel))]
     internal static class IconPreviewPatch
@@ -237,18 +364,30 @@ namespace MapMarkersEnhanced
 
         private static void ApplyPreviews(List<ToggleUIElement> options, List<MapMarkerIconDataBlock> blocks)
         {
+            if (options == null || blocks == null)
+            {
+                return;
+            }
+
+            int rows;
             try
             {
-                if (options == null || blocks == null)
-                {
-                    return;
-                }
+                rows = Math.Min(options.Count, blocks.Count);
+            }
+            catch (Exception e)
+            {
+                WarnOnce(null, e);
+                return;
+            }
 
-                int rows = Math.Min(options.Count, blocks.Count);
-                for (int i = 0; i < rows; i++)
+            // Guarded per row: one bad row keeps vanilla's sprite, the others still get theirs.
+            for (int i = 0; i < rows; i++)
+            {
+                MapMarkerIconDataBlock block = null;
+                try
                 {
                     ToggleUIElement option = options[i];
-                    MapMarkerIconDataBlock block = blocks[i];
+                    block = blocks[i];
                     if (option == null || block == null || option.isOn)
                     {
                         continue;
@@ -271,16 +410,33 @@ namespace MapMarkersEnhanced
                         SetSpriteAndColor(option.deactivatedSprites, sprite, new Color(1f, 1f, 1f, 0.25f));
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                if (!s_failedLogged)
+                catch (Exception e)
                 {
-                    s_failedLogged = true;
-                    Debug.LogWarning("[MapMarkersEnhanced] icon-row previews failed; the row keeps vanilla's sprites");
-                    Debug.LogException(e);
+                    WarnOnce(block, e);
                 }
             }
+        }
+
+        private static void WarnOnce(MapMarkerIconDataBlock block, Exception e)
+        {
+            if (s_failedLogged)
+            {
+                return;
+            }
+            s_failedLogged = true;
+            string address = "<unknown>";
+            try
+            {
+                if (block != null)
+                {
+                    address = block.address.ToString();
+                }
+            }
+            catch (Exception) { }
+            Debug.LogWarning(
+                $"[MapMarkersEnhanced] icon-row preview failed for icon {address}; that tile keeps vanilla's sprite, the other rows are still drawn"
+            );
+            Debug.LogException(e);
         }
 
         /// <summary>Copy of vanilla's private <c>SetSpriteAndColor</c>.</summary>

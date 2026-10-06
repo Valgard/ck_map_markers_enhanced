@@ -72,9 +72,9 @@ Two related decisions:
   the dialog moves a selection to the next visible tile, and keeps the visible
   position, not the index, when the player switches icons.
 - **The dialog carries a small patch** that deactivates hidden tiles and rewires
-  navigation. If it fails, the tiles reappear and the world conversion cleans up
-  afterwards; if the conversion fails, markers keep a mod icon that still
-  renders.
+  navigation. If it fails, it puts the row back the way vanilla built it, so
+  every variant shows again, and the world conversion cleans up afterwards; if
+  the conversion fails, markers keep a mod icon that still renders.
 - **Converted markers survive an uninstall**; the mod's own icons still do not.
 - A conversion is one-way. A converted marker no longer records that it was
   once the mod's.
