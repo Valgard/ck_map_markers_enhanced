@@ -242,6 +242,91 @@ def test_no_retired_address_reused(icons):
     assert not {icon.address for icon in icons} & set(SHIPPED_ADDRESSES.values())
 
 
+# The 2.0.0 identities, copied as literals. A saved marker stores (address, variant
+# index), so these are shipped: the table may only grow at the end of a block.
+NEW_ICONS = [
+    ("General", "69ac8c2b-f5a2-45bd-8dcd-6004b352637b"),
+    ("Ores", "715841ac-735e-4b1d-95db-ec6dd73bd12e"),
+    ("Flags", "7259d242-79c6-429e-acfd-e5206ff6cd78"),
+    ("Tapestry", "73d6f81d-077c-4548-b655-d4644b855323"),
+    ("Orbs", "769702fa-b2cb-499f-9c7f-462442d995ec"),
+    ("Numbers", "782323e6-7f6a-416d-8c63-edc0e05f87b1"),
+    ("Letters", "7890a1b3-a5bd-42c6-a375-d116e12b8f10"),
+]
+_COLOURS = [
+    "Red",
+    "Orange",
+    "Peach",
+    "Yellow",
+    "Green",
+    "Teal",
+    "Cyan",
+    "Blue",
+    "Purple",
+    "Pink",
+    "Brown",
+    "Black",
+    "Gray",
+    "White",
+]
+NEW_VARIANTS = {
+    "General": [
+        "ExclamationMark",
+        "MusicNote",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Chest",
+        "Sign",
+        "Dagger",
+        "Axe",
+        "StructureWood",
+        "Heart",
+        "Flames",
+        "StructureStone",
+        "Leaf",
+        "Fish",
+        "Shield",
+        "Cog",
+    ],
+    "Ores": [
+        "Copper",
+        "Tin",
+        "Iron",
+        "Gold",
+        "Scarlet",
+        "Octarine",
+        "Galaxite",
+        "Solarite",
+        "Pandorium",
+        "Relucite",
+        "RadiationCrystal",
+    ],
+    "Flags": [f"Flag{c}" for c in _COLOURS],
+    "Tapestry": ["TapestryUnpainted"] + [f"Tapestry{c}" for c in _COLOURS],
+    "Orbs": ["OrbEmpty"]
+    + [f"Orb{c}" for c in _COLOURS]
+    + ["OrbGold", "OrbYellowAlternative", "OrbLava", "OrbFlower"],
+    "Numbers": [f"Number{n}" for n in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]],
+    "Letters": [f"Letter{chr(c)}" for c in range(ord("A"), ord("Z") + 1)],
+}
+
+
+def test_new_icon_identities_are_pinned(icons):
+    """The 2.0.0 addresses and variant order are shipped identities.
+
+    A saved marker stores (address, variant index), so reordering or removing a
+    variant, or changing an address, silently changes what existing markers show.
+    test_variant_order_matches_the_pixaki cannot catch that: it compares the table
+    with the sheet, and both can be reordered together. Appending at the end of a
+    block is allowed: extend the literal above. Nothing else is.
+    """
+    assert [(icon.name, icon.address) for icon in icons] == NEW_ICONS
+    for icon in icons:
+        assert [v.name for v in icon.variants] == NEW_VARIANTS[icon.name], icon.name
+
+
 def test_variant_sprite_is_the_layer_name():
     """A space goes before every inner capital or digit; MusicNote is the one exception."""
     assert gi.Variant("OrbYellowAlternative", None).sprite == "Orb Yellow Alternative"
