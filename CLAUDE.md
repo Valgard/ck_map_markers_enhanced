@@ -81,15 +81,18 @@ five 1.x assets; their addresses live only in the `[[retired]]` table and are
 never used again. `MarkerMigrationSystem` rule 2 rewrites a marker on a retired
 (address, variant) to the same-named new variant, or — for General's question
 mark, cross, skull and red skull and Ores' ancient crystal — to the vanilla
-marker the table names. It keeps running in the server world on every pass, so
-a marker a 1.x client places later is rewritten too; a rewritten marker carries
-an address the table does not hold, so it cannot match twice. Nothing is
-written before the game data is loaded, a target is resolved before writing, and
-an unresolved one is warned about once. `PresetConversion` uses the same table
-on the client, and the `Legacy` table points MapMarkers+ restoration straight at
+marker the table names. It keeps running in the server world on every pass, so a
+marker a 1.x client places later is rewritten too; a rewritten marker carries an
+address the table does not hold, so it cannot match twice. Nothing is written
+before the game data is loaded, a target is resolved before writing, and an
+unresolved one is warned about once. `PresetConversion` uses the same table on
+the client, and the `Legacy` table points MapMarkers+ restoration straight at
 the new targets. The cost, accepted knowingly and the reverse of ADR 002's
-choice: markers not yet migrated — a dedicated server without the mod, a
-1.x client — show the fallback sprite. Why: [`docs/adrs/003-retire-the-1x-blocks.md`](docs/adrs/003-retire-the-1x-blocks.md);
+choice: markers not yet migrated — a dedicated server without the mod, a 1.x
+client — show the fallback sprite, and on a server without the mod the big map's
+framerate collapses, because the client logs an error with a native stack trace
+per visible unresolved marker every frame (measured, 2026-10-07: about 12 errors
+per second with roughly 70 markers; none on a server with the mod). Why: [`docs/adrs/003-retire-the-1x-blocks.md`](docs/adrs/003-retire-the-1x-blocks.md);
 what it replaced: [`docs/adrs/002-hide-vanilla-duplicates.md`](docs/adrs/002-hide-vanilla-duplicates.md).
 
 The asset `.meta` GUIDs are derived from the icon names (`uuid5`), so renaming
@@ -109,10 +112,18 @@ exclude, with `excludeNested`, the other size's group and six layers vanilla
 draws or the art does not use (`Question Mark`, `Cross`, `Skull`, `Skull Red`,
 `Diamond`, `Ellipse`). A sprite is named after its layer; the generator pairs
 large and small by name, and a variant's name is the layer name without spaces
-(`Note` → `MusicNote` is the one exception). Recut with the sheet tool's
-`--config`, never by hand; the `Art/*.png` files are generated. `Templates` and
-`Grid` are hidden working material, hidden per layer because the tool ignores a
-group's own visibility.
+(`Note` → `MusicNote` is the one exception). Both definitions use the sheet
+tool's `cells` option, so every sprite is a box of the author's 10-px Pixaki
+grid, not the layer's trimmed pixels: large is the 10×10 cell; small is a 6×6
+box at cell offset (2,2), or 8×8 at (1,1) where the drawing is taller than 6
+(113 large, 69 small 6×6, 44 small 8×8). Why: vanilla's marker sprites are fixed
+even boxes (10×10 and 6×6, 16 px per unit, centre pivot), assigned unscaled; an
+odd trimmed size puts the pivot on half a pixel, and the 5×5 and 5×7 first cut
+jittered on the minimap while the player moved. Where the art sits inside the
+grid is the author's and is preserved. Recut with the sheet tool's `--config`,
+never by hand; the `Art/*.png` files are generated. `Templates` and `Grid` are
+hidden working material, hidden per layer because the tool ignores a group's own
+visibility.
 
 ## Constants the code relies on
 

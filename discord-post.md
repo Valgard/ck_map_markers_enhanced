@@ -24,9 +24,9 @@ question marks.
 ## Update everyone
 
 A dedicated server without the mod converts nothing, so players with 2.0.0 see
-1.x markers there as a plain blue diamond. Players still on 1.x see markers of
-the new set that way. Uninstalling does the same to markers with the mod's
-icons.
+old mod markers there with a placeholder icon and the big map can stutter badly.
+Players still on 1.x see markers of the new set that way. Uninstalling does the
+same to markers with the mod's icons.
 
 Art redrawn by Valgard after MapMarkers+ by **moorowl** (MIT); banners from
 Core Keeper's tapestry sprites, orbs from its item sprites.

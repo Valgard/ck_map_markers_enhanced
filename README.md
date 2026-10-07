@@ -70,8 +70,9 @@ rewritten the same way on your own computer, keeping their names.
 A marker that became the game's own keeps its icon if you uninstall the mod.
 **Update everyone who shares a world or a server with you:** on a dedicated
 server without the mod nothing is converted, and players with 2.0.0 see such
-markers as a stand-in; players still on 1.x see every marker of the new set that
-way.
+markers with a placeholder icon, or another marker's, and the big map can
+stutter badly until the server runs 2.0.0; players still on 1.x see every marker
+of the new set that way.
 
 ## Requirements
 

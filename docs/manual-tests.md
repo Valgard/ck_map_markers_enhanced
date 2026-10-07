@@ -365,7 +365,7 @@ with target resolution and per-rule failure isolation):**
 
 ## Icon rework in game (2.0.0)
 
-**Not yet run.** Six checks, each on a copy of a world, never on a live save.
+Six checks, each on a copy of a world, never on a live save; results below.
 Build with the shipped sources and check the build output for `Adding generated
 file …MarkerMigrationSystem__System_…g.cs` first.
 
@@ -400,6 +400,50 @@ file …MarkerMigrationSystem__System_…g.cs` first.
    Flags, Tapestry, Orbs, Numbers, Letters, with 18, 11, 14, 15, 19, 10 and 26
    variants, each in its Pixaki layer order and with no gap. `Player.log` holds
    `icons: 7 …` and `icon order: moved <n>, ours at 8,9,10,11,12,13,14 of 15`.
+
+**Result, 2026-10-07 (CK 1.3.0.4, local dedicated server):**
+
+- **Dialog (6): passed.** Seven icons after the vanilla ones; `Player.log` read
+  `icon order: moved 15, ours at 8,9,10,11,12,13,14 of 15`; the variant counts
+  were 18, 11, 14, 15, 19, 10 and 26, without gaps.
+- **Minimap (5): failed with the first cut, passed after the re-cut.** With
+  sprites trimmed to their drawn pixels, mostly odd sizes such as 5×5 and 5×7,
+  the small icons jittered against the map while the player moved; the large
+  ones (8×8) were stable. Vanilla's marker sprites are fixed even boxes: the
+  large sheet is 100×90 with 80 sprites of 10×10, the small sheet 60×54 with 80
+  sprites of 6×6, 16 pixels per unit, pivot at the centre (checked on every
+  sprite asset), and the game assigns them to the renderer unscaled. An odd
+  size puts the centre pivot on half a pixel. The fix cuts every sprite as a box
+  of the author's 10-pixel grid through the `cells` option of
+  `utils/pixaki_to_sheet.py`: large is the 10×10 cell; small is a 6×6 box at
+  cell offset (2,2), or 8×8 at (1,1) where the drawing is taller than 6. Result:
+  113 large sprites of 10×10, 69 small of 6×6 and 44 small of 8×8 (letters,
+  numbers, arrows, the flames, StructureStone, StructureWood and Shield). After
+  the re-cut the minimap was stable.
+- **World placed with 1.1.0 (1):** `converted 72 markers on retired icons`, none
+  unresolved, no further line on a second launch. With markers and presets
+  placed under 1.0.0, including the five vanilla duplicates: `converted 78
+  markers on retired icons` and `converted 2 presets`; the duplicates became the
+  game's own, the rest the new art, names and positions kept. Passed.
+- **MapMarkers+ world (2):** a CK 1.2 backup loaded under 1.3 with 2.0.0: the
+  game's own migration, then `restored 60 legacy markers`; no question marks
+  left, none unresolved. Passed.
+- **Dedicated server with the mod (4):** the server log read `converted 72
+  markers on retired icons`; the client log had no such line, because the
+  migration runs in the server world only. Passed.
+- **Dedicated server without the mod (4), observed and accepted:** nothing
+  converts. A 2.0.0 client shows old mod markers with the prefab's default
+  sprite (1.2's blue diamond tile) in a fresh session; in a session whose pooled
+  marker elements had shown resolved icons before, they show stale icons of
+  other markers, off by one. With the big map open the framerate collapses: the
+  client logs `Failed to resolve MapMarkerIconDataBlock at address … for map
+  marker entity …` with a full native stack trace for every unresolved visible
+  marker every frame, about 12 errors per second with roughly 70 markers
+  affected, 6 per second with the map closed. The same world on the server
+  with the mod had no such cost. Vanilla markers were unaffected. The owner
+  chose to keep the 1.x addresses retired regardless.
+- **Not testable locally:** a 1.x client on a 2.0.0 server, because the local
+  server mirrors the client's installed build.
 
 ## Server without the mod
 

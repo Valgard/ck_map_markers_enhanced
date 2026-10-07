@@ -62,6 +62,14 @@ markers.
   and to an uninstall, where markers converted to the game's own are the only
   ones that survive. A server with the mod requires the mod, not a version, so
   nothing prevents the mixed state.
+- **Measured on a dedicated server without the mod (2026-10-07, CK 1.3.0.4):**
+  about 70 old mod markers on a 2.0.0 client, and with the big map open the
+  framerate collapsed — the client logged an unresolved-icon error with a full
+  native stack trace for every visible marker every frame, about 12 per second
+  (6 with the map closed); the same world on a server with the mod had no such
+  cost. The owner kept the addresses retired regardless: players on a server
+  without the mod see a placeholder or another marker's icon and a stuttering
+  big map until the server runs 2.0.0.
 - **That is why this is a major version** and why the release notes tell
   everyone sharing a world to update together.
 - A rewritten marker carries an address the retired table does not hold, so the

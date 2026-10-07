@@ -46,9 +46,9 @@ world or a server with you** — see "Update everyone" below.
 ### Update everyone
 
 - **A dedicated server without the mod does not migrate anything.** Players with
-  2.0.0 see every marker placed with a 1.x icon there as a plain blue diamond
-  (at times another marker's icon), and the game logs an error for each every
-  time it draws it. Put the mod on the server, or accept it.
+  2.0.0 see old mod markers there with a placeholder icon, or with another
+  marker's icon, and the big map can stutter badly while many of them are in
+  view. Put 2.0.0 on the server to avoid it.
 - **Players still on 1.x see every migrated marker, and every marker placed with
   the new set, the same way**, until they update. Markers that became the game's
   own show normally. A server with the mod only asks for the mod, not for a

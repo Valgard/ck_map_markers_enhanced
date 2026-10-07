@@ -33,8 +33,10 @@ use any of them are rewritten on your own computer, whichever server you play
 on.
 
 **Update everyone who shares a world or a server with you.** A dedicated server
-without the mod converts nothing, and players on 1.x see markers of the new set
-as a plain blue diamond until they update.
+without the mod converts nothing: players with 2.0.0 see old mod markers there with a
+placeholder or another marker's icon, and the big map can stutter badly until
+the server runs 2.0.0. Players on 1.x see markers of the new set that way until
+they update.
 
 ## Your old MapMarkers+ markers come back
 Core Keeper 1.3 converted every marker drawn with MapMarkers+'s own art into
