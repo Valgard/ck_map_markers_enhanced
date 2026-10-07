@@ -28,6 +28,7 @@ import re
 import sys
 import tomllib
 import uuid
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -437,14 +438,17 @@ def _pixaki_container():
     or inside one of its own worktrees, so the depth is not fixed.
 
     Raises:
-        ValueError: no ancestor has it.
+        ValueError: no ancestor has it, or the one found does not import.
     """
     for parent in (REPO, *REPO.parents):
         candidate = parent / "utils/pixaki_container.py"
         if candidate.is_file():
-            spec = importlib.util.spec_from_file_location("pixaki_container", candidate)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            try:
+                spec = importlib.util.spec_from_file_location("pixaki_container", candidate)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+            except Exception as err:  # a broken reader is broken input, not drift
+                raise ValueError(f"cannot import {candidate}: {err!r}") from err
             return module
     raise ValueError(f"no utils/pixaki_container.py in any directory above {REPO}")
 
@@ -456,13 +460,17 @@ def pixaki_order(pixaki: Path) -> dict[str, list[str]]:
     stores layers bottom-up, so each list is reversed into Pixaki's own order.
 
     Raises:
-        ValueError: the file does not exist, no pixaki reader is found, or two
-            icon groups share a name.
+        ValueError: the file does not exist or is not a readable Pixaki, no
+            pixaki reader is found, or two icon groups share a name.
     """
     if not pixaki.exists():
         raise ValueError(f"Pixaki master {pixaki} not found")
-    with _pixaki_container().open_pixaki(pixaki) as container:
-        document = json.loads(container.read("document.json"))
+    container_module = _pixaki_container()
+    try:
+        with container_module.open_pixaki(pixaki) as container:
+            document = json.loads(container.read("document.json"))
+    except (OSError, KeyError, zipfile.BadZipFile, ValueError) as err:
+        raise ValueError(f"cannot read the Pixaki master {pixaki}: {err!r}") from err
     order: dict[str, list[str]] = {}
 
     def walk(layers: list[dict]) -> None:
@@ -478,7 +486,10 @@ def pixaki_order(pixaki: Path) -> dict[str, list[str]]:
             else:
                 walk(children)
 
-    walk(document["sprites"][0]["layers"])
+    try:
+        walk(document["sprites"][0]["layers"])
+    except (KeyError, IndexError, TypeError) as err:
+        raise ValueError(f"malformed Pixaki document in {pixaki}: {err!r}") from err
     return order
 
 
@@ -529,7 +540,10 @@ def png_guid(meta_text: str) -> str:
 
 def load_sheet(meta: Path) -> Sheet:
     """A sprite sheet, read from its .meta."""
-    text = meta.read_text(encoding="utf-8")
+    try:
+        text = meta.read_text(encoding="utf-8")
+    except OSError as err:
+        raise ValueError(f"cannot read sprite sheet meta {meta}: {err}") from err
     return Sheet(meta.name, sprite_ids(text), png_guid(text))
 
 

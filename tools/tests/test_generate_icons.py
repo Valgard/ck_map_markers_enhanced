@@ -600,6 +600,23 @@ def test_missing_small_sprite_refuses(tmp_path, monkeypatch, capsys):
     assert "Heart" in err and "markers_small" in err
 
 
+def test_missing_sheet_meta_exits_2_not_a_traceback(tmp_path, monkeypatch, capsys):
+    """A sheet .meta that is absent is broken input (exit 2), not drift (exit 1)."""
+    code, err = run_check(monkeypatch, capsys, small_meta=tmp_path / "markers_small.png.meta")
+    assert code == 2
+    assert "markers_small.png.meta" in err
+
+
+def test_malformed_pixaki_exits_2_not_a_traceback(tmp_path, monkeypatch, capsys):
+    """A Pixaki that is no readable archive or document is broken input too."""
+    bad = tmp_path / "mme_markers.pixaki"
+    bad.write_bytes(b"not a pixaki")
+    monkeypatch.setattr(gi, "PIXAKI", bad)
+    code = gi.main(["--check"])
+    assert code == 2
+    assert "mme_markers.pixaki" in capsys.readouterr().err
+
+
 def test_order_mismatch_refuses(tmp_path, monkeypatch, capsys):
     """Variants in a different order than the Pixaki layers refuse, naming the icon."""
     table = edited_table(tmp_path, 'name = "Copper"', 'name = "@"')
