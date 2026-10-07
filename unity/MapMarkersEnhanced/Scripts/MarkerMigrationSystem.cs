@@ -104,7 +104,7 @@ namespace MapMarkersEnhanced
             catch (Exception e)
             {
                 _conversionOff = true;
-                Debug.LogError("[MapMarkersEnhanced] vanilla target table could not be parsed; conversion is off");
+                Debug.LogError("[MapMarkersEnhanced] retired icon table could not be parsed; conversion is off");
                 Debug.LogException(e);
             }
 
@@ -192,7 +192,7 @@ namespace MapMarkersEnhanced
                 if (!_conversionFailureLogged)
                 {
                     _conversionFailureLogged = true;
-                    Debug.LogError("[MapMarkersEnhanced] conversion to vanilla icons failed; restoration still runs, conversion will keep trying silently");
+                    Debug.LogError("[MapMarkersEnhanced] conversion of retired icons failed; restoration still runs, conversion will keep trying silently");
                     Debug.LogException(e);
                 }
             }
@@ -322,7 +322,7 @@ namespace MapMarkersEnhanced
 
             if (converted > 0)
             {
-                Debug.Log($"[MapMarkersEnhanced] converted {converted} markers to vanilla icons");
+                Debug.Log($"[MapMarkersEnhanced] converted {converted} markers on retired icons");
             }
         }
 

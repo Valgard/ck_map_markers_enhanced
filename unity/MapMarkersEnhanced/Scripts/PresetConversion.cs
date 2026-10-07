@@ -42,7 +42,7 @@ namespace MapMarkersEnhanced
                         {
                             s_unresolvedLogged = true;
                             Debug.LogWarning(
-                                $"[MapMarkersEnhanced] vanilla target {address} variant {targetVariant} is not a registered map marker icon with that variant; "
+                                $"[MapMarkersEnhanced] preset target {address} variant {targetVariant} is not a registered map marker icon with that variant; "
                                     + $"preset {i + 1} is left as it is"
                             );
                         }
