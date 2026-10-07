@@ -17,53 +17,53 @@ MonoBehaviour:
       m_low: 0
       m_high: 0
   m_address:
-    m_low: 5146103212092910988
-    m_high: -7032327695970176841
+    m_low: 4800408146052502082
+    m_high: 8704884611930783148
   m_dynamicCollections:
     m_list: []
   variants:
-  - largeMapSprite: {fileID: -410689665, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1392042038, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -410689665, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 358817327, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -318981155, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 358817327, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -1648248295, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -173845315, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -1648248295, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 782212712, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: 1484841097, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 782212712, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 856741560, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1559409488, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 856741560, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -1636244038, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1603695401, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -1636244038, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 1586139906, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1524210925, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 1586139906, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -1876676528, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: 1009702655, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -1876676528, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 1071120962, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1210893379, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 1071120962, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -1292819617, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -649043673, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -1292819617, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: 1528927936, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -83744811, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: 1528927936, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -936645463, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -1876936150, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -936645463, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -1148891765, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -685645398, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -1148891765, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-  - largeMapSprite: {fileID: -123746199, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    miniMapSprite: {fileID: -2123178401, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
-    colorIcon: {fileID: -123746199, guid: 4a73f83966cf445da22cf9a426563a08, type: 3}
+  - largeMapSprite: {fileID: 1449105359, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 1449105359, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 1449105359, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -1841299013, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -1841299013, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -1841299013, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -206755080, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -206755080, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -206755080, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -1888733716, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -1888733716, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -1888733716, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 144674324, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 144674324, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 144674324, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -625063370, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -625063370, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -625063370, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 1198209839, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 1198209839, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 1198209839, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 202204973, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 202204973, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 202204973, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 180036502, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 180036502, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 180036502, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -1891822670, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -1891822670, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -1891822670, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 1987644568, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 1987644568, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 1987644568, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: 1769928292, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: 1769928292, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: 1769928292, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -61648453, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -61648453, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -61648453, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+  - largeMapSprite: {fileID: -279719062, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
+    miniMapSprite: {fileID: -279719062, guid: b2a59318c0504d438d14c5ca99ce5890, type: 3}
+    colorIcon: {fileID: -279719062, guid: 6007a57f19dd45208f9e69450f04e3d2, type: 3}
   references:
     version: 2
     RefIds: []

@@ -1,16 +1,21 @@
 # The one hand-kept table behind the mod's map-marker icons.
 #
-# tools/generate_icons.py turns it into the five MapMarkerIconDataBlock assets
-# and the C# legacy mapping. Icon order is the order in the marker dialog, and
-# the addresses ascend in that order because each loader sorts its blocks by
-# address. An address is an icon's identity in every saved marker: never change
-# one once it has shipped.
+# tools/generate_icons.py turns it into the MapMarkerIconDataBlock assets and
+# the C# tables in IconTable.g.cs. An address is an icon's identity in every
+# saved marker: never change one once it has shipped, and never reuse one.
 #
-# A variant's `type` is a MapMarkers+ PlusMarkerType name; its large sprite is
-# markers_<type>. `small` names the minimap slice; without it the minimap uses
-# the large sprite. A variant with `vanilla` points at a vanilla block and hides
-# that variant from the dialog, converting it to the vanilla target; indices never
-# shift, hiding included.
+# [[icon]] lists the blocks the mod ships, in dialog order; their addresses
+# ascend in that order because each loader sorts its blocks by address. A
+# variant's `name` is its identity in this table; its sprite in both sheets is
+# the Pixaki layer of the same name with a space before every inner capital or
+# digit, or `layer` where the two differ by more than that. Variant order is
+# the layer order of the icon's `Large` group in sources/mme_markers.pixaki.
+#
+# [[retired]] lists the 1.x blocks, gone from the game but still stored in
+# saved markers: each variant's `type` (a MapMarkers+ PlusMarkerType) in 1.x
+# index order, the only record of which stored index meant which motif. Each
+# goes to its `vanilla` target if it has one, else to the [[icon]] variant of
+# the same name.
 
 [vanilla]
 Cross = "adbecb0c-1236-bf84-d9ea-0516e188e2d0"
@@ -24,321 +29,642 @@ Star = "0eafefb1-8776-40d4-3af9-98637e55183e"
 
 [[icon]]
 name = "General"
-address = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
+address = "69ac8c2b-f5a2-45bd-8dcd-6004b352637b"
 
 [[icon.variant]]
-type = "QuestionMark"
-small = "markers_QuestionMark_small"
-vanilla = { icon = "Question", variant = 9 }
+name = "ExclamationMark"
 
 [[icon.variant]]
-type = "ExclamationMark"
-small = "markers_ExclamationMark_small"
+name = "MusicNote"
+layer = "Note"
 
 [[icon.variant]]
-type = "MusicNote"
-small = "markers_MusicNote_small"
+name = "ArrowLeft"
 
 [[icon.variant]]
-type = "Cross"
-small = "markers_Cross_small"
-vanilla = { icon = "Cross", variant = 9 }
+name = "ArrowRight"
 
 [[icon.variant]]
-type = "ArrowLeft"
-small = "markers_ArrowLeft_small"
+name = "ArrowUp"
 
 [[icon.variant]]
-type = "ArrowRight"
-small = "markers_ArrowRight_small"
+name = "ArrowDown"
 
 [[icon.variant]]
-type = "ArrowUp"
-small = "markers_ArrowUp_small"
+name = "Chest"
 
 [[icon.variant]]
-type = "ArrowDown"
-small = "markers_ArrowDown_small"
+name = "Sign"
 
 [[icon.variant]]
-type = "Chest"
-small = "markers_Chest_small"
+name = "Dagger"
 
 [[icon.variant]]
-type = "Sign"
-small = "markers_Sign_small"
+name = "Axe"
 
 [[icon.variant]]
-type = "StructureWood"
-small = "markers_StructureWood_small"
+name = "StructureWood"
 
 [[icon.variant]]
-type = "StructureStone"
-small = "markers_StructureStone_small"
+name = "Heart"
 
 [[icon.variant]]
-type = "Leaf"
-small = "markers_Leaf_small"
+name = "Flames"
 
 [[icon.variant]]
-type = "Fish"
-small = "markers_Fish_small"
+name = "StructureStone"
 
 [[icon.variant]]
-type = "Cog"
-small = "markers_Cog_small"
+name = "Leaf"
 
 [[icon.variant]]
-type = "Heart"
-small = "markers_Heart_small"
+name = "Fish"
 
 [[icon.variant]]
-type = "Skull"
-small = "markers_skull_small"
-vanilla = { icon = "Skull", variant = 0 }
+name = "Shield"
 
 [[icon.variant]]
-type = "SkullRed"
-small = "markers_SkullRed_small"
-vanilla = { icon = "Skull", variant = 1 }
-
-[[icon.variant]]
-type = "Flames"
-small = "markers_Flames_small"
-
-[[icon.variant]]
-type = "Shield"
-small = "markers_Shield_small"
-
-[[icon.variant]]
-type = "Dagger"
-small = "markers_Dagger_small"
-
-[[icon.variant]]
-type = "Axe"
-small = "markers_Axe_small"
+name = "Cog"
 
 [[icon]]
-name = "OresAndGems"
-address = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
+name = "Ores"
+address = "715841ac-735e-4b1d-95db-ec6dd73bd12e"
 
 [[icon.variant]]
-type = "AncientCrystal"
-small = "markers_ancient_crystal_small"
-vanilla = { icon = "Dot", variant = 2 }
+name = "Copper"
 
 [[icon.variant]]
-type = "Copper"
-small = "markers_Copper_small"
+name = "Tin"
 
 [[icon.variant]]
-type = "Tin"
-small = "markers_Tin_small"
+name = "Iron"
 
 [[icon.variant]]
-type = "Iron"
-small = "markers_Iron_small"
+name = "Gold"
 
 [[icon.variant]]
-type = "Gold"
-small = "markers_Gold_small"
+name = "Scarlet"
 
 [[icon.variant]]
-type = "Scarlet"
-small = "markers_Scarlet_small"
+name = "Octarine"
 
 [[icon.variant]]
-type = "Octarine"
-small = "markers_Octarine_small"
+name = "Galaxite"
 
 [[icon.variant]]
-type = "Galaxite"
-small = "markers_Galaxite_small"
+name = "Solarite"
 
 [[icon.variant]]
-type = "Solarite"
-small = "markers_Solarite_small"
+name = "Pandorium"
 
 [[icon.variant]]
-type = "Pandorium"
-small = "markers_Pandorium_small"
+name = "Relucite"
 
 [[icon.variant]]
-type = "Relucite"
-small = "markers_Relucite_small"
+name = "RadiationCrystal"
 
 [[icon]]
 name = "Flags"
-address = "2e4b6d8c-a19b-476a-b770-8e293827689e"
+address = "7259d242-79c6-429e-acfd-e5206ff6cd78"
 
 [[icon.variant]]
-type = "FlagRed"
-small = "markers_FlagRed_small"
+name = "FlagRed"
 
 [[icon.variant]]
-type = "FlagOrange"
-small = "markers_FlagOrange_small"
+name = "FlagOrange"
 
 [[icon.variant]]
-type = "FlagPeach"
-small = "markers_FlagPeach_small"
+name = "FlagPeach"
 
 [[icon.variant]]
-type = "FlagYellow"
-small = "markers_FlagYellow_small"
+name = "FlagYellow"
 
 [[icon.variant]]
-type = "FlagGreen"
-small = "markers_FlagGreen_small"
+name = "FlagGreen"
 
 [[icon.variant]]
-type = "FlagTeal"
-small = "markers_FlagTeal_small"
+name = "FlagTeal"
 
 [[icon.variant]]
-type = "FlagCyan"
-small = "markers_FlagCyan_small"
+name = "FlagCyan"
 
 [[icon.variant]]
-type = "FlagBlue"
-small = "markers_FlagBlue_small"
+name = "FlagBlue"
 
 [[icon.variant]]
-type = "FlagPurple"
-small = "markers_FlagPurple_small"
+name = "FlagPurple"
 
 [[icon.variant]]
-type = "FlagPink"
-small = "markers_FlagPink_small"
+name = "FlagPink"
 
 [[icon.variant]]
-type = "FlagBrown"
-small = "markers_FlagBrown_small"
+name = "FlagBrown"
 
 [[icon.variant]]
-type = "FlagBlack"
-small = "markers_FlagBlack_small"
+name = "FlagBlack"
 
 [[icon.variant]]
-type = "FlagGray"
-small = "markers_FlagGray_small"
+name = "FlagGray"
 
 [[icon.variant]]
-type = "FlagWhite"
-small = "markers_FlagWhite_small"
+name = "FlagWhite"
+
+[[icon]]
+name = "Tapestry"
+address = "73d6f81d-077c-4548-b655-d4644b855323"
+
+[[icon.variant]]
+name = "TapestryUnpainted"
+
+[[icon.variant]]
+name = "TapestryRed"
+
+[[icon.variant]]
+name = "TapestryOrange"
+
+[[icon.variant]]
+name = "TapestryPeach"
+
+[[icon.variant]]
+name = "TapestryYellow"
+
+[[icon.variant]]
+name = "TapestryGreen"
+
+[[icon.variant]]
+name = "TapestryTeal"
+
+[[icon.variant]]
+name = "TapestryCyan"
+
+[[icon.variant]]
+name = "TapestryBlue"
+
+[[icon.variant]]
+name = "TapestryPurple"
+
+[[icon.variant]]
+name = "TapestryPink"
+
+[[icon.variant]]
+name = "TapestryBrown"
+
+[[icon.variant]]
+name = "TapestryBlack"
+
+[[icon.variant]]
+name = "TapestryGray"
+
+[[icon.variant]]
+name = "TapestryWhite"
+
+[[icon]]
+name = "Orbs"
+address = "769702fa-b2cb-499f-9c7f-462442d995ec"
+
+[[icon.variant]]
+name = "OrbEmpty"
+
+[[icon.variant]]
+name = "OrbRed"
+
+[[icon.variant]]
+name = "OrbOrange"
+
+[[icon.variant]]
+name = "OrbPeach"
+
+[[icon.variant]]
+name = "OrbYellow"
+
+[[icon.variant]]
+name = "OrbGreen"
+
+[[icon.variant]]
+name = "OrbTeal"
+
+[[icon.variant]]
+name = "OrbCyan"
+
+[[icon.variant]]
+name = "OrbBlue"
+
+[[icon.variant]]
+name = "OrbPurple"
+
+[[icon.variant]]
+name = "OrbPink"
+
+[[icon.variant]]
+name = "OrbBrown"
+
+[[icon.variant]]
+name = "OrbBlack"
+
+[[icon.variant]]
+name = "OrbGray"
+
+[[icon.variant]]
+name = "OrbWhite"
+
+[[icon.variant]]
+name = "OrbGold"
+
+[[icon.variant]]
+name = "OrbYellowAlternative"
+
+[[icon.variant]]
+name = "OrbLava"
+
+[[icon.variant]]
+name = "OrbFlower"
 
 [[icon]]
 name = "Numbers"
-address = "6152c695-14f2-4344-bee4-a2967b880bd3"
+address = "782323e6-7f6a-416d-8c63-edc0e05f87b1"
 
 [[icon.variant]]
-type = "Number1"
+name = "Number1"
 
 [[icon.variant]]
-type = "Number2"
+name = "Number2"
 
 [[icon.variant]]
-type = "Number3"
+name = "Number3"
 
 [[icon.variant]]
-type = "Number4"
+name = "Number4"
 
 [[icon.variant]]
-type = "Number5"
+name = "Number5"
 
 [[icon.variant]]
-type = "Number6"
+name = "Number6"
 
 [[icon.variant]]
-type = "Number7"
+name = "Number7"
 
 [[icon.variant]]
-type = "Number8"
+name = "Number8"
 
 [[icon.variant]]
-type = "Number9"
+name = "Number9"
 
 [[icon.variant]]
-type = "Number0"
+name = "Number0"
 
 [[icon]]
 name = "Letters"
+address = "7890a1b3-a5bd-42c6-a375-d116e12b8f10"
+
+[[icon.variant]]
+name = "LetterA"
+
+[[icon.variant]]
+name = "LetterB"
+
+[[icon.variant]]
+name = "LetterC"
+
+[[icon.variant]]
+name = "LetterD"
+
+[[icon.variant]]
+name = "LetterE"
+
+[[icon.variant]]
+name = "LetterF"
+
+[[icon.variant]]
+name = "LetterG"
+
+[[icon.variant]]
+name = "LetterH"
+
+[[icon.variant]]
+name = "LetterI"
+
+[[icon.variant]]
+name = "LetterJ"
+
+[[icon.variant]]
+name = "LetterK"
+
+[[icon.variant]]
+name = "LetterL"
+
+[[icon.variant]]
+name = "LetterM"
+
+[[icon.variant]]
+name = "LetterN"
+
+[[icon.variant]]
+name = "LetterO"
+
+[[icon.variant]]
+name = "LetterP"
+
+[[icon.variant]]
+name = "LetterQ"
+
+[[icon.variant]]
+name = "LetterR"
+
+[[icon.variant]]
+name = "LetterS"
+
+[[icon.variant]]
+name = "LetterT"
+
+[[icon.variant]]
+name = "LetterU"
+
+[[icon.variant]]
+name = "LetterV"
+
+[[icon.variant]]
+name = "LetterW"
+
+[[icon.variant]]
+name = "LetterX"
+
+[[icon.variant]]
+name = "LetterY"
+
+[[icon.variant]]
+name = "LetterZ"
+
+[[retired]]
+name = "General"
+address = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
+
+[[retired.variant]]
+type = "QuestionMark"
+vanilla = { icon = "Question", variant = 9 }
+
+[[retired.variant]]
+type = "ExclamationMark"
+
+[[retired.variant]]
+type = "MusicNote"
+
+[[retired.variant]]
+type = "Cross"
+vanilla = { icon = "Cross", variant = 9 }
+
+[[retired.variant]]
+type = "ArrowLeft"
+
+[[retired.variant]]
+type = "ArrowRight"
+
+[[retired.variant]]
+type = "ArrowUp"
+
+[[retired.variant]]
+type = "ArrowDown"
+
+[[retired.variant]]
+type = "Chest"
+
+[[retired.variant]]
+type = "Sign"
+
+[[retired.variant]]
+type = "StructureWood"
+
+[[retired.variant]]
+type = "StructureStone"
+
+[[retired.variant]]
+type = "Leaf"
+
+[[retired.variant]]
+type = "Fish"
+
+[[retired.variant]]
+type = "Cog"
+
+[[retired.variant]]
+type = "Heart"
+
+[[retired.variant]]
+type = "Skull"
+vanilla = { icon = "Skull", variant = 0 }
+
+[[retired.variant]]
+type = "SkullRed"
+vanilla = { icon = "Skull", variant = 1 }
+
+[[retired.variant]]
+type = "Flames"
+
+[[retired.variant]]
+type = "Shield"
+
+[[retired.variant]]
+type = "Dagger"
+
+[[retired.variant]]
+type = "Axe"
+
+[[retired]]
+name = "OresAndGems"
+address = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
+
+[[retired.variant]]
+type = "AncientCrystal"
+vanilla = { icon = "Dot", variant = 2 }
+
+[[retired.variant]]
+type = "Copper"
+
+[[retired.variant]]
+type = "Tin"
+
+[[retired.variant]]
+type = "Iron"
+
+[[retired.variant]]
+type = "Gold"
+
+[[retired.variant]]
+type = "Scarlet"
+
+[[retired.variant]]
+type = "Octarine"
+
+[[retired.variant]]
+type = "Galaxite"
+
+[[retired.variant]]
+type = "Solarite"
+
+[[retired.variant]]
+type = "Pandorium"
+
+[[retired.variant]]
+type = "Relucite"
+
+[[retired]]
+name = "Flags"
+address = "2e4b6d8c-a19b-476a-b770-8e293827689e"
+
+[[retired.variant]]
+type = "FlagRed"
+
+[[retired.variant]]
+type = "FlagOrange"
+
+[[retired.variant]]
+type = "FlagPeach"
+
+[[retired.variant]]
+type = "FlagYellow"
+
+[[retired.variant]]
+type = "FlagGreen"
+
+[[retired.variant]]
+type = "FlagTeal"
+
+[[retired.variant]]
+type = "FlagCyan"
+
+[[retired.variant]]
+type = "FlagBlue"
+
+[[retired.variant]]
+type = "FlagPurple"
+
+[[retired.variant]]
+type = "FlagPink"
+
+[[retired.variant]]
+type = "FlagBrown"
+
+[[retired.variant]]
+type = "FlagBlack"
+
+[[retired.variant]]
+type = "FlagGray"
+
+[[retired.variant]]
+type = "FlagWhite"
+
+[[retired]]
+name = "Numbers"
+address = "6152c695-14f2-4344-bee4-a2967b880bd3"
+
+[[retired.variant]]
+type = "Number1"
+
+[[retired.variant]]
+type = "Number2"
+
+[[retired.variant]]
+type = "Number3"
+
+[[retired.variant]]
+type = "Number4"
+
+[[retired.variant]]
+type = "Number5"
+
+[[retired.variant]]
+type = "Number6"
+
+[[retired.variant]]
+type = "Number7"
+
+[[retired.variant]]
+type = "Number8"
+
+[[retired.variant]]
+type = "Number9"
+
+[[retired.variant]]
+type = "Number0"
+
+[[retired]]
+name = "Letters"
 address = "77aea3e9-b732-4217-92f4-1bc153361245"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterA"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterB"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterC"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterD"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterE"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterF"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterG"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterH"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterI"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterJ"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterK"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterL"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterM"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterN"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterO"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterP"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterQ"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterR"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterS"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterT"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterU"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterV"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterW"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterX"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterY"
 
-[[icon.variant]]
+[[retired.variant]]
 type = "LetterZ"

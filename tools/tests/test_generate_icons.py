@@ -1,5 +1,6 @@
 """Tests for tools/generate_icons.py and the table it reads, tools/icons.toml."""
 
+import json
 import re
 import sys
 import uuid
@@ -13,12 +14,16 @@ sys.path.insert(0, str(TOOLS))
 
 import generate_icons as gi  # noqa: E402
 
-META = REPO / "unity/MapMarkersEnhanced/Art/markers.png.meta"
+ART = REPO / "unity/MapMarkersEnhanced/Art"
+LARGE_META = ART / "markers_large.png.meta"
+SMALL_META = ART / "markers_small.png.meta"
+PIXAKI = REPO / "sources/mme_markers.pixaki"
 TABLE = TOOLS / "icons.toml"
-PNG_GUID = "0123456789abcdef0123456789abcdef"
+LARGE_GUID = "0123456789abcdef0123456789abcdef"
+SMALL_GUID = "fedcba9876543210fedcba9876543210"
 
 # MapMarkers+ 1.1.1, Scripts/Common/PlusMarkerCategory.cs — copied as literals so
-# the table is checked against upstream, not against itself.
+# the retired 1.x blocks are checked against upstream, not against themselves.
 GENERAL = [
     "QuestionMark",
     "ExclamationMark",
@@ -126,42 +131,8 @@ PLUS_MARKER_TYPE = [
     "ArrowDown",
     "Flames",
     "Relucite",
-    "LetterA",
-    "LetterB",
-    "LetterC",
-    "LetterD",
-    "LetterE",
-    "LetterF",
-    "LetterG",
-    "LetterH",
-    "LetterI",
-    "LetterJ",
-    "LetterK",
-    "LetterL",
-    "LetterM",
-    "LetterN",
-    "LetterO",
-    "LetterP",
-    "LetterQ",
-    "LetterR",
-    "LetterS",
-    "LetterT",
-    "LetterU",
-    "LetterV",
-    "LetterW",
-    "LetterX",
-    "LetterY",
-    "LetterZ",
-    "Number1",
-    "Number2",
-    "Number3",
-    "Number4",
-    "Number5",
-    "Number6",
-    "Number7",
-    "Number8",
-    "Number9",
-    "Number0",
+    *LETTERS,
+    *NUMBERS,
     "Cross",
     "SkullRed",
     "Chest",
@@ -177,9 +148,8 @@ PLUS_MARKER_TYPE = [
     "Cog",
 ]
 
-# The addresses that have shipped. Saved markers store these, so a shipped
-# address must never change: every marker using it would turn into the game's
-# fallback sprite. New icons may be appended; these entries stay as they are.
+# The 1.x addresses. Saved markers store these, so none may ever be used again by
+# any block: the migration matches them, and a new block there would shadow it.
 SHIPPED_ADDRESSES = {
     "General": "0877e397-7e74-4b3f-b822-4d0f052e1b60",
     "OresAndGems": "1d93e76b-8037-44e9-97a9-1c69a3f57156",
@@ -188,103 +158,127 @@ SHIPPED_ADDRESSES = {
     "Letters": "77aea3e9-b732-4217-92f4-1bc153361245",
 }
 
-SMALL_SPELLING = {
-    "Skull": "markers_skull_small",
-    "AncientCrystal": "markers_ancient_crystal_small",
+DIALOG_ORDER = ["General", "Ores", "Flags", "Tapestry", "Orbs", "Numbers", "Letters"]
+EXCLUDED_LAYERS = {"Question Mark", "Cross", "Skull", "Skull Red", "Diamond", "Ellipse"}
+
+VANILLA_ADDRESSES = {  # read at runtime on 1.3.0.4; see the handbook, world-and-mechanics.md
+    "Cross": "adbecb0c-1236-bf84-d9ea-0516e188e2d0",
+    "Dot": "f9203606-618b-6384-7a99-a790e5c6de35",
+    "Flag": "3005a608-1b77-8604-8abe-d189ae05a0d8",
+    "Home": "64007694-5b2f-5474-b8ad-9f972e822421",
+    "Pickaxe": "a707985f-1e22-c2f4-e837-0cc32288f9c5",
+    "Question": "7e09f30c-8838-5604-2b46-8c13b0ef771e",
+    "Skull": "169f71d7-f86d-7234-abf0-0120b015262b",
+    "Star": "0eafefb1-8776-40d4-3af9-98637e55183e",
 }
+VANILLA_TARGETS = {  # (retired icon, 1.x index, type) -> (vanilla block, variant), as in 1.1.0
+    ("General", 0, "QuestionMark"): ("Question", 9),
+    ("General", 3, "Cross"): ("Cross", 9),
+    ("General", 16, "Skull"): ("Skull", 0),
+    ("General", 17, "SkullRed"): ("Skull", 1),
+    ("OresAndGems", 0, "AncientCrystal"): ("Dot", 2),
+}
+
+_LEGACY_ENTRY = re.compile(r'\{(\d+), \("([^"]+)", (\d+)\)\}')
 
 
 @pytest.fixture(scope="module")
-def icons():
-    """The table as the generator reads it."""
+def table():
+    """(icons, retired) as the generator reads them."""
     return gi.load_table(TABLE)
 
 
 @pytest.fixture(scope="module")
-def ids():
-    """Sprite name -> internalID of the real sprite sheet."""
-    return gi.sprite_ids(META.read_text(encoding="utf-8"))
+def icons(table):
+    """The new blocks."""
+    return table[0]
 
 
-def variants(icons):
-    """All variants of all icons, flattened."""
-    return [v for icon in icons for v in icon.variants]
+@pytest.fixture(scope="module")
+def retired(table):
+    """The retired 1.x blocks."""
+    return table[1]
 
 
-def test_every_variant_has_a_large_sprite(icons, ids):
-    """Every variant's large sprite exists in the sheet."""
-    missing = [v.large for v in variants(icons) if v.large not in ids]
-    assert missing == []
+@pytest.fixture(scope="module")
+def sheets():
+    """The two real sprite sheets, with stand-in GUIDs."""
+    return (
+        gi.Sheet(
+            LARGE_META.name, gi.sprite_ids(LARGE_META.read_text(encoding="utf-8")), LARGE_GUID
+        ),
+        gi.Sheet(
+            SMALL_META.name, gi.sprite_ids(SMALL_META.read_text(encoding="utf-8")), SMALL_GUID
+        ),
+    )
 
 
-def test_small_sprite_where_one_exists(icons, ids):
-    """A minimap slice is named exactly where the sheet has one."""
-    for v in variants(icons):
-        expected = SMALL_SPELLING.get(v.type, f"markers_{v.type}_small")
-        if expected in ids:
-            assert v.small == expected, v.type
-        else:
-            assert v.small is None, v.type
-    by_name = {icon.name: icon for icon in icons}
-    for name in ("Numbers", "Letters"):
-        assert all(v.small is None for v in by_name[name].variants)
+def legacy_entries(text):
+    """Amount -> (address, variant) of the C# Legacy table."""
+    block = text.split(" Legacy =", 1)[1].split("};", 1)[0]
+    return {int(a): (addr, int(v)) for a, addr, v in _LEGACY_ENTRY.findall(block)}
 
 
-def test_all_shipped_markers_are_variants(icons):
-    """Icons and variants follow PlusMarkerCategory.cs, letters appended."""
-    assert [icon.name for icon in icons] == [
-        "General",
-        "OresAndGems",
-        "Flags",
-        "Numbers",
-        "Letters",
-    ]
-    got = [[v.type for v in icon.variants] for icon in icons]
-    assert got == [GENERAL, ORES_AND_GEMS, FLAGS, NUMBERS, LETTERS]
-    assert [len(x) for x in got] == [22, 11, 14, 10, 26]
+# --- the new blocks -------------------------------------------------------------
 
 
-def test_addresses_unique_ascending_start_0_to_7(icons):
+def test_icon_order_and_counts(icons):
+    """Seven icons in dialog order, with the spec's variant counts."""
+    assert [icon.name for icon in icons] == DIALOG_ORDER
+    assert [len(icon.variants) for icon in icons] == [18, 11, 14, 15, 19, 10, 26]
+
+
+def test_addresses_ascend_and_start_low(icons):
     """Addresses are distinct, canonical, ascending, and start with 0-7."""
     addresses = [icon.address for icon in icons]
     assert len(set(addresses)) == len(addresses)
-    assert all(a == a.lower() for a in addresses)
     assert addresses == sorted(addresses)
     assert all(a[0] in "01234567" for a in addresses)
     assert all(str(uuid.UUID(a)) == a for a in addresses)
 
 
-def test_legacy_coverage(icons):
-    """Every PlusMarkerType is mapped or excluded, never both."""
-    legacy_variant_types = {v.type for v in variants(icons) if v.legacy}
-    for name in gi.LEGACY_TYPES:
-        in_mapping = name in legacy_variant_types
-        excluded = name in gi.LEGACY_EXCLUDED
-        assert in_mapping != excluded, name
-    assert set(gi.LEGACY_TYPES) >= gi.LEGACY_EXCLUDED
-    assert legacy_variant_types <= set(gi.LEGACY_TYPES)
-    assert len(gi.LEGACY_TYPES) == 85
-    assert len(set(gi.LEGACY_TYPES)) == 85
-    assert gi.LEGACY_TYPES.index("Copper") == 16
-    assert gi.LEGACY_TYPES.index("MusicNote") == 28
-    assert gi.LEGACY_TYPES[0] == "None"
-    assert gi.LEGACY_TYPES[-1] == "Cog"
+def test_no_retired_address_reused(icons):
+    """No new block sits at a 1.x address."""
+    assert not {icon.address for icon in icons} & set(SHIPPED_ADDRESSES.values())
 
 
-def test_address_fields_roundtrip():
-    """m_low/m_high are the Guid's two little-endian halves."""
-    address = "7e09f30c-8838-5604-2b46-8c13b0ef771e"
-    raw = uuid.UUID(address).bytes_le
-    low, high = gi.address_fields(address)
-    assert low == int.from_bytes(raw[:8], "little", signed=True)
-    assert high == int.from_bytes(raw[8:], "little", signed=True)
-    assert gi.address_fields("00000000-0000-0000-0000-000000000000") == (0, 0)
+def test_variant_sprite_is_the_layer_name():
+    """A space goes before every inner capital or digit; MusicNote is the one exception."""
+    assert gi.Variant("OrbYellowAlternative", None).sprite == "Orb Yellow Alternative"
+    assert gi.Variant("Number1", None).sprite == "Number 1"
+    assert gi.Variant("Copper", None).sprite == "Copper"
+    assert gi.Variant("MusicNote", "Note").sprite == "Note"
 
 
-def test_render_asset_references(icons, ids):
-    """The asset carries the script, address and sprite references."""
+def test_variant_order_matches_the_pixaki(icons):
+    """Each icon's variants are its Pixaki Large group, top layer first, minus the excluded."""
+    order = gi.pixaki_order(PIXAKI)
     for icon in icons:
-        text = gi.render_asset(icon, ids, PNG_GUID)
+        expected = [name for name in order[icon.name] if name not in EXCLUDED_LAYERS]
+        assert [v.sprite for v in icon.variants] == expected, icon.name
+
+
+def test_excluded_layers_match_the_sheet_definitions():
+    """The generator's excluded layers are the ones both sheet definitions leave out."""
+    assert gi.EXCLUDED_LAYERS == EXCLUDED_LAYERS
+    for config, group in (("large", "Small"), ("small", "Large")):
+        text = (REPO / f"sources/mme_markers.{config}.json").read_text(encoding="utf-8")
+        assert set(json.loads(text)["excludeNested"]) == EXCLUDED_LAYERS | {group}
+
+
+def test_every_variant_has_both_sprites(icons, sheets):
+    """Every variant's sprite exists in both sheets."""
+    large, small = sheets
+    for v in (v for icon in icons for v in icon.variants):
+        assert v.sprite in large.ids, v.name
+        assert v.sprite in small.ids, v.name
+
+
+def test_render_asset_references(icons, sheets):
+    """The asset carries the script, the address, and each variant's large and small sprite."""
+    large, small = sheets
+    for icon in icons:
+        text = gi.render_asset(icon, large, small)
         assert (
             "m_Script: {fileID: 1194909520, guid: 5a7e404e57a3ed387bf565f46c30b9c1, type: 3}"
             in text
@@ -292,24 +286,152 @@ def test_render_asset_references(icons, ids):
         assert f"m_Name: {icon.name}\n" in text
         low, high = gi.address_fields(icon.address)
         assert f"  m_address:\n    m_low: {low}\n    m_high: {high}\n" in text
-        large_lines = [line.strip() for line in text.splitlines() if "largeMapSprite:" in line]
-        expected = [
-            f"largeMapSprite: {{fileID: {ids[v.large]}, guid: {PNG_GUID}, type: 3}}"
+
+        def refs(key, text=text):
+            return [
+                line.strip().removeprefix("- ") for line in text.splitlines() if f"{key}:" in line
+            ]
+
+        assert refs("largeMapSprite") == [
+            f"largeMapSprite: {{fileID: {large.ids[v.sprite]}, guid: {LARGE_GUID}, type: 3}}"
             for v in icon.variants
         ]
-        assert [line.removeprefix("- ") for line in large_lines] == expected
-        mini = [line.strip() for line in text.splitlines() if "miniMapSprite:" in line]
-        expected_mini = [
-            f"miniMapSprite: {{fileID: {ids[v.small or v.large]}, guid: {PNG_GUID}, type: 3}}"
+        assert refs("miniMapSprite") == [
+            f"miniMapSprite: {{fileID: {small.ids[v.sprite]}, guid: {SMALL_GUID}, type: 3}}"
             for v in icon.variants
         ]
-        assert mini == expected_mini
-        color = [line.strip() for line in text.splitlines() if "colorIcon:" in line]
-        expected_color = [
-            f"colorIcon: {{fileID: {ids[v.large]}, guid: {PNG_GUID}, type: 3}}"
+        assert refs("colorIcon") == [
+            f"colorIcon: {{fileID: {large.ids[v.sprite]}, guid: {LARGE_GUID}, type: 3}}"
             for v in icon.variants
         ]
-        assert color == expected_color
+
+
+def test_render_asset_rejects_missing_sprite(icons, sheets):
+    """A sprite missing from either sheet aborts rendering, naming the sheet."""
+    large, small = sheets
+    icon = icons[0]
+    broken = gi.Icon(icon.name, icon.address, (gi.Variant("NoSuchMarker", None),))
+    with pytest.raises(ValueError, match=r"No Such Marker.*markers_large"):
+        gi.render_asset(broken, large, small)
+    only_large = gi.Sheet(small.name, {}, SMALL_GUID)
+    with pytest.raises(ValueError, match="markers_small"):
+        gi.render_asset(icon, large, only_large)
+
+
+# --- the retired 1.x blocks -----------------------------------------------------
+
+
+def test_retired_lists_still_mirror_mapmarkers(retired):
+    """The five retired blocks list MapMarkers+ 1.1.1's categories, in 1.x index order."""
+    assert [r.name for r in retired] == list(SHIPPED_ADDRESSES)
+    got = [[v.type for v in r.variants] for r in retired]
+    assert got == [GENERAL, ORES_AND_GEMS, FLAGS, NUMBERS, LETTERS]
+
+
+def test_shipped_addresses_are_the_retired_ones(retired):
+    """Every 1.x block keeps its name and address in [[retired]]."""
+    assert {r.name: r.address for r in retired} == SHIPPED_ADDRESSES
+
+
+def test_retired_vanilla_targets_are_the_five(retired):
+    """Exactly the five 1.1.0 hidden variants carry a vanilla target, unchanged."""
+    found = {
+        (r.name, n, v.type): (v.vanilla.block, v.vanilla.variant)
+        for r in retired
+        for n, v in enumerate(r.variants)
+        if v.vanilla
+    }
+    assert found == VANILLA_TARGETS
+
+
+def test_every_retired_variant_has_exactly_one_target(icons, retired):
+    """Each stored 1.x (address, index) maps to its vanilla target or its same-named variant."""
+    targets = gi.retired_targets(icons, retired)
+    assert len(targets) == 22 + 11 + 14 + 10 + 26
+    new = {v.name: (icon.address, n) for icon in icons for n, v in enumerate(icon.variants)}
+    for r in retired:
+        for n, v in enumerate(r.variants):
+            expected = (v.vanilla.address, v.vanilla.variant) if v.vanilla else new[v.type]
+            assert targets[(r.address, n)] == expected, v.type
+    general = SHIPPED_ADDRESSES["General"]
+    ores = SHIPPED_ADDRESSES["OresAndGems"]
+    assert targets[(general, 0)] == ("7e09f30c-8838-5604-2b46-8c13b0ef771e", 9)
+    assert targets[(ores, 0)] == (VANILLA_ADDRESSES["Dot"], 2)
+    by_name = {icon.name: icon for icon in icons}
+    assert targets[(general, GENERAL.index("Heart"))] == (by_name["General"].address, 11)
+
+
+def test_flag_green_goes_to_the_new_flags(icons, retired):
+    """FlagGreen is a mod variant, not a vanilla duplicate."""
+    targets = gi.retired_targets(icons, retired)
+    flags = next(i for i in icons if i.name == "Flags")
+    assert targets[(SHIPPED_ADDRESSES["Flags"], 4)] == (flags.address, 4)
+
+
+# --- the generated C# -----------------------------------------------------------
+
+
+def test_csharp_tables(icons, retired):
+    """ModIconAddresses, Legacy, Retired and ToVanilla agree with the table."""
+    text = gi.render_csharp(icons, retired)
+    assert "namespace MapMarkersEnhanced" in text
+    assert "internal static class IconTable" in text
+    block = text.split("ModIconAddresses", 1)[1].split(";", 1)[0]
+    assert re.findall(r'"([^"]+)"', block) == [icon.address for icon in icons]
+
+    targets = gi.retired_targets(icons, retired)
+    assert (
+        "public static readonly Dictionary<(string icon, int variant),"
+        " (string address, int variant)> Retired" in text
+    )
+    retired_block = text.split(" Retired =", 1)[1].split("};", 1)[0]
+    for (address, index), (target, variant) in targets.items():
+        assert f'{{("{address}", {index}), ("{target}", {variant})}}' in retired_block
+    assert retired_block.count('{("') == len(targets)
+
+    assert (
+        "public static readonly Dictionary<(string icon, int variant),"
+        " (string address, int variant)> ToVanilla" in text
+    )
+    to_vanilla = text.split(" ToVanilla =", 1)[1].split("};", 1)[0]
+    assert to_vanilla.count('{("') == 5
+    for r in retired:
+        for n, v in enumerate(r.variants):
+            if v.vanilla:
+                assert (
+                    f'{{("{r.address}", {n}), ("{v.vanilla.address}", {v.vanilla.variant})}}'
+                    in to_vanilla
+                )
+
+    legacy = legacy_entries(text)
+    expected = {}
+    for r in retired:
+        for n, v in enumerate(r.variants):
+            if v.type not in gi.LEGACY_EXCLUDED:
+                expected[6000 + gi.LEGACY_TYPES.index(v.type)] = targets[(r.address, n)]
+    assert legacy == expected
+
+
+def test_legacy_cross_and_skullred_go_to_vanilla(icons, retired):
+    """MapMarkers+ Cross and SkullRed restore straight onto their vanilla targets."""
+    legacy = legacy_entries(gi.render_csharp(icons, retired))
+    assert legacy[6000 + gi.LEGACY_TYPES.index("Cross")] == (VANILLA_ADDRESSES["Cross"], 9)
+    assert legacy[6000 + gi.LEGACY_TYPES.index("SkullRed")] == (VANILLA_ADDRESSES["Skull"], 1)
+
+
+def test_legacy_coverage(retired):
+    """Every PlusMarkerType is a retired legacy variant or excluded, never both."""
+    legacy = {v.type for r in retired for v in r.variants if v.type not in gi.LEGACY_EXCLUDED}
+    for name in gi.LEGACY_TYPES:
+        assert (name in legacy) != (name in gi.LEGACY_EXCLUDED), name
+    assert gi.LEGACY_TYPES.index("Copper") == 16
+    assert gi.LEGACY_TYPES.index("MusicNote") == 28
+
+
+def test_legacy_types_match_upstream_enum():
+    """LEGACY_TYPES is PlusMarkerType, every name in enum order."""
+    assert list(gi.LEGACY_TYPES) == PLUS_MARKER_TYPE
+    assert len(PLUS_MARKER_TYPE) == 85
 
 
 def test_legacy_excluded_is_exactly_the_vanilla_backed_types():
@@ -324,68 +446,24 @@ def test_legacy_excluded_is_exactly_the_vanilla_backed_types():
     } == gi.LEGACY_EXCLUDED
 
 
-def test_render_asset_rejects_missing_sprite(icons, ids):
-    """A sprite missing from the sheet aborts rendering."""
-    icon = icons[0]
-    broken = gi.Icon(icon.name, icon.address, (gi.Variant("NoSuchMarker", None),))
-    with pytest.raises(ValueError, match="markers_NoSuchMarker"):
-        gi.render_asset(broken, ids, PNG_GUID)
+def test_address_fields_roundtrip():
+    """m_low/m_high are the Guid's two little-endian halves."""
+    address = "7e09f30c-8838-5604-2b46-8c13b0ef771e"
+    raw = uuid.UUID(address).bytes_le
+    low, high = gi.address_fields(address)
+    assert low == int.from_bytes(raw[:8], "little", signed=True)
+    assert high == int.from_bytes(raw[8:], "little", signed=True)
+    assert gi.address_fields("00000000-0000-0000-0000-000000000000") == (0, 0)
 
 
-def test_csharp_table_agrees(icons):
-    """The C# mapping lists exactly the legacy variants, addresses in order."""
-    text = gi.render_csharp(icons)
-    entries = 0
-    hidden = []
-    for icon in icons:
-        for index, v in enumerate(icon.variants):
-            key = 6000 + gi.LEGACY_TYPES.index(v.type)
-            if v.vanilla:
-                entry = f'{{{key}, ("{v.vanilla.address}", {v.vanilla.variant})}}'
-                hidden.append(
-                    f'{{("{icon.address}", {index}), ("{v.vanilla.address}", {v.vanilla.variant})}}'
-                )
-            else:
-                entry = f'{{{key}, ("{icon.address}", {index})}}'
-            if v.legacy:
-                assert entry in text, v.type
-                entries += 1
-            else:
-                assert f"{{{key}," not in text, v.type
-    assert text.count("{60") == entries
-    to_vanilla = text.split("ToVanilla", 1)[1]
-    assert to_vanilla.count('{("') == len(hidden)
-    assert all(h in to_vanilla for h in hidden)
-    assert "namespace MapMarkersEnhanced" in text
-    assert "internal static class IconTable" in text
-    assert "public static readonly string[] ModIconAddresses" in text
-    assert "public static readonly Dictionary<int, (string address, int variant)> Legacy" in text
-    block = text.split("ModIconAddresses", 1)[1].split(";", 1)[0]
-    positions = [block.find(f'"{icon.address}"') for icon in icons]
-    assert all(p >= 0 for p in positions)
-    assert positions == sorted(positions)
-
-
-def test_generation_is_deterministic(icons, ids):
+def test_generation_is_deterministic(icons, retired, sheets):
     """Rendering twice gives identical text; meta GUIDs are name-derived."""
+    large, small = sheets
     for icon in icons:
-        assert gi.render_asset(icon, ids, PNG_GUID) == gi.render_asset(icon, ids, PNG_GUID)
-        assert gi.render_meta(icon) == gi.render_meta(icon)
+        assert gi.render_asset(icon, large, small) == gi.render_asset(icon, large, small)
         expected_guid = uuid.uuid5(uuid.NAMESPACE_URL, "MapMarkersEnhanced/" + icon.name).hex
         assert f"guid: {expected_guid}\n" in gi.render_meta(icon)
-    assert gi.render_csharp(icons) == gi.render_csharp(gi.load_table(TABLE))
-
-
-def test_legacy_types_match_upstream_enum():
-    """LEGACY_TYPES is PlusMarkerType, every name in enum order."""
-    assert list(gi.LEGACY_TYPES) == PLUS_MARKER_TYPE
-    assert len(PLUS_MARKER_TYPE) == 85
-
-
-def test_shipped_addresses_never_change(icons):
-    """Every shipped icon keeps its name and its address."""
-    by_name = {icon.name: icon.address for icon in icons}
-    assert {name: by_name.get(name) for name in SHIPPED_ADDRESSES} == SHIPPED_ADDRESSES
+    assert gi.render_csharp(icons, retired) == gi.render_csharp(*gi.load_table(TABLE))
 
 
 def test_committed_outputs_match_the_generator():
@@ -394,24 +472,120 @@ def test_committed_outputs_match_the_generator():
         assert path.read_bytes() == text.encode("utf-8"), path.name
 
 
-GOOD_A = "0877e397-7e74-4b3f-b822-4d0f052e1b60"
-GOOD_B = "1d93e76b-8037-44e9-97a9-1c69a3f57156"
-QUESTION = "7e09f30c-8838-5604-2b46-8c13b0ef771e"
+def test_vanilla_table_is_the_measured_one():
+    """The [vanilla] table holds the eight measured vanilla block addresses."""
+    assert gi.load_vanilla(TABLE) == VANILLA_ADDRESSES
 
 
-def _hidden(block, n, kind="QuestionMark"):
-    """A variant row of write_table that points at a vanilla block."""
-    return {"type": kind, "vanilla": (block, n)}
+MIGRATION_SYSTEM = REPO / "unity/MapMarkersEnhanced/Scripts/MarkerMigrationSystem.cs"
 
 
-def write_table(tmp_path, *icons, vanilla=None):
-    """A minimal icons.toml, one variant per (name, address[, type[, variants]]).
+def test_migration_question_mark_matches_the_table():
+    """MarkerMigrationSystem's question-mark constants agree with [vanilla] Question, variant 9."""
+    source = MIGRATION_SYSTEM.read_text(encoding="utf-8")
+    address = re.search(r'const string QuestionMarkAddress = "([^"]+)";', source)
+    variant = re.search(r"const int QuestionMarkVariant = (\d+);", source)
+    assert address and variant, "constants not found in MarkerMigrationSystem.cs"
+    assert address.group(1) == gi.load_vanilla(TABLE)["Question"]
+    assert int(variant.group(1)) == 9
 
-    `vanilla` is a name -> address dict written as the [vanilla] table; a str
-    address is quoted, anything else written as given. A fourth element replaces
-    the single default variant with dicts of `type` and an optional `vanilla`
-    (block, variant) pair, or a `vanilla_raw` TOML value written verbatim.
+
+# --- refusals: exit 2 before anything is written --------------------------------
+
+
+def run_check(monkeypatch, capsys, *, table=None, small_meta=None):
+    """main(["--check"]) against the real sources, with a table or small meta swapped in."""
+    if table is not None:
+        monkeypatch.setattr(gi, "TABLE", table)
+    if small_meta is not None:
+        monkeypatch.setattr(gi, "SHEET_METAS", (gi.SHEET_METAS[0], small_meta))
+    code = gi.main(["--check"])
+    return code, capsys.readouterr().err
+
+
+def edited_table(tmp_path, old, new, count=1):
+    """The real table with `old` replaced by `new` (`count` times), as a temp file."""
+    text = TABLE.read_text(encoding="utf-8")
+    assert text.count(old) >= count, old
+    path = tmp_path / "icons.toml"
+    path.write_text(text.replace(old, new, count), encoding="utf-8")
+    return path
+
+
+def test_real_sources_pass_the_check(monkeypatch, capsys):
+    """The baseline the refusal tests vary: the real sources pass --check."""
+    assert run_check(monkeypatch, capsys) == (0, "")
+
+
+def test_missing_small_sprite_refuses(tmp_path, monkeypatch, capsys):
+    """A variant whose sprite the small sheet lacks refuses, naming sprite and sheet."""
+    meta = tmp_path / "markers_small.png.meta"
+    text = SMALL_META.read_text(encoding="utf-8")
+    assert "      name: Heart\n" in text
+    meta.write_text(text.replace("      name: Heart\n", "      name: Hurt\n"), encoding="utf-8")
+    code, err = run_check(monkeypatch, capsys, small_meta=meta)
+    assert code == 2
+    assert "Heart" in err and "markers_small" in err
+
+
+def test_order_mismatch_refuses(tmp_path, monkeypatch, capsys):
+    """Variants in a different order than the Pixaki layers refuse, naming the icon."""
+    table = edited_table(tmp_path, 'name = "Copper"', 'name = "@"')
+    table.write_text(
+        table.read_text(encoding="utf-8")
+        .replace('name = "Tin"', 'name = "Copper"')
+        .replace('name = "@"', 'name = "Tin"'),
+        encoding="utf-8",
+    )
+    code, err = run_check(monkeypatch, capsys, table=table)
+    assert code == 2
+    assert "Ores" in err and "order" in err
+
+
+def test_retired_variant_without_target_refuses(tmp_path, monkeypatch, capsys):
+    """A 1.x variant with neither a vanilla nor a same-named target refuses, naming it."""
+    table = edited_table(
+        tmp_path,
+        'type = "QuestionMark"\nvanilla = { icon = "Question", variant = 9 }\n',
+        'type = "QuestionMark"\n',
+    )
+    code, err = run_check(monkeypatch, capsys, table=table)
+    assert code == 2
+    assert "QuestionMark" in err and "target" in err
+
+
+def test_retired_address_in_new_block_refuses(tmp_path, monkeypatch, capsys):
+    """A new block at a retired address refuses, naming the address."""
+    general = gi.load_table(TABLE)[0][0].address
+    table = edited_table(tmp_path, general, SHIPPED_ADDRESSES["General"])
+    code, err = run_check(monkeypatch, capsys, table=table)
+    assert code == 2
+    assert SHIPPED_ADDRESSES["General"] in err and "retired" in err
+
+
+# --- table defects on crafted tables ----------------------------------------------
+
+GOOD_A = "0aaaaaaa-7e74-4b3f-b822-4d0f052e1b60"
+GOOD_B = "1bbbbbbb-8037-44e9-97a9-1c69a3f57156"
+OLD_A = "2ccccccc-b732-4217-92f4-1bc153361245"
+QUESTION = VANILLA_ADDRESSES["Question"]
+
+
+def write_table(tmp_path, icons=(), retired=(), vanilla=None):
+    """A minimal icons.toml.
+
+    `icons` and `retired` are (name, address, rows); an icon row is a variant
+    name or a dict of raw TOML fields, a retired row a type or such a dict. A
+    dict value that is a str is quoted, anything else written verbatim.
     """
+
+    def fields(row, key):
+        row = {key: row} if isinstance(row, str) else row
+        return "".join(
+            f'{k} = "{v}"\n' if isinstance(v, str) and k != "vanilla" else f"{k} = {v}\n"
+            for k, v in row.items()
+        )
+
     parts = []
     if vanilla:
         parts.append(
@@ -421,18 +595,12 @@ def write_table(tmp_path, *icons, vanilla=None):
                 for k, v in vanilla.items()
             )
         )
-    for name, address, *rest in icons:
-        kind = rest[0] if rest and rest[0] is not None else "QuestionMark"
-        variant_rows = rest[1] if len(rest) > 1 else [{"type": kind}]
-        text = f'[[icon]]\nname = "{name}"\naddress = "{address}"\n'
-        for row in variant_rows:
-            text += f'\n[[icon.variant]]\ntype = "{row["type"]}"\n'
-            if "vanilla" in row:
-                block, n = row["vanilla"]
-                text += f'vanilla = {{ icon = "{block}", variant = {n} }}\n'
-            if "vanilla_raw" in row:
-                text += f"vanilla = {row['vanilla_raw']}\n"
-        parts.append(text)
+    for kind, key, entries in (("icon", "name", icons), ("retired", "type", retired)):
+        for name, address, rows in entries:
+            text = f'[[{kind}]]\nname = "{name}"\naddress = "{address}"\n'
+            for row in rows:
+                text += f"\n[[{kind}.variant]]\n" + fields(row, key)
+            parts.append(text)
     path = tmp_path / "icons.toml"
     path.write_text("\n".join(parts), encoding="utf-8")
     return path
@@ -440,56 +608,87 @@ def write_table(tmp_path, *icons, vanilla=None):
 
 def test_valid_crafted_table_loads(tmp_path):
     """The crafted-table helper itself produces a table that passes validation."""
-    icons = gi.load_table(write_table(tmp_path, ("A", GOOD_A), ("B", GOOD_B)))
+    icons, retired = gi.load_table(
+        write_table(
+            tmp_path,
+            icons=[("A", GOOD_A, ["Heart"]), ("B", GOOD_B, ["Fish"])],
+            retired=[
+                (
+                    "Old",
+                    OLD_A,
+                    ["Heart", {"type": "Cross", "vanilla": '{ icon = "Q", variant = 9 }'}],
+                )
+            ],
+            vanilla={"Q": QUESTION},
+        )
+    )
     assert [icon.name for icon in icons] == ["A", "B"]
+    assert gi.retired_targets(icons, retired) == {
+        (OLD_A, 0): (GOOD_A, 0),
+        (OLD_A, 1): (QUESTION, 9),
+    }
 
 
 @pytest.mark.parametrize(
-    ("rows", "message"),
+    ("icons", "retired", "message"),
     [
-        ((("A", GOOD_A), ("A", GOOD_B)), "name A"),
-        ((("A", GOOD_A), ("B", GOOD_A)), "address .* twice"),
-        ((("A", GOOD_A.upper()),), "canonical"),
-        ((("A", "not-a-uuid"),), "canonical"),
-        ((("A", GOOD_A.replace("-", "")),), "canonical"),
-        ((("A", GOOD_B), ("B", GOOD_A)), "ascend"),
-        ((("A", "8" + GOOD_A[1:]),), "0-7"),
-        ((("A", "f" + GOOD_A[1:]),), "0-7"),
-        ((("A", GOOD_A, "NoSuchType"),), "NoSuchType"),
-        ((("A", GOOD_A, None, [_hidden("Nope", 9)]),), "Nope"),
-        ((("A", GOOD_A, None, [_hidden("Question", 10), {"type": "Cross"}]),), "0-9"),
-        ((("A", GOOD_A, None, [_hidden("Question", -1), {"type": "Cross"}]),), "0-9"),
-        ((("A", GOOD_A, None, [_hidden("Question", 9)]),), "visible"),
+        ([("A", GOOD_A, ["Heart"]), ("A", GOOD_B, ["Fish"])], [], "name A"),
+        ([("A", GOOD_A, ["Heart"]), ("B", GOOD_A, ["Fish"])], [], "address .* twice"),
+        ([("A", GOOD_A.upper(), ["Heart"])], [], "canonical"),
+        ([("A", "not-a-uuid", ["Heart"])], [], "canonical"),
+        ([("A", GOOD_B, ["Heart"]), ("B", GOOD_A, ["Fish"])], [], "ascend"),
+        ([("A", "8" + GOOD_A[1:], ["Heart"])], [], "0-7"),
+        ([("A", GOOD_A, [])], [], "no variant"),
+        ([("A", GOOD_A, ["Heart", "Heart"])], [], "Heart.*twice"),
+        ([("A", GOOD_A, [{"name": "Heart", "type": "Heart"}])], [], "type"),
+        ([("A", GOOD_A, ["Heart"])], [("Old", OLD_A.upper(), ["Heart"])], "canonical"),
+        ([("A", GOOD_A, ["Heart"])], [("Old", GOOD_A, ["Heart"])], "retired"),
+        ([("A", GOOD_A, ["Heart"])], [("Old", OLD_A, ["NoSuchType"])], "NoSuchType"),
+        ([("A", GOOD_A, ["Heart"])], [("Old", OLD_A, ["Fish"])], "Fish.*target"),
+        (
+            [("A", GOOD_A, ["Heart"])],
+            [("Old", OLD_A, ["Heart"]), ("Old2", OLD_A, ["Heart"])],
+            "twice",
+        ),
+        (
+            [("A", GOOD_A, ["Heart"])],
+            [("Old", OLD_A, [{"type": "Cross", "vanilla": '{ icon = "Nope", variant = 9 }'}])],
+            "Nope",
+        ),
+        (
+            [("A", GOOD_A, ["Heart"])],
+            [("Old", OLD_A, [{"type": "Cross", "vanilla": '{ icon = "Q", variant = 10 }'}])],
+            "0-9",
+        ),
     ],
     ids=[
         "duplicate-name",
         "duplicate-address",
         "uppercase-address",
         "malformed-address",
-        "unhyphenated-address",
         "descending-addresses",
         "address-from-8",
-        "address-from-f",
-        "unknown-type",
+        "no-variant",
+        "duplicate-variant",
+        "unknown-variant-field",
+        "uppercase-retired-address",
+        "retired-address-reused",
+        "unknown-retired-type",
+        "retired-without-target",
+        "duplicate-retired-address",
         "unknown-vanilla-block",
-        "vanilla-variant-out-of-range-high",
-        "vanilla-variant-out-of-range-negative",
-        "all-hidden",
+        "vanilla-variant-out-of-range",
     ],
 )
-def test_load_table_rejects(tmp_path, rows, message):
+def test_load_table_rejects(tmp_path, icons, retired, message):
     """Every table defect is a ValueError naming it, before anything is rendered."""
     with pytest.raises(ValueError, match=message):
-        gi.load_table(write_table(tmp_path, *rows, vanilla={"Question": QUESTION}))
+        gi.load_table(write_table(tmp_path, icons, retired, vanilla={"Q": QUESTION}))
 
 
 def test_vanilla_address_must_not_be_a_mod_address(tmp_path):
-    """A [vanilla] entry pointing at one of the mod's own icons is rejected."""
-    path = write_table(
-        tmp_path,
-        ("A", GOOD_A, None, [_hidden("Question", 9), {"type": "Cross"}]),
-        vanilla={"Question": GOOD_A},
-    )
+    """A [vanilla] entry pointing at one of the mod's own addresses is rejected."""
+    path = write_table(tmp_path, [("A", GOOD_A, ["Heart"])], vanilla={"Q": GOOD_A})
     with pytest.raises(ValueError, match="vanilla"):
         gi.load_table(path)
 
@@ -501,7 +700,7 @@ def test_vanilla_address_must_not_be_a_mod_address(tmp_path):
 )
 def test_vanilla_address_must_be_canonical(tmp_path, address):
     """A [vanilla] address is held to the same lowercase canonical form as a mod address."""
-    path = write_table(tmp_path, ("A", GOOD_A), vanilla={"Question": address})
+    path = write_table(tmp_path, [("A", GOOD_A, ["Heart"])], vanilla={"Q": address})
     with pytest.raises(ValueError, match="canonical"):
         gi.load_table(path)
 
@@ -509,14 +708,14 @@ def test_vanilla_address_must_be_canonical(tmp_path, address):
 @pytest.mark.parametrize(
     "raw",
     [
-        '{ icon = "Question" }',
+        '{ icon = "Q" }',
         "{ variant = 9 }",
-        '"Question"',
-        '{ icon = "Question", variant = "9" }',
-        '{ icon = "Question", variant = true }',
-        '{ icon = "Question", variant = 9.0 }',
+        '"Q"',
+        '{ icon = "Q", variant = "9" }',
+        '{ icon = "Q", variant = true }',
+        '{ icon = "Q", variant = 9.0 }',
         "{ icon = 1, variant = 9 }",
-        '{ icon = "Question", variant = 9, note = "x" }',
+        '{ icon = "Q", variant = 9, note = "x" }',
     ],
     ids=[
         "missing-variant",
@@ -533,8 +732,9 @@ def test_malformed_vanilla_target_is_a_value_error(tmp_path, raw, monkeypatch, c
     """A malformed `vanilla = {...}` is a ValueError, so main exits 2 rather than 1 (drift)."""
     path = write_table(
         tmp_path,
-        ("A", GOOD_A, None, [{"type": "QuestionMark", "vanilla_raw": raw}, {"type": "Cross"}]),
-        vanilla={"Question": QUESTION},
+        [("A", GOOD_A, ["Heart"])],
+        [("Old", OLD_A, [{"type": "QuestionMark", "vanilla": raw}])],
+        vanilla={"Q": QUESTION},
     )
     with pytest.raises(ValueError, match="vanilla"):
         gi.load_table(path)
@@ -548,47 +748,21 @@ def test_vanilla_table_must_be_a_table(tmp_path):
     path = tmp_path / "icons.toml"
     path.write_text(
         f'vanilla = "x"\n\n[[icon]]\nname = "A"\naddress = "{GOOD_A}"\n\n'
-        '[[icon.variant]]\ntype = "QuestionMark"\n',
+        '[[icon.variant]]\nname = "Heart"\n',
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match=r"\[vanilla\]"):
         gi.load_table(path)
 
 
-def test_vanilla_target_resolves(tmp_path):
-    """A variant's vanilla pair resolves to the [vanilla] address and hides the variant."""
-    path = write_table(
-        tmp_path,
-        ("A", GOOD_A, None, [_hidden("Question", 9, "QuestionMark"), {"type": "Cross"}]),
-        vanilla={"Question": QUESTION},
-    )
-    (icon,) = gi.load_table(path)
-    assert icon.variants[0].vanilla == gi.VanillaTarget("Question", QUESTION, 9)
-    assert icon.variants[0].hidden and not icon.variants[1].hidden
-
-
 def test_load_vanilla_reads_the_table(tmp_path):
     """load_vanilla returns the [vanilla] table, and {} when there is none."""
-    with_table = write_table(tmp_path, ("A", GOOD_A), vanilla={"Question": QUESTION})
-    assert gi.load_vanilla(with_table) == {"Question": QUESTION}
-    assert gi.load_vanilla(write_table(tmp_path, ("A", GOOD_A))) == {}
+    with_table = write_table(tmp_path, [("A", GOOD_A, ["Heart"])], vanilla={"Q": QUESTION})
+    assert gi.load_vanilla(with_table) == {"Q": QUESTION}
+    assert gi.load_vanilla(write_table(tmp_path, [("A", GOOD_A, ["Heart"])])) == {}
 
 
-def test_csharp_emits_to_vanilla_and_redirects_legacy(tmp_path):
-    """Hidden variants get a ToVanilla entry, and their Legacy entry points at the target."""
-    path = write_table(
-        tmp_path,
-        ("A", GOOD_A, None, [_hidden("Question", 9, "Cross"), {"type": "ExclamationMark"}]),
-        vanilla={"Question": QUESTION},
-    )
-    text = gi.render_csharp(gi.load_table(path))
-    assert (
-        "public static readonly Dictionary<(string icon, int variant),"
-        " (string address, int variant)> ToVanilla" in text
-    )
-    assert f'{{("{GOOD_A}", 0), ("{QUESTION}", 9)}}, // Cross' in text
-    assert f'{{6072, ("{QUESTION}", 9)}}, // Cross' in text
-    assert f'{{6027, ("{GOOD_A}", 1)}}, // ExclamationMark' in text
+# --- orphans ----------------------------------------------------------------------
 
 
 def test_orphans_flags_files_the_table_does_not_generate(tmp_path):
@@ -610,68 +784,3 @@ def test_check_fails_on_an_orphan(tmp_path, monkeypatch, capsys):
     (asset_dir / "Renamed.asset").write_text("x", encoding="utf-8")
     assert gi.main(["--check"]) == 1
     assert "Renamed.asset" in capsys.readouterr().out
-
-
-VANILLA_ADDRESSES = {  # read at runtime on 1.3.0.4; see the handbook, world-and-mechanics.md
-    "Cross": "adbecb0c-1236-bf84-d9ea-0516e188e2d0",
-    "Dot": "f9203606-618b-6384-7a99-a790e5c6de35",
-    "Flag": "3005a608-1b77-8604-8abe-d189ae05a0d8",
-    "Home": "64007694-5b2f-5474-b8ad-9f972e822421",
-    "Pickaxe": "a707985f-1e22-c2f4-e837-0cc32288f9c5",
-    "Question": "7e09f30c-8838-5604-2b46-8c13b0ef771e",
-    "Skull": "169f71d7-f86d-7234-abf0-0120b015262b",
-    "Star": "0eafefb1-8776-40d4-3af9-98637e55183e",
-}
-HIDDEN = {  # (icon, index, type) -> (block, variant)
-    ("General", 0, "QuestionMark"): ("Question", 9),
-    ("General", 3, "Cross"): ("Cross", 9),
-    ("General", 16, "Skull"): ("Skull", 0),
-    ("General", 17, "SkullRed"): ("Skull", 1),
-    ("OresAndGems", 0, "AncientCrystal"): ("Dot", 2),
-}
-
-
-def test_vanilla_table_is_the_measured_one():
-    """The [vanilla] table holds the eight measured vanilla block addresses."""
-    assert gi.load_vanilla(TABLE) == VANILLA_ADDRESSES
-
-
-def test_hidden_variants_are_exactly_the_five(icons):
-    """Exactly five variants are hidden and mapped to vanilla targets."""
-    found = {
-        (i.name, n, v.type): (v.vanilla.block, v.vanilla.variant)
-        for i in icons
-        for n, v in enumerate(i.variants)
-        if v.hidden
-    }
-    assert found == HIDDEN
-
-
-def test_flag_green_stays_visible(icons):
-    """No Flags variants are hidden; FlagGreen in particular stays visible."""
-    flags = next(i for i in icons if i.name == "Flags")
-    assert not any(v.hidden for v in flags.variants)
-
-
-def test_cross_and_skull_red_restore_to_vanilla(icons):
-    """Hidden variants are listed in Legacy as their vanilla targets."""
-    text = gi.render_csharp(icons)
-    assert '{6072, ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross' in text
-    assert '{6073, ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed' in text
-
-
-MIGRATION_SYSTEM = REPO / "unity/MapMarkersEnhanced/Scripts/MarkerMigrationSystem.cs"
-
-
-def test_migration_question_mark_matches_the_table():
-    """MarkerMigrationSystem's question-mark constants agree with [vanilla] Question, variant 9.
-
-    The system hard-codes the address the version-13 migration writes; the table
-    measures the same block. The two must not drift apart.
-    """
-    source = MIGRATION_SYSTEM.read_text(encoding="utf-8")
-    address = re.search(r'const string QuestionMarkAddress = "([^"]+)";', source)
-    variant = re.search(r"const int QuestionMarkVariant = (\d+);", source)
-    assert address and variant, "constants not found in MarkerMigrationSystem.cs"
-    assert address.group(1) == gi.load_vanilla(TABLE)["Question"]
-    assert int(variant.group(1)) == 9

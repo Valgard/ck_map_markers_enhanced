@@ -11,98 +11,188 @@ namespace MapMarkersEnhanced
         /// <summary>The mod's icon addresses, in dialog order.</summary>
         public static readonly string[] ModIconAddresses =
         {
-            "0877e397-7e74-4b3f-b822-4d0f052e1b60",
-            "1d93e76b-8037-44e9-97a9-1c69a3f57156",
-            "2e4b6d8c-a19b-476a-b770-8e293827689e",
-            "6152c695-14f2-4344-bee4-a2967b880bd3",
-            "77aea3e9-b732-4217-92f4-1bc153361245",
+            "69ac8c2b-f5a2-45bd-8dcd-6004b352637b",
+            "715841ac-735e-4b1d-95db-ec6dd73bd12e",
+            "7259d242-79c6-429e-acfd-e5206ff6cd78",
+            "73d6f81d-077c-4548-b655-d4644b855323",
+            "769702fa-b2cb-499f-9c7f-462442d995ec",
+            "782323e6-7f6a-416d-8c63-edc0e05f87b1",
+            "7890a1b3-a5bd-42c6-a375-d116e12b8f10",
         };
 
         /// <summary>Legacy MapMarkers+ Amount (6000 + PlusMarkerType) to icon address and variant index.</summary>
         public static readonly Dictionary<int, (string address, int variant)> Legacy = new Dictionary<int, (string address, int variant)>
         {
-            {6027, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 1)}, // ExclamationMark
-            {6028, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 2)}, // MusicNote
+            {6027, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 0)}, // ExclamationMark
+            {6028, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 1)}, // MusicNote
             {6072, ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross
-            {6030, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 4)}, // ArrowLeft
-            {6031, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 5)}, // ArrowRight
-            {6032, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 6)}, // ArrowUp
-            {6033, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 7)}, // ArrowDown
-            {6074, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 8)}, // Chest
-            {6076, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 9)}, // Sign
-            {6079, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 10)}, // StructureWood
-            {6080, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 11)}, // StructureStone
-            {6081, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 12)}, // Leaf
-            {6082, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 13)}, // Fish
-            {6084, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 14)}, // Cog
-            {6029, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 15)}, // Heart
+            {6030, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 2)}, // ArrowLeft
+            {6031, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 3)}, // ArrowRight
+            {6032, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 4)}, // ArrowUp
+            {6033, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 5)}, // ArrowDown
+            {6074, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 6)}, // Chest
+            {6076, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 7)}, // Sign
+            {6079, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 10)}, // StructureWood
+            {6080, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 13)}, // StructureStone
+            {6081, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 14)}, // Leaf
+            {6082, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 15)}, // Fish
+            {6084, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 17)}, // Cog
+            {6029, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 11)}, // Heart
             {6073, ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed
-            {6034, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 18)}, // Flames
-            {6083, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 19)}, // Shield
-            {6077, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 20)}, // Dagger
-            {6078, ("0877e397-7e74-4b3f-b822-4d0f052e1b60", 21)}, // Axe
-            {6016, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 1)}, // Copper
-            {6017, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 2)}, // Tin
-            {6018, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 3)}, // Iron
-            {6019, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 4)}, // Gold
-            {6020, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 5)}, // Scarlet
-            {6021, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 6)}, // Octarine
-            {6022, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 7)}, // Galaxite
-            {6023, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 8)}, // Solarite
-            {6024, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 9)}, // Pandorium
-            {6035, ("1d93e76b-8037-44e9-97a9-1c69a3f57156", 10)}, // Relucite
-            {6001, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 0)}, // FlagRed
-            {6002, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 1)}, // FlagOrange
-            {6003, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 2)}, // FlagPeach
-            {6004, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 3)}, // FlagYellow
-            {6006, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 5)}, // FlagTeal
-            {6007, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 6)}, // FlagCyan
-            {6008, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 7)}, // FlagBlue
-            {6009, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 8)}, // FlagPurple
-            {6010, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 9)}, // FlagPink
-            {6011, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 10)}, // FlagBrown
-            {6012, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 11)}, // FlagBlack
-            {6013, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 12)}, // FlagGray
-            {6014, ("2e4b6d8c-a19b-476a-b770-8e293827689e", 13)}, // FlagWhite
-            {6062, ("6152c695-14f2-4344-bee4-a2967b880bd3", 0)}, // Number1
-            {6063, ("6152c695-14f2-4344-bee4-a2967b880bd3", 1)}, // Number2
-            {6064, ("6152c695-14f2-4344-bee4-a2967b880bd3", 2)}, // Number3
-            {6065, ("6152c695-14f2-4344-bee4-a2967b880bd3", 3)}, // Number4
-            {6066, ("6152c695-14f2-4344-bee4-a2967b880bd3", 4)}, // Number5
-            {6067, ("6152c695-14f2-4344-bee4-a2967b880bd3", 5)}, // Number6
-            {6068, ("6152c695-14f2-4344-bee4-a2967b880bd3", 6)}, // Number7
-            {6069, ("6152c695-14f2-4344-bee4-a2967b880bd3", 7)}, // Number8
-            {6070, ("6152c695-14f2-4344-bee4-a2967b880bd3", 8)}, // Number9
-            {6071, ("6152c695-14f2-4344-bee4-a2967b880bd3", 9)}, // Number0
-            {6036, ("77aea3e9-b732-4217-92f4-1bc153361245", 0)}, // LetterA
-            {6037, ("77aea3e9-b732-4217-92f4-1bc153361245", 1)}, // LetterB
-            {6038, ("77aea3e9-b732-4217-92f4-1bc153361245", 2)}, // LetterC
-            {6039, ("77aea3e9-b732-4217-92f4-1bc153361245", 3)}, // LetterD
-            {6040, ("77aea3e9-b732-4217-92f4-1bc153361245", 4)}, // LetterE
-            {6041, ("77aea3e9-b732-4217-92f4-1bc153361245", 5)}, // LetterF
-            {6042, ("77aea3e9-b732-4217-92f4-1bc153361245", 6)}, // LetterG
-            {6043, ("77aea3e9-b732-4217-92f4-1bc153361245", 7)}, // LetterH
-            {6044, ("77aea3e9-b732-4217-92f4-1bc153361245", 8)}, // LetterI
-            {6045, ("77aea3e9-b732-4217-92f4-1bc153361245", 9)}, // LetterJ
-            {6046, ("77aea3e9-b732-4217-92f4-1bc153361245", 10)}, // LetterK
-            {6047, ("77aea3e9-b732-4217-92f4-1bc153361245", 11)}, // LetterL
-            {6048, ("77aea3e9-b732-4217-92f4-1bc153361245", 12)}, // LetterM
-            {6049, ("77aea3e9-b732-4217-92f4-1bc153361245", 13)}, // LetterN
-            {6050, ("77aea3e9-b732-4217-92f4-1bc153361245", 14)}, // LetterO
-            {6051, ("77aea3e9-b732-4217-92f4-1bc153361245", 15)}, // LetterP
-            {6052, ("77aea3e9-b732-4217-92f4-1bc153361245", 16)}, // LetterQ
-            {6053, ("77aea3e9-b732-4217-92f4-1bc153361245", 17)}, // LetterR
-            {6054, ("77aea3e9-b732-4217-92f4-1bc153361245", 18)}, // LetterS
-            {6055, ("77aea3e9-b732-4217-92f4-1bc153361245", 19)}, // LetterT
-            {6056, ("77aea3e9-b732-4217-92f4-1bc153361245", 20)}, // LetterU
-            {6057, ("77aea3e9-b732-4217-92f4-1bc153361245", 21)}, // LetterV
-            {6058, ("77aea3e9-b732-4217-92f4-1bc153361245", 22)}, // LetterW
-            {6059, ("77aea3e9-b732-4217-92f4-1bc153361245", 23)}, // LetterX
-            {6060, ("77aea3e9-b732-4217-92f4-1bc153361245", 24)}, // LetterY
-            {6061, ("77aea3e9-b732-4217-92f4-1bc153361245", 25)}, // LetterZ
+            {6034, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 12)}, // Flames
+            {6083, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 16)}, // Shield
+            {6077, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 8)}, // Dagger
+            {6078, ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 9)}, // Axe
+            {6016, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 0)}, // Copper
+            {6017, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 1)}, // Tin
+            {6018, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 2)}, // Iron
+            {6019, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 3)}, // Gold
+            {6020, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 4)}, // Scarlet
+            {6021, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 5)}, // Octarine
+            {6022, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 6)}, // Galaxite
+            {6023, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 7)}, // Solarite
+            {6024, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 8)}, // Pandorium
+            {6035, ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 9)}, // Relucite
+            {6001, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 0)}, // FlagRed
+            {6002, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 1)}, // FlagOrange
+            {6003, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 2)}, // FlagPeach
+            {6004, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 3)}, // FlagYellow
+            {6006, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 5)}, // FlagTeal
+            {6007, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 6)}, // FlagCyan
+            {6008, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 7)}, // FlagBlue
+            {6009, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 8)}, // FlagPurple
+            {6010, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 9)}, // FlagPink
+            {6011, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 10)}, // FlagBrown
+            {6012, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 11)}, // FlagBlack
+            {6013, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 12)}, // FlagGray
+            {6014, ("7259d242-79c6-429e-acfd-e5206ff6cd78", 13)}, // FlagWhite
+            {6062, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 0)}, // Number1
+            {6063, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 1)}, // Number2
+            {6064, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 2)}, // Number3
+            {6065, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 3)}, // Number4
+            {6066, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 4)}, // Number5
+            {6067, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 5)}, // Number6
+            {6068, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 6)}, // Number7
+            {6069, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 7)}, // Number8
+            {6070, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 8)}, // Number9
+            {6071, ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 9)}, // Number0
+            {6036, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 0)}, // LetterA
+            {6037, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 1)}, // LetterB
+            {6038, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 2)}, // LetterC
+            {6039, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 3)}, // LetterD
+            {6040, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 4)}, // LetterE
+            {6041, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 5)}, // LetterF
+            {6042, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 6)}, // LetterG
+            {6043, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 7)}, // LetterH
+            {6044, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 8)}, // LetterI
+            {6045, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 9)}, // LetterJ
+            {6046, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 10)}, // LetterK
+            {6047, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 11)}, // LetterL
+            {6048, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 12)}, // LetterM
+            {6049, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 13)}, // LetterN
+            {6050, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 14)}, // LetterO
+            {6051, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 15)}, // LetterP
+            {6052, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 16)}, // LetterQ
+            {6053, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 17)}, // LetterR
+            {6054, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 18)}, // LetterS
+            {6055, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 19)}, // LetterT
+            {6056, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 20)}, // LetterU
+            {6057, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 21)}, // LetterV
+            {6058, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 22)}, // LetterW
+            {6059, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 23)}, // LetterX
+            {6060, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 24)}, // LetterY
+            {6061, ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 25)}, // LetterZ
         };
 
-        /// <summary>Hidden variants (icon address, variant index) to the vanilla block variant they are converted to.</summary>
+        /// <summary>Retired 1.x variants (icon address, variant index) to the new or vanilla variant they are converted to.</summary>
+        public static readonly Dictionary<(string icon, int variant), (string address, int variant)> Retired = new Dictionary<(string icon, int variant), (string address, int variant)>
+        {
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 0), ("7e09f30c-8838-5604-2b46-8c13b0ef771e", 9)}, // General QuestionMark
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 1), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 0)}, // General ExclamationMark
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 2), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 1)}, // General MusicNote
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 3), ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // General Cross
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 4), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 2)}, // General ArrowLeft
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 5), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 3)}, // General ArrowRight
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 6), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 4)}, // General ArrowUp
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 7), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 5)}, // General ArrowDown
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 8), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 6)}, // General Chest
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 9), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 7)}, // General Sign
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 10), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 10)}, // General StructureWood
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 11), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 13)}, // General StructureStone
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 12), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 14)}, // General Leaf
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 13), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 15)}, // General Fish
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 14), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 17)}, // General Cog
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 15), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 11)}, // General Heart
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 16), ("169f71d7-f86d-7234-abf0-0120b015262b", 0)}, // General Skull
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 17), ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // General SkullRed
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 18), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 12)}, // General Flames
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 19), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 16)}, // General Shield
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 20), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 8)}, // General Dagger
+            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 21), ("69ac8c2b-f5a2-45bd-8dcd-6004b352637b", 9)}, // General Axe
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 0), ("f9203606-618b-6384-7a99-a790e5c6de35", 2)}, // OresAndGems AncientCrystal
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 1), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 0)}, // OresAndGems Copper
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 2), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 1)}, // OresAndGems Tin
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 3), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 2)}, // OresAndGems Iron
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 4), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 3)}, // OresAndGems Gold
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 5), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 4)}, // OresAndGems Scarlet
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 6), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 5)}, // OresAndGems Octarine
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 7), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 6)}, // OresAndGems Galaxite
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 8), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 7)}, // OresAndGems Solarite
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 9), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 8)}, // OresAndGems Pandorium
+            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 10), ("715841ac-735e-4b1d-95db-ec6dd73bd12e", 9)}, // OresAndGems Relucite
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 0), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 0)}, // Flags FlagRed
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 1), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 1)}, // Flags FlagOrange
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 2), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 2)}, // Flags FlagPeach
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 3), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 3)}, // Flags FlagYellow
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 4), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 4)}, // Flags FlagGreen
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 5), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 5)}, // Flags FlagTeal
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 6), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 6)}, // Flags FlagCyan
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 7), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 7)}, // Flags FlagBlue
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 8), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 8)}, // Flags FlagPurple
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 9), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 9)}, // Flags FlagPink
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 10), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 10)}, // Flags FlagBrown
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 11), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 11)}, // Flags FlagBlack
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 12), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 12)}, // Flags FlagGray
+            {("2e4b6d8c-a19b-476a-b770-8e293827689e", 13), ("7259d242-79c6-429e-acfd-e5206ff6cd78", 13)}, // Flags FlagWhite
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 0), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 0)}, // Numbers Number1
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 1), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 1)}, // Numbers Number2
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 2), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 2)}, // Numbers Number3
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 3), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 3)}, // Numbers Number4
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 4), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 4)}, // Numbers Number5
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 5), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 5)}, // Numbers Number6
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 6), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 6)}, // Numbers Number7
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 7), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 7)}, // Numbers Number8
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 8), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 8)}, // Numbers Number9
+            {("6152c695-14f2-4344-bee4-a2967b880bd3", 9), ("782323e6-7f6a-416d-8c63-edc0e05f87b1", 9)}, // Numbers Number0
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 0), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 0)}, // Letters LetterA
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 1), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 1)}, // Letters LetterB
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 2), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 2)}, // Letters LetterC
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 3), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 3)}, // Letters LetterD
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 4), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 4)}, // Letters LetterE
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 5), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 5)}, // Letters LetterF
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 6), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 6)}, // Letters LetterG
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 7), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 7)}, // Letters LetterH
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 8), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 8)}, // Letters LetterI
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 9), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 9)}, // Letters LetterJ
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 10), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 10)}, // Letters LetterK
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 11), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 11)}, // Letters LetterL
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 12), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 12)}, // Letters LetterM
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 13), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 13)}, // Letters LetterN
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 14), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 14)}, // Letters LetterO
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 15), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 15)}, // Letters LetterP
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 16), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 16)}, // Letters LetterQ
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 17), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 17)}, // Letters LetterR
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 18), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 18)}, // Letters LetterS
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 19), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 19)}, // Letters LetterT
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 20), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 20)}, // Letters LetterU
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 21), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 21)}, // Letters LetterV
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 22), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 22)}, // Letters LetterW
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 23), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 23)}, // Letters LetterX
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 24), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 24)}, // Letters LetterY
+            {("77aea3e9-b732-4217-92f4-1bc153361245", 25), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 25)}, // Letters LetterZ
+        };
+
+        /// <summary>The retired 1.x variants that go to a vanilla block: the subset of <see cref="Retired"/> with a vanilla target.</summary>
         public static readonly Dictionary<(string icon, int variant), (string address, int variant)> ToVanilla = new Dictionary<(string icon, int variant), (string address, int variant)>
         {
             {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 0), ("7e09f30c-8838-5604-2b46-8c13b0ef771e", 9)}, // QuestionMark
