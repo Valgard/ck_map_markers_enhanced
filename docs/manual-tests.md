@@ -11,21 +11,21 @@ Every line the mod writes starts with `[MapMarkersEnhanced]`, so
 only these, each at most once except the conversion line below:
 
 - `Mod initialized.` — at load.
-- `icons: 5 <addresses> (indices: <i> … of <count>)` — once the game data is
-  loaded; the five addresses are `ModIconAddresses` in `IconTable.g.cs`.
+- `icons: 7 <addresses> (indices: <i> … of <count>)` — once the game data is
+  loaded; the seven addresses are `ModIconAddresses` in `IconTable.g.cs`.
 - `icon order: moved <n>, ours at <indices> of <count>` — the first time the
-  marker dialog opens; `<indices>` are the last five of `<count>`.
+  marker dialog opens; `<indices>` are the last seven of `<count>`.
 - `restored <n> legacy markers` — only on a world with MapMarkers+ markers the
   1.3 migration turned into question marks, and only on the first load there. It
   comes from the server world, so with a dedicated server it is in the server's
   log, not the client's.
-- `converted <n> presets` — only when a preset pointed at one of the variants
-  the dialog no longer offers, and then once per session.
-- `converted <n> markers to vanilla icons` — only on a world with markers that
-  use one of those variants. It comes from the server world, so with a dedicated
+- `converted <n> presets` — only when a preset pointed at a retired 1.x variant,
+  and then once per session.
+- `converted <n> markers on retired icons` — only on a world with markers that
+  use a retired 1.x variant. It comes from the server world, so with a dedicated
   server it is in the server's log, not the client's. Unlike the others it can
   appear on any pass that converts something, so again whenever such a marker
-  turns up later (for instance one placed by a 1.0.0 client).
+  turns up later (for instance one placed by a 1.x client).
 
 Anything else is a warning or an error. Each is logged once per session (the
 ones from the server world once per world), never per frame:
@@ -33,9 +33,9 @@ ones from the server world once per world), never per frame:
 - `icons: no MapMarkerIconDataBlock list registered` — the game has no icon list
   at all, so the icon type or its loading changed in a game update. Check the
   decompile for `MapMarkerIconDataBlock` and `ScriptableData.TryGetDataBlocks`.
-- `icons: <n> <addresses> (indices: … of <count>); only <n> of 5 registered` —
+- `icons: <n> <addresses> (indices: … of <count>); only <n> of 7 registered` —
   some of the mod's icons did not load, and markers using a missing one show
-  the game's fallback sprite. Check that the five `.asset` files are in the
+  the game's fallback sprite. Check that the seven `.asset` files are in the
   build and that `uv run tools/generate_icons.py --check` passes.
 - `icons: none matched; registered addresses: <all addresses>` — follows the
   line above when not one icon matched. Compare the printed addresses with
@@ -52,8 +52,8 @@ ones from the server world once per world), never per frame:
 - `icon order: the reorder did not stick (the list is not live); icons stay in
   front` — the list is a copy rather than the game's own, so the dialog reads
   another one. Check what `PopulateIconRow` iterates.
-- `icon order: only <n> of the mod's 5 icons are registered` — as the `only <n>
-  of 5 registered` line above.
+- `icon order: only <n> of the mod's 7 icons are registered` — as the `only <n>
+  of 7 registered` line above.
 - `icon order: the mod's icons are at the end but not in table order` — the
   addresses no longer sort in table order. Check the address rule in
   `CLAUDE.md` and run `uv run tools/generate_icons.py --check`.
@@ -91,63 +91,47 @@ ones from the server world once per world), never per frame:
   restoring or converting, but `ScriptableData.isLoaded` has stayed false for
   ten passes, so no target can be checked and nothing is written; the system
   keeps waiting. Check the game's data loading in the log before this line.
-- `vanilla target <address> variant <v> is not a registered map marker icon
-  with that variant; preset <n> is left as it is` — the same, for a preset, on
-  the player's computer.
+- `preset target <address> variant <v> is not a registered map marker icon with
+  that variant; preset <n> is left as it is` — the same, for a preset, on the
+  player's computer, once per session.
 - `preset conversion failed; remaining presets stay as they are` — followed by
   the exception; presets before the failing slot may already be rewritten. Check
   `PrefsManager.GetMapMarkerPreset`/`SetMapMarkerPreset` in the decompile.
-- `hiding marker variants failed for icon <address>; the row was put back as
-  vanilla built it, all variants visible` — followed by the exception. The
-  dialog offers the hidden duplicates again, and a marker placed on one is
-  converted by the world. Check `MapMarkerCustomizationPanel.BuildVariantRow` in
-  the decompile.
-- `hiding marker variants failed for icon <address>, and putting the row back
-  failed too; the variant row may be incomplete` — as above, but some tiles may
-  stay hidden or unreachable by controller until the next icon click.
-- `icon-row preview failed for icon <address>; that tile keeps vanilla's sprite,
-  the other rows are still drawn` — followed by the exception. That icon's tile
-  shows its hidden variant 0 while unselected. Check `PopulateIconRow` and
-  `UpdateIconRowSprites`.
-- `explicit-selection depth would go below 0: a finalizer of Open or
-  OnResetToDefaultClicked ran without its prefix; kept at 0` — Harmony ran a
-  finalizer whose prefix did not run, so a dialog may move the selection by
-  visible position where it should keep the index. Check the `Explicit*Patch`
-  classes against both `Open` overloads in the decompile.
 
-Five errors, each followed by the exception:
-`legacy marker table could not be parsed; restoration is off` (an address in
-`IconTable.g.cs` does not parse — regenerate and check), `vanilla target table
-could not be parsed; conversion is off` (the same for `ToVanilla`; restoration
-keeps running), `legacy restoration failed; conversion still runs, restoration
-will keep trying silently` and `conversion to vanilla icons failed; restoration
-still runs, conversion will keep trying silently` (one rule's writes threw; the
-other rule is unaffected), and `marker migration failed: the scan threw, so
-neither rule ran; will keep trying silently` (the shared scan threw; the stack
-trace names the cause). One cause of the last seen in practice is `Exception:
-This method should have been replaced by codegen`: the build shipped without
+Five errors, each followed by the exception: `legacy marker table could not be
+parsed; restoration is off` (an address in `IconTable.g.cs` does not parse —
+regenerate and check), `retired icon table could not be parsed; conversion is
+off` (the same for `Retired`; restoration keeps running), `legacy restoration
+failed; conversion still runs, restoration will keep trying silently` and
+`conversion of retired icons failed; restoration still runs, conversion will
+keep trying silently` (one rule's writes threw; the other rule is unaffected),
+and `marker migration failed: the scan threw, so neither rule ran; will keep
+trying silently` (the shared scan threw; the stack trace names the cause). One
+cause of the last seen in practice is `Exception: This method should have been
+replaced by codegen`: the build shipped without
 `Scripts/Generated/MarkerMigrationSystem__System_*.g.cs`, so `Player.log` also
 lacks `Replacing method MapMarkersEnhanced.MarkerMigrationSystem/Scan_T0 …`
-(`Pass_T0` in builds before the scan had a method of its own). Touch
-`MarkerMigrationSystem.cs` and rebuild; the build output must contain `Adding
-generated file …MarkerMigrationSystem__System_…g.cs`.
+(`Pass_T0` in builds before the scan had a method of its own). `utils/build.sh`
+now guards against it (exit 4); rebuild, and the build output must contain
+`Adding generated file …MarkerMigrationSystem__System_…g.cs`.
 
 ## Icons in the dialog and on the map
 
 Open the map-marker dialog (create a marker on the large map).
 
 - `Player.log` holds `Successfully compiled MapMarkersEnhanced` and one
-  `[MapMarkersEnhanced] icons: 5 <address> …` line whose five addresses equal
+  `[MapMarkersEnhanced] icons: 7 <address> …` line whose seven addresses equal
   `ModIconAddresses` in `IconTable.g.cs`; no error line names the mod or one of
   its icons.
-- The dialog shows five extra icons — General, Ores and Gems, Flags, Numbers,
-  Letters — each with all of its variants (Ores and Gems: 11, Copper included;
-  Letters: A–Z).
+- The dialog shows seven extra icons — General, Ores, Flags, Tapestry, Orbs,
+  Numbers, Letters — each with all of its variants (counts 18, 11, 14, 15, 19,
+  10, 26) in the order of the Pixaki's layers.
 - Place one marker per icon: each shows its icon on the large map and on the
   minimap.
 - Restart the game: every placed marker still shows its icon.
 
-**Result, 2026-09-29 (CK 1.3.0.2):**
+**Result, 2026-09-29 (CK 1.3.0.2, version 1.0.0 with five icons; not yet run for
+2.0.0):**
 
 Passed, with one known limitation. All five addresses were registered as in the
 table; the dialog showed every icon and variant; five placed markers (cross,
@@ -159,19 +143,19 @@ sprites — kept for 1.0.0, redraw planned in `docs/roadmap.md`.
 
 ## Icon order and scrolling
 
-- The icon row reads: the vanilla icons (8), then General, Ores and Gems, Flags,
-  Numbers, Letters.
+- The icon row reads: the vanilla icons (8), then General, Ores, Flags,
+  Tapestry, Orbs, Numbers, Letters.
 - Close and reopen the dialog five times: the order stays the same and no tiles
   are added.
 - `Player.log` holds one `[MapMarkersEnhanced] icon order: moved <n>, ours at
-  <indices> of <count>` line per session, and `<indices>` are the last five
-  indices of `<count>` (with 13 icons in total: `8,9,10,11,12 of 13`); no icon
-  order warning.
+  <indices> of <count>` line per session, and `<indices>` are the last seven
+  indices of `<count>` (with 15 icons in total: `8,9,10,11,12,13,14 of 15`); no
+  icon order warning.
 - Edit a preset that uses a mod icon deep in the row (e.g. Letters, variant Z):
   on open, both the selected icon and the selected variant are visible without
   scrolling. A preset with a vanilla icon still opens at the start of the row.
 
-**Result, 2026-09-29 (CK 1.3.0.2):**
+**Result, 2026-09-29 (CK 1.3.0.2, version 1.0.0; not yet run for 2.0.0):**
 
 Passed. Log: `moved 13, ours at 8,9,10,11,12 of 13`, no warning; repeated
 opening kept the order. Scrolling was added after the first run showed the row
@@ -235,6 +219,9 @@ that needs no Burst workaround.
 
 ## Hidden variants in the marker dialog
 
+_Historical: version 1.1.0 only. 2.0.0 hides nothing and the patches are gone;
+the checks are kept as the record of what was run._
+
 Five variants are no longer offered, because vanilla has the same motif: General
 0 (question mark), 3 (cross), 16 (skull), 17 (red skull) and Ores and Gems 0
 (ancient crystal). Open the map-marker dialog.
@@ -274,6 +261,9 @@ Five variants are no longer offered, because vanilla has the same motif: General
 
 ## Presets on hidden variants
 
+_Historical: version 1.1.0. The 2.0.0 preset check is under "Icon rework
+in game" below._
+
 - Before installing the build, with the 1.0.0 mod, set one preset to General 0
   (`?`) and one to General 3 (`X`).
 - After the first launch with the build: `Player.log` holds `converted 2
@@ -295,6 +285,10 @@ Five variants are no longer offered, because vanilla has the same motif: General
   points at a hidden variant.
 
 ## World conversion to vanilla icons
+
+_Historical: version 1.1.0, with the log texts of that version (`converted <n>
+markers to vanilla icons`). 2.0.0 logs `converted <n> markers on retired icons`;
+see "Icon rework in game"._
 
 Only ever on a copy of a world, never on a live save.
 
@@ -368,6 +362,44 @@ with target resolution and per-rule failure isolation):**
   ("MME Final Test"): `converted 1 presets`, the game's `Converted 67 old map
   markers`, then `restored 60 legacy markers` — the same count as before the
   fixes; the dialog still hid the five variants. No new warning.
+
+## Icon rework in game (2.0.0)
+
+**Not yet run.** Six checks, each on a copy of a world, never on a live save.
+Build with the shipped sources and check the build output for `Adding generated
+file …MarkerMigrationSystem__System_…g.cs` first.
+
+1. **A world placed with 1.0.0.** The world holds markers on all five 1.x
+   blocks, including the five that duplicate a vanilla motif (a world that
+   already ran 1.1.0 has those converted and cannot show that case). Load it
+   with 2.0.0. Expect `converted <n> markers on retired icons` once, in the
+   server world's log; the five duplicates are the game's own (yellow question
+   mark, yellow cross, white skull, red skull, blue diamond) and every other
+   marker shows the same-named, redrawn marker of the new set, names and
+   positions kept. No `icon target …` warning. Reload: no further `converted`
+   line.
+2. **A MapMarkers+ world.** Load a copy of a world that went through the 1.3
+   migration. Expect `restored <n> legacy markers` and the restored markers on
+   the new set directly, with a MapMarkers+ cross and red skull as the game's
+   own; no `converted` line for them.
+3. **Presets.** With 1.0.0, set presets on a General, an Ores and a Letters
+   marker plus one on `?` and one on `X`. Start 2.0.0 and open a world: expect
+   `converted <n> presets`, each preset on the new marker (or the yellow
+   vanilla `?` and `X`), names kept; a second launch prints no such line.
+4. **Dedicated server.** With the mod on the server, a player joining makes the
+   server log (not the client's) print the `converted` line, and a marker a 1.x
+   client places on a retired icon is converted on the next pass; the client
+   switches to the new icon without reopening the map. On a server without the
+   mod (the mod on the client's `disabledMods` for `utils/server.sh start`
+   only) nothing converts and 1.x markers show the stand-in diamond; record what
+   is observed.
+5. **Minimap.** Place one marker from every variant of every icon: each draws
+   its own small sprite on the minimap, and Numbers and Letters no longer
+   overlap their neighbours.
+6. **The dialog.** The icon row reads the vanilla icons, then General, Ores,
+   Flags, Tapestry, Orbs, Numbers, Letters, with 18, 11, 14, 15, 19, 10 and 26
+   variants, each in its Pixaki layer order and with no gap. `Player.log` holds
+   `icons: 7 …` and `icon order: moved <n>, ours at 8,9,10,11,12,13,14 of 15`.
 
 ## Server without the mod
 

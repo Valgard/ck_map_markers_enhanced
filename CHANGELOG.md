@@ -4,6 +4,63 @@ All notable changes to this mod are documented here. The format is loosely based
 on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the topmost `## [x.y.z]` entry is the current published
 version.
 
+## [2.0.0] - 2026-10-07
+
+The marker art is redrawn, and two icons are new. **Update everyone who shares a
+world or a server with you** — see "Update everyone" below.
+
+### Added
+
+- **A redrawn set of 113 markers in seven icons**, in this order after the
+  game's own: General (18), Ores (11), Flags (14), Tapestry (15),
+  Orbs (19), Numbers (10) and Letters (26). The art is redrawn after moorowl's
+  MapMarkers+ (MIT).
+- **Tapestry**: the game's fifteen tapestry banners, the unpainted one and
+  fourteen colours, as 8x8 markers.
+- **Orbs**: nineteen of the game's orbs, from the empty one through every colour
+  to the gold, lava and flower orbs.
+- **Every marker has its own minimap sprite.** Numbers and Letters no longer
+  overlap their neighbours, and the other icons get redrawn small sprites too.
+
+### Changed
+
+- **The mod's five 1.x icons are gone for good.** The marker dialog offers only
+  the seven new ones, with no hidden markers left in the rows, and the five
+  1.x icon identities are never used again.
+- **Existing markers move to the new set** wherever the world runs with the
+  mod: single-player, the host, or a dedicated server with the mod. A marker
+  keeps its position and name and gets the same-named marker of the new set; the
+  five that the game draws itself (question mark, cross, skull, red skull, blue
+  diamond) become the game's own, as in 1.1.0. This also catches a marker that a
+  1.x client places later. Restored MapMarkers+ markers land on the new set
+  directly, and presets on a 1.x marker are rewritten the same way.
+- Ores and Gems is now called Ores and has 11 markers: the radiation crystal is
+  new beside the ten that remained.
+
+### Removed
+
+- The tweaks that hid five markers in the dialog. With nothing hidden any more,
+  the icon preview and the position-keeping across icon switches that went with
+  them are gone.
+
+### Update everyone
+
+- **A dedicated server without the mod does not migrate anything.** Players with
+  2.0.0 see every marker placed with a 1.x icon there as a plain blue diamond
+  (at times another marker's icon), and the game logs an error for each every
+  time it draws it. Put the mod on the server, or accept it.
+- **Players still on 1.x see every migrated marker, and every marker placed with
+  the new set, the same way**, until they update. Markers that became the game's
+  own show normally. A server with the mod only asks for the mod, not for a
+  version, so nothing stops a 1.x player from joining.
+- **Uninstalling still turns every marker with a mod icon into that stand-in.**
+  Markers that became the game's own keep their icon.
+
+### Credits
+
+- The art is redrawn by Valgard after moorowl's MapMarkers+ (MIT); the banners
+  come from Core Keeper's tapestry sprites and the orbs from its item sprites.
+
 ## [1.1.0] - 2026-10-06
 
 The mod stops duplicating the markers Core Keeper 1.3 draws itself.

@@ -1,32 +1,35 @@
 # Map Markers Enhanced
 
-A Core Keeper mod that brings moorowl's MapMarkers+ marker art to Core Keeper
-1.3 — ores and gems, coloured flags, arrows, chests, numbers, letters and more —
-as native icons in the game's own map-marker dialog. It also gives back the
-markers that MapMarkers+ players lost in the 1.3 update, when every one of them
-turned into the same yellow question mark.
+A Core Keeper mod that adds a redrawn set of 113 map markers to Core Keeper 1.3
+— ores and gems, coloured flags, tapestry banners, orbs, arrows, chests,
+numbers, letters and more — as native icons in the game's own map-marker
+dialog. The art is redrawn after moorowl's MapMarkers+. The mod also gives back
+the markers that MapMarkers+ players lost in the 1.3 update, when every one of
+them turned into the same yellow question mark.
 
 ## Features
 
-- **Five extra icons in the marker dialog**, listed after the game's own:
-  General (18 markers), Ores and Gems (10), Flags (14), Numbers (10) and
-  Letters (26, A–Z). Pick an icon in the upper row, then the marker in the lower
-  one.
-- **Four motifs are the game's own now.** The question mark, the cross, the
-  skull (white and red) and the blue diamond exist in the game itself since 1.3,
-  so the mod no longer offers its copies of them — five markers in all — and
-  converts existing ones, see below. The flags, including the green one, are
-  unchanged.
+- **Seven extra icons in the marker dialog**, listed after the game's own:
+  General (18 markers), Ores (11), Flags (14), Tapestry (15), Orbs (19),
+  Numbers (10) and Letters (26, A–Z). Pick an icon in the upper row, then the
+  marker in the lower one.
+- **Tapestry and Orbs are new.** Tapestry is the game's fifteen banners, the
+  unpainted one and fourteen colours; Orbs are nineteen of the game's orbs, from
+  the empty one through every colour to the gold, lava and flower orbs.
+- **Every marker has its own minimap sprite**, so numbers and letters sit
+  cleanly beside their neighbours.
+- **The game's own question mark, cross, skull and blue diamond** are not
+  offered by the mod: the game draws them itself since 1.3. Markers that used
+  the mod's older copies are converted, see below.
 - **The rest is the game's own.** Naming a marker, the five presets, the
   minimap, multiplayer and saving work exactly as they do for vanilla markers:
-  the mod adds icons, keeps the dialog scrolled to your selection and restores
-  old markers, hides the five duplicates and converts markers and presets that
-  use them, and leaves the rest to the game.
+  the mod adds icons, keeps the dialog scrolled to your selection, restores old
+  markers and moves markers and presets from the older icons to the new set.
 - **The dialog opens on your selection.** When you open a preset that uses one
   of the mod's icons, the dialog scrolls so the selected icon and marker are in
   view instead of starting at the left end.
 - **Old MapMarkers+ markers are restored** — see below.
-- **Markers with the retired motifs are converted** — see below.
+- **Markers placed with the mod's 1.x icons move to the new set** — see below.
 
 ## Restoring MapMarkers+ markers
 
@@ -51,19 +54,24 @@ restoration replaces the stored MapMarkers+ type with the game's normal value,
 so afterwards nothing in the world records which MapMarkers+ marker a restored
 marker used to be.
 
-## Markers that now use the game's own icons
+## Markers from version 1.x of this mod
 
-Markers you placed with the mod's question mark, cross, skull, red skull or
-diamond are converted to the game's own marker with the same motif — a yellow
-question mark, a yellow cross, a white skull, a red skull and a blue diamond.
-Like the restoration, this happens where the world runs with the mod:
-single-player, the host of a multiplayer game, or a dedicated server that has
-it. The marker keeps its position and name. Your five presets are rewritten the
-same way on your own computer, keeping their names.
+Version 2.0.0 replaces the mod's five 1.x icons with the seven new ones, and
+the old icons are never used again. A marker you placed with a 1.x icon is
+rewritten to the same-named marker of the new set — the same arrow, ore, flag,
+number or letter, redrawn. The question mark, cross, skull, red skull and
+diamond become the game's own: a yellow question mark, a yellow cross, a white
+skull, a red skull and a blue diamond. Like the restoration, this happens where
+the world runs with the mod: single-player, the host of a multiplayer game, or a
+dedicated server that has it, and it catches a marker that a 1.x player places
+later too. The marker keeps its position and name. Your five presets are
+rewritten the same way on your own computer, keeping their names.
 
-A converted marker is the game's own, so it keeps its icon if you uninstall the
-mod. On a dedicated server without the mod nothing is converted, and such
-markers keep showing the mod's icon to players who have the mod.
+A marker that became the game's own keeps its icon if you uninstall the mod.
+**Update everyone who shares a world or a server with you:** on a dedicated
+server without the mod nothing is converted, and players with 2.0.0 see such
+markers as a stand-in; players still on 1.x see every marker of the new set that
+way.
 
 ## Requirements
 
@@ -97,9 +105,6 @@ skulls, which the mod restores as the game's own.
 
 ## Known limitations
 
-- **Numbers and Letters are too large on the minimap.** They have no small
-  minimap sprite yet and use their full-size one, which overlaps neighbouring
-  markers. The other three icons have proper small sprites.
 - **A placed marker cannot be edited.** This is Core Keeper 1.3's own
   behaviour, not the mod's: to change a marker's icon or name, delete it and
   place a new one.
@@ -109,10 +114,14 @@ skulls, which the mod restores as the game's own.
 
 ## Credits
 
-The marker art and the original mod, [MapMarkers+](https://github.com/moorowl/MapMarkersPlus), are by **moorowl**, released
-under the MIT License. Map Markers Enhanced is a fork of it for Core Keeper 1.3:
-it keeps moorowl's sprite sheet and commit history, and replaces the rest of the
-old implementation with the game's own marker system.
+The original mod, [MapMarkers+](https://github.com/moorowl/MapMarkersPlus), is by **moorowl**, released under the MIT
+License. Map Markers Enhanced is a fork of it for Core Keeper 1.3: it keeps
+moorowl's commit history and replaces the rest of the old implementation with
+the game's own marker system.
+
+The art is redrawn by Valgard after moorowl's MapMarkers+ (MIT). The tapestry
+banners are drawn from Core Keeper's tapestry sprites and the orbs from its item
+sprites.
 
 ## License
 
@@ -129,6 +138,7 @@ Built with the official Pugstorm Core Keeper Mod SDK.
 - [Mod-internal CLAUDE.md](CLAUDE.md) — the icon generator, the constants the
   code relies on, and how to test
 - [ADR 001 — a data-native port](docs/adrs/001-data-native-port.md)
-- [ADR 002 — hiding vanilla duplicates](docs/adrs/002-hide-vanilla-duplicates.md)
+- [ADR 002 — hiding vanilla duplicates](docs/adrs/002-hide-vanilla-duplicates.md) (partly superseded)
+- [ADR 003 — retiring the 1.x blocks](docs/adrs/003-retire-the-1x-blocks.md)
 - [Manual in-game tests](docs/manual-tests.md)
 - [Roadmap](docs/roadmap.md)

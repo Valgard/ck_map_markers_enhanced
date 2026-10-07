@@ -1,23 +1,7 @@
 # MapMarkersEnhanced — roadmap
 
-Planned, not-yet-built work after 1.0.0. Each point stands on its own; pick the
+Planned, not-yet-built work. Each point stands on its own; pick the
 next one, and let the version number collect whatever has shipped.
-
-## Redraw the small marker buttons
-
-On the minimap, Numbers and Letters currently use their **large** sprite, which
-fills the whole cell and overlaps neighbouring markers. moorowl's sheet has a
-slot 10 px below each of them, but those slices are blank two-colour placeholder
-buttons with no glyph, so they were left unused for 1.0.0.
-
-- **Plan:** redraw the small buttons — borderless, in Core Keeper 1.3's own
-  style — for Numbers and Letters, and possibly for every icon so the set looks
-  consistent.
-- **Wiring once the art exists:** name each slice `markers_<type>_small` in
-  `markers.png.meta`, set `small` for those variants in `tools/icons.toml`, and
-  extend the small-sprite test so Numbers and Letters require one. No address
-  changes, so markers placed with 1.0.0 pick up the new buttons without a
-  migration.
 
 ## Edit a placed marker
 
@@ -42,7 +26,7 @@ icon, variant and name (`Pug.Other:413869`) — but nothing calls
 
 ## More than five presets
 
-The marker bar holds five presets. With five extra icons and up to 26 variants
+The marker bar holds five presets. With seven extra icons and up to 26 variants
 each, five quick slots run out fast.
 
 - **What the game does:** five is a literal in six places — the preset bar's
