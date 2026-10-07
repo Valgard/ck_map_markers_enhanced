@@ -403,6 +403,9 @@ file …MarkerMigrationSystem__System_…g.cs` first.
 
 ## Server without the mod
 
+_Historical: recorded on 1.0.0 and 1.1.0, including the hidden-variant check
+of 1.1.0. The 2.0.0 server checks are under "Icon rework in game"._
+
 Local dedicated server (`utils/server.sh`), started with the mod on the client's
 `disabledMods` for the duration of `start` only — `relink` mirrors every mod the
 client has enabled — and switched back on for the client afterwards.

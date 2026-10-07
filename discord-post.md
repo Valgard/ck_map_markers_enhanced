@@ -1,16 +1,17 @@
 # Map Markers Enhanced
 
-moorowl's **MapMarkers+** marker art for Core Keeper 1.3 — 78 markers as five
-extra icons right in the game's own map-marker dialog: General, Ores and Gems,
-Flags, Numbers and Letters. Pick an icon in the upper row, the marker in the
-lower one. Naming, presets, minimap and multiplayer are the game's own.
+A redrawn set of 113 map markers for Core Keeper 1.3, after moorowl's
+**MapMarkers+** — seven extra icons right in the game's own map-marker dialog:
+General, Ores, Flags, Tapestry, Orbs, Numbers and Letters. New: Tapestry (the
+game's banners) and Orbs. Every marker has its own minimap sprite. Pick an icon
+in the upper row, the marker in the lower one. Naming, presets and multiplayer
+are the game's own.
 
-## The game's own where it has one
+## Coming from 1.x
 
 The question mark, cross, skulls and blue diamond are the game's own now, not
-copies. Markers you already have with the old ones are converted to the game's
-wherever the world runs with the mod; a dedicated server without it converts
-nothing.
+copies. Markers placed with any 1.x icon move to the new set, or to the game's
+own for those five, wherever the world runs with the mod; presets too.
 
 ## Your old MapMarkers+ markers come back
 
@@ -20,10 +21,12 @@ original type survived in the save. The first time a world loads with this mod
 icon back — once, and saved. Back up the world first if you want to keep the
 question marks.
 
-## Good to know
+## Update everyone
 
-Everyone who wants to see the icons needs the mod; a server without it still
-keeps markers placed with them. Numbers and Letters are too large on the
-minimap for now — new small buttons are planned.
+A dedicated server without the mod converts nothing, so players with 2.0.0 see
+1.x markers there as a plain blue diamond. Players still on 1.x see markers of
+the new set that way. Uninstalling does the same to markers with the mod's
+icons.
 
-Based on MapMarkers+ by **moorowl** (MIT), whose art this is.
+Art redrawn by Valgard after MapMarkers+ by **moorowl** (MIT); banners from
+Core Keeper's tapestry sprites, orbs from its item sprites.
