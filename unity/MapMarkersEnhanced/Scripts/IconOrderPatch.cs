@@ -20,7 +20,7 @@ namespace MapMarkersEnhanced
     /// The patch re-reads the list afterwards rather than trusting that it is live,
     /// and warns once per session per cause: no list, a list that is not a
     /// <c>List&lt;&gt;</c> or did not keep the new order (icons stay in front),
-    /// fewer than five of the mod's icons registered, or the mod's icons at the end
+    /// fewer than all of the mod's icons registered, or the mod's icons at the end
     /// but not in table order. It never throws into the game.
     /// </para>
     /// </summary>

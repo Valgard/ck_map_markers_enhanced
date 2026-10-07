@@ -185,7 +185,7 @@ namespace MapMarkersEnhanced
         /// only for a top-left pivot on both. The marker dialog's rows are centred
         /// (<c>LinearLayoutUIComponent</c>, TopCenter) with centred 16-pixel tiles
         /// (<c>WrapperUIComponent</c>, MiddleCenter), where vanilla's figure would be off by
-        /// half the row: with thirteen icons the last one reads as position 6 of an 8-wide
+        /// half the row: with fifteen icons (eight vanilla and seven mod icons) the last one reads as position 7 of an 8-wide
         /// viewport, so nothing scrolls. Both pivots are therefore converted out here.
         /// </summary>
         /// <returns>
