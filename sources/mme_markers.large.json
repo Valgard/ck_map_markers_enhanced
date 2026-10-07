@@ -1,6 +1,7 @@
 {
   "guid": "6007a57f19dd45208f9e69450f04e3d2",
   "sheetWidth": 128,
+  "cells": {"grid": 10, "boxes": [[10, 0]]},
   "gutter": 2,
   "exclude": [
     "Grid",
