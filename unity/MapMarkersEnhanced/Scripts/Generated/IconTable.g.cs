@@ -191,15 +191,5 @@ namespace MapMarkersEnhanced
             {("77aea3e9-b732-4217-92f4-1bc153361245", 24), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 24)}, // Letters LetterY
             {("77aea3e9-b732-4217-92f4-1bc153361245", 25), ("7890a1b3-a5bd-42c6-a375-d116e12b8f10", 25)}, // Letters LetterZ
         };
-
-        /// <summary>The retired 1.x variants that go to a vanilla block: the subset of <see cref="Retired"/> with a vanilla target.</summary>
-        public static readonly Dictionary<(string icon, int variant), (string address, int variant)> ToVanilla = new Dictionary<(string icon, int variant), (string address, int variant)>
-        {
-            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 0), ("7e09f30c-8838-5604-2b46-8c13b0ef771e", 9)}, // QuestionMark
-            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 3), ("adbecb0c-1236-bf84-d9ea-0516e188e2d0", 9)}, // Cross
-            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 16), ("169f71d7-f86d-7234-abf0-0120b015262b", 0)}, // Skull
-            {("0877e397-7e74-4b3f-b822-4d0f052e1b60", 17), ("169f71d7-f86d-7234-abf0-0120b015262b", 1)}, // SkullRed
-            {("1d93e76b-8037-44e9-97a9-1c69a3f57156", 0), ("f9203606-618b-6384-7a99-a790e5c6de35", 2)}, // AncientCrystal
-        };
     }
 }

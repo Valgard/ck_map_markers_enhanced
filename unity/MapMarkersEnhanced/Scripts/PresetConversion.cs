@@ -3,8 +3,9 @@ using UnityEngine;
 namespace MapMarkersEnhanced
 {
     /// <summary>
-    /// Rewrites the player's marker presets that point at a variant the dialog no longer offers
-    /// to the vanilla twin (<see cref="VanillaTargets"/>). Presets live client-side in the game's
+    /// Rewrites the player's marker presets that point at a retired variant to its target — the
+    /// same-named variant in the mod's new blocks, or a vanilla marker
+    /// (<see cref="RetiredTargets"/>). Presets live client-side in the game's
     /// prefs, so this runs where the player is. The slots are the five that
     /// <c>MapUI.EnsurePresetsInitialized</c> fills (<c>Pug.Other:346760</c>); the roadmap item
     /// "More than five presets" has to raise <see cref="PresetSlots"/> together with the game's
@@ -17,8 +18,8 @@ namespace MapMarkersEnhanced
         private static bool s_unresolvedLogged;
 
         /// <summary>
-        /// Converts every preset on a hidden variant whose vanilla target resolves
-        /// (<see cref="VanillaTargets.Resolves"/>; needs <c>ScriptableData.isLoaded</c>, which the
+        /// Converts every preset on a retired variant whose target resolves
+        /// (<see cref="RetiredTargets.Resolves"/>; needs <c>ScriptableData.isLoaded</c>, which the
         /// caller checks); returns how many were rewritten. A preset whose target does not resolve
         /// is left as it is, with one warning per session.
         /// </summary>
@@ -33,15 +34,15 @@ namespace MapMarkersEnhanced
                     continue;
                 }
 
-                if (VanillaTargets.TryGet(preset.iconAddress, preset.variantIndex, out DataBlockAddress address, out int vanillaVariant))
+                if (RetiredTargets.TryGet(preset.iconAddress, preset.variantIndex, out DataBlockAddress address, out int targetVariant))
                 {
-                    if (!VanillaTargets.Resolves(address, vanillaVariant))
+                    if (!RetiredTargets.Resolves(address, targetVariant))
                     {
                         if (!s_unresolvedLogged)
                         {
                             s_unresolvedLogged = true;
                             Debug.LogWarning(
-                                $"[MapMarkersEnhanced] vanilla target {address} variant {vanillaVariant} is not a registered map marker icon with that variant; "
+                                $"[MapMarkersEnhanced] vanilla target {address} variant {targetVariant} is not a registered map marker icon with that variant; "
                                     + $"preset {i + 1} is left as it is"
                             );
                         }
@@ -53,7 +54,7 @@ namespace MapMarkersEnhanced
                         new MapMarkerPreset
                         {
                             iconAddress = address,
-                            variantIndex = vanillaVariant,
+                            variantIndex = targetVariant,
                             name = preset.name,
                         }
                     );

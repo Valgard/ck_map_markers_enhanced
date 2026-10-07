@@ -672,21 +672,6 @@ def render_csharp(icons: tuple[Icon, ...], retired: tuple[Retired, ...]) -> str:
             )
     lines += [
         "        };",
-        "",
-        "        /// <summary>The retired 1.x variants that go to a vanilla block:"
-        ' the subset of <see cref="Retired"/> with a vanilla target.</summary>',
-        f"        public static readonly {_PAIR_MAP} ToVanilla = new {_PAIR_MAP}",
-        "        {",
-    ]
-    for block in retired:
-        for index, v in enumerate(block.variants):
-            if v.vanilla:
-                lines.append(
-                    f'            {{("{block.address}", {index}),'
-                    f' ("{v.vanilla.address}", {v.vanilla.variant})}}, // {v.type}'
-                )
-    lines += [
-        "        };",
         "    }",
         "}",
     ]

@@ -16,28 +16,30 @@ namespace MapMarkersEnhanced
     /// the first pass in a world that finds legacy-amount markers which are not
     /// the question mark warns how many, with one of them as an example, so a
     /// changed migration default does not leave restoration off without a trace.
-    /// A marker whose target does not resolve (<see cref="VanillaTargets.Resolves"/>) is not
+    /// A marker whose target does not resolve (<see cref="RetiredTargets.Resolves"/>) is not
     /// written at all and keeps its legacy <c>Amount</c>, so a later pass can still restore it.
     /// <para>
-    /// Rule 2 converts a marker whose icon and variant are in
-    /// <see cref="IconTable.ToVanilla"/> (a variant the dialog hides) to its vanilla
-    /// target, leaving <c>Amount</c> alone, under the same check. Both rules resolve each
-    /// distinct target once per pass, write nothing for one that does not resolve, and warn
-    /// about it once per target and instance; while the game data is not loaded neither rule
-    /// writes. A converted marker carries a vanilla address
-    /// and cannot match again. The rules are disjoint within a pass (rule 1 needs a
-    /// vanilla address, rule 2 a mod address). Across passes rule 2 writes the question
-    /// mark onto exactly the icon and variant rule 1 looks for, which is safe because the
-    /// game creates every placed marker with <c>Amount</c> 1 and restoration writes 1.
-    /// Should a legacy-amount marker ever reach a hidden variant, rule 1 restores it on a
-    /// later pass if rule 2 left it on the question mark.
+    /// Rule 2 converts a marker whose icon and variant are in <see cref="IconTable.Retired"/>
+    /// (a variant of a retired 1.x block) to its target — the same-named variant in the mod's
+    /// new blocks, or a vanilla marker — leaving <c>Amount</c> alone, under the same check, on
+    /// every pass, so a marker a 1.x client places on a retired address later is rewritten on
+    /// the next pass. Both rules resolve each distinct target once per pass, write nothing for
+    /// one that does not resolve, and warn about it once per target and instance; while the
+    /// game data is not loaded neither rule writes. A converted marker carries an address the
+    /// retired table does not contain and cannot match again. The rules are disjoint within a
+    /// pass (rule 1 needs the vanilla question mark, rule 2 a retired address). Across passes
+    /// rule 2 writes the question mark onto exactly the icon and variant rule 1 looks for,
+    /// which is safe because the game creates every placed marker with <c>Amount</c> 1 and
+    /// restoration writes 1. Should a legacy-amount marker ever reach a retired variant, rule 1
+    /// restores it on a later pass if rule 2 left it on the question mark.
     /// </para>
     /// <para>
     /// Both rules share one read-only scan per pass; each rule's writes then run under a try
     /// of its own with its own once-per-instance error, so a throw in one rule's write loop
     /// never stops the other. A table that fails to parse in <c>OnCreate</c> turns off its own
-    /// rule; <see cref="IconTable.Legacy"/> also names the vanilla targets of hidden types, so a
-    /// malformed vanilla address would fail both tables, which is why the generator rejects one.
+    /// rule; <see cref="IconTable.Legacy"/> and <see cref="IconTable.Retired"/> name the same
+    /// targets, so a malformed target address would fail both tables, which is why the
+    /// generator rejects one.
     /// A throw in the shared scan stops both rules for that pass. Every failure is retried on
     /// the next pass.
     /// </para>
@@ -96,8 +98,8 @@ namespace MapMarkersEnhanced
 
             try
             {
-                // Forces VanillaTargets' static initialisation here, so a parse failure turns off rule 2 alone.
-                VanillaTargets.HasHidden(default);
+                // Forces RetiredTargets' static initialisation here, so a parse failure turns off rule 2 alone.
+                RetiredTargets.IsRetired(default, 0);
             }
             catch (Exception e)
             {
@@ -183,7 +185,7 @@ namespace MapMarkersEnhanced
 
             try
             {
-                ConvertHidden();
+                ConvertRetired();
             }
             catch (Exception e)
             {
@@ -221,7 +223,7 @@ namespace MapMarkersEnhanced
                             return;
                         }
 
-                        if (conversionOn && VanillaTargets.IsHidden(custom.iconAddress, custom.variantIndex))
+                        if (conversionOn && RetiredTargets.IsRetired(custom.iconAddress, custom.variantIndex))
                         {
                             conversions.Add(entity);
                         }
@@ -295,14 +297,14 @@ namespace MapMarkersEnhanced
             }
         }
 
-        /// <summary>Rule 2's writes, over the markers the scan found on a hidden variant.</summary>
-        private void ConvertHidden()
+        /// <summary>Rule 2's writes, over the markers the scan found on a retired variant.</summary>
+        private void ConvertRetired()
         {
             int converted = 0;
             foreach (Entity entity in _conversions)
             {
                 MapMarkerCustomDataCD custom = EntityManager.GetComponentData<MapMarkerCustomDataCD>(entity);
-                if (!VanillaTargets.TryGet(custom.iconAddress, custom.variantIndex, out DataBlockAddress address, out int variant))
+                if (!RetiredTargets.TryGet(custom.iconAddress, custom.variantIndex, out DataBlockAddress address, out int variant))
                 {
                     continue;
                 }
@@ -326,14 +328,14 @@ namespace MapMarkersEnhanced
 
         /// <summary>
         /// Whether a restoration or conversion target is a registered icon with that variant
-        /// (<see cref="VanillaTargets.Resolves"/>), cached for the pass. An unresolved target is
+        /// (<see cref="RetiredTargets.Resolves"/>), cached for the pass. An unresolved target is
         /// warned about once per target and instance; the caller writes nothing for it.
         /// </summary>
         private bool TargetResolves(DataBlockAddress address, int variant)
         {
             if (!_resolved.TryGetValue((address, variant), out bool resolves))
             {
-                resolves = VanillaTargets.Resolves(address, variant);
+                resolves = RetiredTargets.Resolves(address, variant);
                 _resolved[(address, variant)] = resolves;
                 if (!resolves && _unresolvedWarned.Add((address, variant)))
                 {

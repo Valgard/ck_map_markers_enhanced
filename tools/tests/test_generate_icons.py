@@ -372,7 +372,7 @@ def test_flag_green_goes_to_the_new_flags(icons, retired):
 
 
 def test_csharp_tables(icons, retired):
-    """ModIconAddresses, Legacy, Retired and ToVanilla agree with the table."""
+    """ModIconAddresses, Legacy and Retired agree with the table."""
     text = gi.render_csharp(icons, retired)
     assert "namespace MapMarkersEnhanced" in text
     assert "internal static class IconTable" in text
@@ -388,20 +388,7 @@ def test_csharp_tables(icons, retired):
     for (address, index), (target, variant) in targets.items():
         assert f'{{("{address}", {index}), ("{target}", {variant})}}' in retired_block
     assert retired_block.count('{("') == len(targets)
-
-    assert (
-        "public static readonly Dictionary<(string icon, int variant),"
-        " (string address, int variant)> ToVanilla" in text
-    )
-    to_vanilla = text.split(" ToVanilla =", 1)[1].split("};", 1)[0]
-    assert to_vanilla.count('{("') == 5
-    for r in retired:
-        for n, v in enumerate(r.variants):
-            if v.vanilla:
-                assert (
-                    f'{{("{r.address}", {n}), ("{v.vanilla.address}", {v.vanilla.variant})}}'
-                    in to_vanilla
-                )
+    assert "ToVanilla" not in text
 
     legacy = legacy_entries(text)
     expected = {}
