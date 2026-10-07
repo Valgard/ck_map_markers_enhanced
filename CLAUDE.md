@@ -115,15 +115,16 @@ large and small by name, and a variant's name is the layer name without spaces
 (`Note` → `MusicNote` is the one exception). Both definitions use the sheet
 tool's `cells` option, so every sprite is a box of the author's 10-px Pixaki
 grid, not the layer's trimmed pixels: large is the 10×10 cell; small is a 6×6
-box at cell offset (2,2), or 8×8 at (1,1) where the drawing is taller than 6
+box at cell offset (2,2), or 8×8 at (1,1) where the drawing does not fit 6×6
 (113 large, 69 small 6×6, 44 small 8×8). Why: vanilla's marker sprites are fixed
 even boxes (10×10 and 6×6, 16 px per unit, centre pivot), assigned unscaled; an
 odd trimmed size puts the pivot on half a pixel, and the 5×5 and 5×7 first cut
 jittered on the minimap while the player moved. Where the art sits inside the
 grid is the author's and is preserved. Recut with the sheet tool's `--config`,
 never by hand; the `Art/*.png` files are generated. `Templates` and `Grid` are
-hidden working material, hidden per layer because the tool ignores a group's own
-visibility.
+working material: both definitions list them under `exclude` by name, because the
+tool ignores a group's own visibility, so hiding them in Pixaki would not keep
+them out of the sheets.
 
 ## Constants the code relies on
 

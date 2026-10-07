@@ -28,9 +28,9 @@ Version 2.0.0 replaces the five 1.x icons with the seven new ones. Markers you
 placed with a 1.x icon are rewritten to the same-named marker of the new set
 wherever the world runs with the mod (single-player, the host, or a dedicated
 server that has it). The question mark, cross, skulls and blue diamond are the
-game's own markers since 1.3, so those five become the game's own. Presets that
-use any of them are rewritten on your own computer, whichever server you play
-on.
+game's own markers since 1.3, so those five become the game's own. Your presets that
+use any 1.x icon are rewritten on your own computer, whichever server you play
+on: to the same-named new marker, or for those five to the game's own.
 
 **Update everyone who shares a world or a server with you.** A dedicated server
 without the mod converts nothing: players with 2.0.0 see old mod markers there with a

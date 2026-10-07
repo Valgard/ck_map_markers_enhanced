@@ -139,7 +139,7 @@ flag, 6, F, an ore) showed their icons on the large map and kept them after a
 restart. **On the minimap, Numbers and Letters are too large**: they use their
 full-size sprite, which fills the cell and overlaps neighbouring markers. The
 slots below them in the sheet are blank placeholder buttons, not usable small
-sprites — kept for 1.0.0, redraw planned in `docs/roadmap.md`.
+sprites — kept for 1.0.0, replaced by the 2.0.0 redraw.
 
 ## Icon order and scrolling
 
@@ -416,7 +416,7 @@ file …MarkerMigrationSystem__System_…g.cs` first.
   size puts the centre pivot on half a pixel. The fix cuts every sprite as a box
   of the author's 10-pixel grid through the `cells` option of
   `utils/pixaki_to_sheet.py`: large is the 10×10 cell; small is a 6×6 box at
-  cell offset (2,2), or 8×8 at (1,1) where the drawing is taller than 6. Result:
+  cell offset (2,2), or 8×8 at (1,1) where the drawing does not fit 6×6. Result:
   113 large sprites of 10×10, 69 small of 6×6 and 44 small of 8×8 (letters,
   numbers, arrows, the flames, StructureStone, StructureWood and Shield). After
   the re-cut the minimap was stable.
