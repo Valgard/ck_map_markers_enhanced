@@ -1,6 +1,7 @@
 # Hide the motifs vanilla now draws, do not remove them
 
-- Status: accepted
+- Status: accepted; superseded in part by ADR 003, which retires the 1.x blocks
+  instead of keeping them
 - Date: 2026-10-06
 
 ## Context and Problem Statement
