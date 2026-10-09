@@ -45,3 +45,50 @@ each, five quick slots run out fast.
   pre-filled or they can never be opened.
 - **Unknown:** how many slots the bar can show before it overflows; decide the
   limit from a look at the prefab or in game.
+
+## Make the way into the dialog visible
+
+The marker dialog opens with a right-click on a slot of the big map's preset
+bar, and nothing on that bar says so until the cursor hovers a slot and the
+game's tooltip appears. A player coming from MapMarkers+, whose own drop-down
+arrow sat next to the default icons, did not find the dialog at all and took the
+mod for broken (Core Keeper Discord, modding-help channel, 2026-10-08/09); the
+log showed it loaded and working.
+
+- **Idea:** a permanent cue on the bar — an arrow or a hint glyph on the slots —
+  rather than a change to the dialog itself.
+- **Cost:** the bar is the game's prefab, not the mod's data, so this is the
+  first piece of UI the mod would touch; until now it only adds data and reorders
+  a list.
+- **Neighbour, not part of this:** the red slot on the far left of the same bar
+  deletes every marker on the map. A cue that draws the eye to the bar also
+  draws it there.
+
+## Fewer pages to reach the mod's icons
+
+The dialog's icon row shows the game's icons first and the mod's seven after
+them, so every customisation starts with paging right. `IconOrderPatch` puts
+them there on purpose — ADR 001's "Icons behind vanilla's" — but the ADR only
+records that the game had listed them first, not why the end is the better
+place.
+
+- **Idea:** let the mod's icons come first, so a player starting on a vanilla
+  preset sees them without paging.
+- **Check first:** how much paging remains in practice. `ScrollToSelectionPatch`
+  already scrolls the icon row to the preset's current icon, so a preset that
+  sits on a mod icon opens on the right page.
+
+## A compact picker with every marker at once
+
+Suggested by the same player: an arrow that opens one panel listing every
+marker, the way MapMarkers+ did, instead of the dialog's two linked rows with
+back-and-forth between icon and variant.
+
+- **Cost:** a picker of the mod's own beside the game's dialog — prefab, input
+  handling, and writing the chosen icon and variant into a preset the way the
+  dialog does. ADR 001 rejected exactly this as its "Hybrid" option, because the
+  vanilla rows turned out to carry the volume. Usability is a driver that ADR
+  did not weigh, so building it means revisiting the ADR, not just adding a
+  feature.
+- **Overlaps the two points above:** if this lands, it replaces both; if it
+  does not, they stand on their own.
