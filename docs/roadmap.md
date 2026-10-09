@@ -68,15 +68,16 @@ log showed it loaded and working.
 
 The dialog's icon row shows the game's icons first and the mod's seven after
 them, so every customisation starts with paging right. `IconOrderPatch` puts
-them there on purpose — ADR 001's "Icons behind vanilla's" — but the ADR only
-records that the game had listed them first, not why the end is the better
-place.
+them there on purpose — ADR 001's "Icons behind vanilla's". The reason, which
+the ADR does not state: the game's own icons come first out of respect for its
+developers, and a mod's additions follow them.
 
-- **Idea:** let the mod's icons come first, so a player starting on a vanilla
-  preset sees them without paging.
+- **Not an option:** moving the mod's icons ahead of the game's. Any fix has to
+  shorten the way to them while vanilla keeps the front.
 - **Check first:** how much paging remains in practice. `ScrollToSelectionPatch`
   already scrolls the icon row to the preset's current icon, so a preset that
-  sits on a mod icon opens on the right page.
+  sits on a mod icon opens on the right page; the paging is mainly the first
+  time, from a vanilla preset.
 
 ## A compact picker with every marker at once
 
@@ -86,9 +87,13 @@ back-and-forth between icon and variant.
 
 - **Cost:** a picker of the mod's own beside the game's dialog — prefab, input
   handling, and writing the chosen icon and variant into a preset the way the
-  dialog does. ADR 001 rejected exactly this as its "Hybrid" option, because the
-  vanilla rows turned out to carry the volume. Usability is a driver that ADR
-  did not weigh, so building it means revisiting the ADR, not just adding a
-  feature.
+  dialog does. ADR 001 rejected exactly this as its "Hybrid" option: the game
+  already ships a picker, so a second one is duplicated work to keep alive, and
+  the vanilla rows turned out to carry the volume. Building it means revisiting
+  that decision, not just adding a feature.
+- **Against it, beyond the ADR:** one panel with every marker gets harder to use
+  as the set grows, and it grows with every icon added — where two
+  linked rows scale by adding a tile. A panel would need its own answer to that
+  before it is easier than what it replaces.
 - **Overlaps the two points above:** if this lands, it replaces both; if it
   does not, they stand on their own.
